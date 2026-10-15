@@ -8973,6 +8973,21 @@
           Spieler&nbsp;2 und 3 und im WLAN-Mehrspieler. Aus: das Auto wird nach Gr&uuml;n
           stattdessen 2&nbsp;s lang ausgebremst.</small></div>
         <label class="tgl"><input type="checkbox" id="race-fruehstart-zeit" checked><span></span></label></div>
+      <!-- STARTAMPEL (74-startampel.js): echte Ampel am Tisch, ein Raspberry Pi per Bluetooth LE.
+           Der Gegenpart liegt in tools/startampel/. -->
+      <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi)
+          <span class="wip-tag">experimentell</span>
+          <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab
+          &bdquo;Rennen starten&ldquo;; Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
+          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.
+          <span id="ampel-status">Nicht verbunden.</span></small></div>
+        <button type="button" id="ampel-verbinden">Verbinden</button></div>
+      <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
+          mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
+          Fr&uuml;hstart h&auml;lt den Countdown an, Gelb blinkt am Tisch, und &bdquo;Rennen
+          starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
+          oben.</small></div>
+        <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Gelbe Flagge deaktivieren<small>An: Der Knopf
           &bdquo;Gelbe Flagge&ldquo; und das Halten der Boxentaste rufen kein Gelb mehr aus.</small></div>
         <label class="tgl"><input type="checkbox" id="race-gelb-aus"><span></span></label></div>
@@ -13372,6 +13387,15 @@
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
     "Akku kritisch ansagen": "Announce critical battery",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops to 6 % – the last step before the car stops: “Abort session, box now!” Armed again only after charging.",
+    "Startampel (Raspberry Pi)": "Start light (Raspberry Pi)",
+    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab „Rennen starten“; Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "A real start light at the table: red while nothing is released; yellow from “Start race”; green column by column with the start beeps; everything off at green; yellow under a yellow flag; red again after the race.",
+    "Startampel: Frühstart bricht den Start ab": "Start light: a jump start aborts the start",
+    "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Only with a connected start light, not in Wi-Fi multiplayer and not in challenges: a jump start stops the countdown, yellow flashes at the table, and “Start race” begins the sequence again. Off: the lights carry on, penalty as above.",
+    "Verbunden: {n}": "Connected: {n}",
+    "Nicht verbunden.": "Not connected.",
+    "Dieser Browser kann kein Bluetooth.": "This browser has no Bluetooth.",
+    "Frühstart – bitte neu starten": "Jump start – please restart",
+    "Frühstart – Start abgebrochen": "Jump start – start aborted",
     "An: Der Knopf „Gelbe Flagge“ und das Halten der Boxentaste rufen kein Gelb mehr aus.": "On: neither the “Yellow flag” button nor holding the pit key calls a yellow any more.",
     "Gelbe Flagge ist deaktiviert": "Yellow flag is disabled",
     "Statistiken": "Statistics",
@@ -16036,6 +16060,16 @@
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
     "Akku kritisch ansagen": "Anunciar batería crítica",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja al 6 % – el último paso antes de que se pare: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
+    "Startampel (Raspberry Pi)": "Semáforo de salida (Raspberry Pi)",
+    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab „Rennen starten“; Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "Un semáforo de salida real en la mesa: rojo mientras nada está liberado; amarillo desde «Iniciar carrera»; verde columna a columna al ritmo de los pitidos; todo apagado con el verde; amarillo con bandera amarilla; rojo de nuevo tras la carrera.",
+    "Startampel: Frühstart bricht den Start ab": "Semáforo: una salida en falso cancela la salida",
+    "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Solo con el semáforo conectado, no en multijugador por WiFi ni en desafíos: una salida en falso detiene la cuenta atrás, el amarillo parpadea en la mesa y «Iniciar carrera» reinicia la secuencia. Desactivado: el semáforo continúa, con la penalización de arriba.",
+    "Verbunden: {n}": "Conectado: {n}",
+    "Nicht verbunden.": "No conectado.",
+    "Verbinden": "Conectar",
+    "Dieser Browser kann kein Bluetooth.": "Este navegador no tiene Bluetooth.",
+    "Frühstart – bitte neu starten": "Salida en falso – reinicia, por favor",
+    "Frühstart – Start abgebrochen": "Salida en falso – salida cancelada",
     "Gelbe Flagge ist deaktiviert": "La bandera amarilla está desactivada",
     "Statistiken": "Estadísticas",
     "Kilometer, Sitzungen, Fahrzeit, Rennen, Siege, Medaillen und das Ranking deiner Autos.": "Kilómetros, sesiones, tiempo de conducción, carreras, victorias, medallas y la clasificación de tus coches.",
@@ -34302,10 +34336,13 @@
     fruehstartTimer = setInterval(() => {
       if (raceState !== 'countdown') return;
       FRUEH_SPIELER.forEach((w) => {
+        if (raceState !== 'countdown') return;   // die Startampel kann den Start abgebrochen haben
         if (w >= 2 && !(zweiSpieler && zusatzPlatz(w) && zusatzPlatz(w).car)) return;
         if (!fruehstart[w].frueh && fruehstartTempo(w) > FRUEHSTART_KMH) {
           fruehstart[w].frueh = true;
           showHudToast(w >= 2 ? t('Frühstart Spieler {n}!').replace('{n}', w) : t('Frühstart!'));
+          // Startampel (74-startampel.js): bricht den Start ab, wenn sie verbunden ist und soll.
+          ampelFruehstart();
         }
       });
     }, 100);
@@ -35435,6 +35472,7 @@
     gs.hidden = false;
     gridFokusIdx = -1;
     raceGridFokus(0);
+    ampelStartfenster();   // Startampel: Rot aus, Gelb an
   }
   // v0.10.5 BESTELLT: "Rennstartmenue: mach Abbrechen und Start anwaehlbar, dann mit X
   // bestaetigen." Steuerkreuz links/rechts (oder hoch/runter) waehlt, X drueckt den gewaehlten
@@ -35474,6 +35512,7 @@
     if (gs) gs.hidden = true;
     if (typeof aufstellenStoppen === 'function') aufstellenStoppen(false);
     raceGridWeiter = null;
+    ampelStartAbgebrochen();   // Startampel: zurueck auf Rot
     // Hing die Challenge gerade in der Ampel-Phase (Autos-in-Position war ihr Start),
     // bricht Abbrechen sie ab - sonst bliebe sie auf Stillstand warten.
     if (typeof challengeAbbrechen === 'function' && typeof challengeLaeuft === 'function'
@@ -35794,6 +35833,7 @@
       finishSeitenZaehlerZuruecksetzen();
     }
     raceState = 'countdown';
+    ampelCountdown(!!gruenBei);
     fruehstartBeginnen();
     $('race-start-btn').disabled = true;
     // Abbrechen muss schon im Countdown gehen: requestRaceStop() raeumt den Zaehler mit
@@ -35812,6 +35852,7 @@
       if (stufe > 0 && warte < -400 && k + 1 < plan.length) { schritt(k + 1); return; }
       if (stufe > 0) {
         setRaceLights(stufe);
+        ampelTon(stufe);
         playTone(440 + (3 - stufe) * 60, 0.18, 'square', 0.18);
         schritt(k + 1);
         return;
@@ -35843,6 +35884,7 @@
     // and no laps count until the field crosses the line.
     raceFormationLap = raceFlying;
     raceGreenAt = raceFlying ? null : Date.now();
+    ampelLos();   // Startampel: alles aus
     fruehstartGruen();
     rammReset();
     // FRISCH ZAEHLEN. Ohne das traegt ein zweites Rennen die Ueberfahrten des ersten mit
@@ -35965,6 +36007,7 @@
   // requestRaceStop() uebergibt ausdruecklich false.
   function finishRace(auslaufen) {
     raceState = 'finished';
+    ampelRennende();   // Startampel: wieder Rot
     // Das Safety Car steht beim Rennende - es hat in keinem Ergebnis etwas zu suchen.
     garage.forEach((c) => {
       if (c.role === 'safetycar' && c.ghost && c.ghost.running) {
@@ -44559,6 +44602,161 @@
     else return;
     e.preventDefault(); e.stopPropagation();
   }, true);
+  // ============================== STARTAMPEL (Raspberry Pi, Bluetooth LE) ==============================
+  //
+  // BESTELLT: eine echte Startampel am Tisch, angesteuert von OmegaSim per Bluetooth. Drei
+  // LED-Reihen: oben Rot, in der Mitte Gelb, unten Gruen mit fuenf Spalten.
+  //
+  //   gesperrt (kein Training/Rennen freigegeben)   Rot
+  //   "Rennen starten" gedrueckt                    Rot aus, Gelb an (+ Ansage am Pi)
+  //   Starttoene des Countdowns                     Gruen, Spalte fuer Spalte dazu
+  //   Gruen / Los                                   alles aus
+  //   Fruehstart im Countdown                       Gruen aus, Gelb blinkt bis zum Neustart
+  //   Gelbe Flagge im Rennen                        Gelb, bis sie aufgehoben ist
+  //   Rennende oder Abbruch                         wieder Rot
+  //
+  // PROTOKOLL: Textzeilen mit "\n" auf eine schreibbare Characteristic eines EIGENEN Dienstes.
+  // Nicht der Nordic-UART-Dienst der Autos: garageConnect() filtert auch nach diesem, und die
+  // Ampel stuende dann im Auto-Verbinden-Dialog. Der Gegenpart ist tools/startampel/startampel.py.
+  //
+  //   ROT | START | GRUEN <1-5> | LOS | FRUEHSTART | GELB | GELB_AUS
+  //
+  // DREI TOENE, FUENF SPALTEN: der Countdown hat drei Toene. Wie die Bruecke im Cockpit
+  // (GANTRY_COLS in 70-race.js) leuchtet je Ton ein anteiliger Teil - 2, 3, 5 Spalten -,
+  // damit die Lampen am Tisch und die Toene, die man hoert, uebereinstimmen.
+  const AMPEL_SERVICE = 'b5a30001-0e9a-4b7c-8d2f-a3f1c0de5a11';
+  const AMPEL_BEFEHL = 'b5a30002-0e9a-4b7c-8d2f-a3f1c0de5a11';
+  const AMPEL_SPALTEN = [0, 2, 3, 5];          // Ton 1..3 -> leuchtende Gruen-Spalten
+  let ampelGeraet = null, ampelKanal = null;
+  let ampelSchlange = Promise.resolve();
+  // Ob die Ampel gerade im Vorstart steht (Gelb). START kommt beim Oeffnen des Startfensters;
+  // startRaceCountdown() schickt es nur nach, wenn es dort nicht kam (Challenge, Mehrspieler).
+  let ampelVorstart = false;
+  // Countdown mit fester Gruenzeit (WLAN-Mehrspieler, Challenge-Fenster): dort laeuft die Ampel
+  // auf allen Geraeten gleichzeitig, ein Abbruch hier wuerde nur dieses Geraet anhalten.
+  let ampelZeitgesteuert = false;
+
+  function ampelVerbunden() {
+    return !!(ampelKanal && ampelGeraet && ampelGeraet.gatt && ampelGeraet.gatt.connected);
+  }
+  function ampelNeustartAn() { const el = $('race-ampel-neustart'); return el ? !!el.checked : true; }
+
+  // Befehle laufen nacheinander: Bluetooth vertraegt keinen zweiten Schreibvorgang, solange der
+  // erste noch offen ist, und die Reihenfolge (START vor GRUEN) muss am Pi ankommen, wie sie
+  // hier gemeint war.
+  function ampelSenden(befehl) {
+    if (befehl === 'ROT' || befehl === 'LOS' || befehl === 'FRUEHSTART') ampelVorstart = false;
+    else if (befehl === 'START') ampelVorstart = true;
+    if (!ampelVerbunden()) return;
+    const kanal = ampelKanal;
+    const daten = new TextEncoder().encode(befehl + '\n');
+    ampelSchlange = ampelSchlange
+      .then(() => kanal.writeValueWithResponse(daten))
+      .catch((e) => log('Startampel: ' + befehl + ' nicht gesendet (' + (e && e.message) + ')', 'err'));
+  }
+
+  // Nach dem Verbinden den Stand der App nachziehen - die Ampel weiss sonst nicht, ob gerade
+  // ein Rennen laeuft.
+  function ampelStandSenden() {
+    const live = raceState === 'racing' || raceState === 'finishing';
+    if (live) {
+      ampelSenden('LOS');
+      if (typeof flagState !== 'undefined' && flagState !== 'green') ampelSenden('GELB');
+    } else if (raceState === 'countdown' || (typeof raceGridOffen === 'function' && raceGridOffen())) {
+      ampelSenden('START');
+    } else {
+      ampelSenden('ROT');
+    }
+  }
+
+  function ampelStatusZeigen(text) {
+    const s = $('ampel-status');
+    if (s) s.textContent = text || (ampelVerbunden()
+      ? t('Verbunden: {n}').replace('{n}', (ampelGeraet && ampelGeraet.name) || 'Startampel')
+      : t('Nicht verbunden.'));
+    const b = $('ampel-verbinden');
+    if (b) b.textContent = ampelVerbunden() ? t('Trennen') : t('Verbinden');
+  }
+
+  async function ampelVerbinden() {
+    if (ampelVerbunden()) {
+      try { ampelGeraet.gatt.disconnect(); } catch (e) { /* schon weg */ }
+      return;
+    }
+    if (!navigator.bluetooth) { alert(t('Dieser Browser kann kein Bluetooth.')); return; }
+    try {
+      ampelStatusZeigen(t('Suche …'));
+      const dev = await navigator.bluetooth.requestDevice({
+        filters: [{ services: [AMPEL_SERVICE] }],
+        optionalServices: [AMPEL_SERVICE],
+      });
+      const srv = await dev.gatt.connect();
+      const dienst = await srv.getPrimaryService(AMPEL_SERVICE);
+      ampelKanal = await dienst.getCharacteristic(AMPEL_BEFEHL);
+      ampelGeraet = dev;
+      dev.addEventListener('gattserverdisconnected', () => {
+        if (ampelGeraet !== dev) return;
+        ampelKanal = null;
+        log('Startampel getrennt.', 'err');
+        ampelStatusZeigen();
+      });
+      log('Startampel verbunden.', 'info');
+      ampelStatusZeigen();
+      ampelStandSenden();
+    } catch (err) {
+      ampelKanal = null;
+      ampelStatusZeigen();
+      if (err && err.name === 'NotFoundError') log('Keine Startampel gewaehlt.', 'info');
+      else log('Startampel: Verbinden fehlgeschlagen: ' + (err && err.message), 'err');
+    }
+  }
+  if ($('ampel-verbinden')) $('ampel-verbinden').addEventListener('click', ampelVerbinden);
+
+  // ---- Die Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
+  // "Rennen starten" oeffnet das Startfenster: ab hier ist freigegeben, die Ampel geht auf Gelb.
+  function ampelStartfenster() { ampelSenden('START'); }
+  // Startfenster abgebrochen: zurueck auf Rot.
+  function ampelStartAbgebrochen() { ampelSenden('ROT'); }
+  // Der Countdown beginnt. Kam kein Startfenster davor, fehlt START noch.
+  function ampelCountdown(zeitgesteuert) {
+    ampelZeitgesteuert = !!zeitgesteuert;
+    if (!ampelVorstart) ampelSenden('START');
+  }
+  // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
+  function ampelTon(stufe) {
+    const ton = Math.max(1, Math.min(3, 4 - stufe));
+    ampelSenden('GRUEN ' + AMPEL_SPALTEN[ton]);
+  }
+  function ampelLos() { ampelSenden('LOS'); }
+  function ampelRennende() { ampelSenden('ROT'); }
+  function ampelGelb(an) { ampelSenden(an ? 'GELB' : 'GELB_AUS'); }
+
+  // FRUEHSTART. Ohne Startampel bleibt alles, wie es war: die Ampel laeuft weiter, Strafe nach
+  // den Renneinstellungen. MIT Startampel und eingeschaltetem Schalter wird der Start
+  // abgebrochen - Gelb blinkt am Tisch, und "Rennen starten" beginnt die Abfolge neu.
+  // Nicht im Mehrspieler und nicht in einer Challenge: dort haengt Gruen an einer Zeit, die
+  // andere Geraete oder die Challenge vorgeben.
+  // Rueckgabe true: der Start ist abgebrochen.
+  function ampelFruehstart() {
+    if (!ampelVerbunden() || !ampelNeustartAn() || ampelZeitgesteuert) return false;
+    if (typeof challengeLaeuft === 'function' && challengeLaeuft()) return false;
+    if (raceState !== 'countdown') return false;
+    ampelSenden('FRUEHSTART');
+    if (raceCountdownTimer) { clearTimeout(raceCountdownTimer); raceCountdownTimer = null; }
+    ampelPlan = null; ampelSchritt = null;
+    setRaceLights(0);
+    fruehstartReset();
+    raceState = 'idle';
+    $('race-start-btn').disabled = false;
+    $('race-stop-btn').disabled = true;
+    $('race-status').textContent = t('Frühstart – bitte neu starten');
+    showHudToast(t('Frühstart – Start abgebrochen'));
+    log('Fruehstart: Start abgebrochen, die Startampel blinkt gelb. Rennen neu starten.', 'err');
+    updateRaceActButtons();
+    return true;
+  }
+
+  ampelStatusZeigen();
   // =========================================================================
   // Der Ton
   // =========================================================================
@@ -52406,11 +52604,13 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
           + 'die Ampel.', 'err');
       showHudToast('GELBE FLAGGE');
       setRaceLights(0);
+      ampelGelb(true);   // Startampel: Gelb an
     } else if (next === 'green') {
       limitYellow = 1;
       safetyCarHeim();
       applySpeedLimit();
       log('Gr\u00fcn. Volle Kontrolle.', 'info');
+      ampelGelb(false);   // Startampel: Gelb aus
       showHudToast('GR\u00dcN');
     }
     updateFlagUi();
@@ -85926,6 +86126,54 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       if (fruehstartZuschlag(1, 0) !== 0) f.push('Schalter aus: trotzdem Zuschlag');
     } finally { $('race-fruehstart-zeit').checked = merk; fruehstartReset(); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'einmal +5 s auf Runde 1, je Spieler, Schalter wirkt' };
+  });
+
+  stAdd('Startampel: Befehle fuer Start, Toene, Gruen, Gelb, Fruehstart und Ende', async () => {
+    const f = [];
+    const gesendet = [];
+    const merk = { k: ampelKanal, g: ampelGeraet, rs: raceState, vs: ampelVorstart,
+                   zg: ampelZeitgesteuert, neu: $('race-ampel-neustart').checked,
+                   timer: raceCountdownTimer, start: $('race-start-btn').disabled,
+                   stop: $('race-stop-btn').disabled, status: $('race-status').textContent };
+    try {
+      ampelGeraet = { name: 'Test', gatt: { connected: true } };
+      ampelKanal = { writeValueWithResponse(d) {
+        gesendet.push(new TextDecoder().decode(d).trim()); return Promise.resolve(); } };
+      ampelVorstart = false; ampelZeitgesteuert = false;
+      // Ohne Startfenster: der Countdown schickt START nach.
+      raceState = 'countdown';
+      ampelCountdown(false);
+      ampelTon(3); ampelTon(2); ampelTon(1);
+      ampelLos();
+      ampelGelb(true); ampelGelb(false);
+      ampelRennende();
+      // Mit Startfenster: START nur einmal.
+      ampelStartfenster(); ampelCountdown(false);
+      // Fruehstart, Schalter an: Start abgebrochen.
+      $('race-ampel-neustart').checked = true;
+      raceState = 'countdown';
+      if (!ampelFruehstart()) f.push('Fruehstart hat nicht abgebrochen');
+      if (raceState !== 'idle') f.push('nach Fruehstart nicht idle');
+      // Mehrspieler (feste Gruenzeit): kein Abbruch, nichts gesendet.
+      raceState = 'countdown'; ampelZeitgesteuert = true;
+      if (ampelFruehstart()) f.push('Mehrspieler-Countdown abgebrochen');
+      ampelZeitgesteuert = false;
+      // Schalter aus: kein Abbruch.
+      $('race-ampel-neustart').checked = false;
+      if (ampelFruehstart()) f.push('Schalter aus: trotzdem abgebrochen');
+      await ampelSchlange;
+      const soll = ['START', 'GRUEN 2', 'GRUEN 3', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
+                    'START', 'FRUEHSTART'];
+      if (gesendet.join('|') !== soll.join('|')) f.push('gesendet: ' + gesendet.join(', '));
+    } finally {
+      ampelKanal = merk.k; ampelGeraet = merk.g; raceState = merk.rs; ampelVorstart = merk.vs;
+      ampelZeitgesteuert = merk.zg; $('race-ampel-neustart').checked = merk.neu;
+      raceCountdownTimer = merk.timer; $('race-start-btn').disabled = merk.start;
+      $('race-stop-btn').disabled = merk.stop; $('race-status').textContent = merk.status;
+      fruehstartReset();
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
   });
 
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {

@@ -5285,11 +5285,13 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
           + 'die Ampel.', 'err');
       showHudToast('GELBE FLAGGE');
       setRaceLights(0);
+      ampelGelb(true);   // Startampel: Gelb an
     } else if (next === 'green') {
       limitYellow = 1;
       safetyCarHeim();
       applySpeedLimit();
       log('Gr\u00fcn. Volle Kontrolle.', 'info');
+      ampelGelb(false);   // Startampel: Gelb aus
       showHudToast('GR\u00dcN');
     }
     updateFlagUi();
