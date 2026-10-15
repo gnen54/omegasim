@@ -522,10 +522,13 @@
     fruehstartTimer = setInterval(() => {
       if (raceState !== 'countdown') return;
       FRUEH_SPIELER.forEach((w) => {
+        if (raceState !== 'countdown') return;   // die Startampel kann den Start abgebrochen haben
         if (w >= 2 && !(zweiSpieler && zusatzPlatz(w) && zusatzPlatz(w).car)) return;
         if (!fruehstart[w].frueh && fruehstartTempo(w) > FRUEHSTART_KMH) {
           fruehstart[w].frueh = true;
           showHudToast(w >= 2 ? t('Frühstart Spieler {n}!').replace('{n}', w) : t('Frühstart!'));
+          // Startampel (74-startampel.js): bricht den Start ab, wenn sie verbunden ist und soll.
+          ampelFruehstart();
         }
       });
     }, 100);
@@ -1655,6 +1658,7 @@
     gs.hidden = false;
     gridFokusIdx = -1;
     raceGridFokus(0);
+    ampelStartfenster();   // Startampel: Rot aus, Gelb an
   }
   // v0.10.5 BESTELLT: "Rennstartmenue: mach Abbrechen und Start anwaehlbar, dann mit X
   // bestaetigen." Steuerkreuz links/rechts (oder hoch/runter) waehlt, X drueckt den gewaehlten
@@ -1694,6 +1698,7 @@
     if (gs) gs.hidden = true;
     if (typeof aufstellenStoppen === 'function') aufstellenStoppen(false);
     raceGridWeiter = null;
+    ampelStartAbgebrochen();   // Startampel: zurueck auf Rot
     // Hing die Challenge gerade in der Ampel-Phase (Autos-in-Position war ihr Start),
     // bricht Abbrechen sie ab - sonst bliebe sie auf Stillstand warten.
     if (typeof challengeAbbrechen === 'function' && typeof challengeLaeuft === 'function'
@@ -2014,6 +2019,7 @@
       finishSeitenZaehlerZuruecksetzen();
     }
     raceState = 'countdown';
+    ampelCountdown(!!gruenBei);
     fruehstartBeginnen();
     $('race-start-btn').disabled = true;
     // Abbrechen muss schon im Countdown gehen: requestRaceStop() raeumt den Zaehler mit
@@ -2032,6 +2038,7 @@
       if (stufe > 0 && warte < -400 && k + 1 < plan.length) { schritt(k + 1); return; }
       if (stufe > 0) {
         setRaceLights(stufe);
+        ampelTon(stufe);
         playTone(440 + (3 - stufe) * 60, 0.18, 'square', 0.18);
         schritt(k + 1);
         return;
@@ -2063,6 +2070,7 @@
     // and no laps count until the field crosses the line.
     raceFormationLap = raceFlying;
     raceGreenAt = raceFlying ? null : Date.now();
+    ampelLos();   // Startampel: alles aus
     fruehstartGruen();
     rammReset();
     // FRISCH ZAEHLEN. Ohne das traegt ein zweites Rennen die Ueberfahrten des ersten mit
@@ -2185,6 +2193,7 @@
   // requestRaceStop() uebergibt ausdruecklich false.
   function finishRace(auslaufen) {
     raceState = 'finished';
+    ampelRennende();   // Startampel: wieder Rot
     // Das Safety Car steht beim Rennende - es hat in keinem Ergebnis etwas zu suchen.
     garage.forEach((c) => {
       if (c.role === 'safetycar' && c.ghost && c.ghost.running) {

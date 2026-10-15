@@ -8973,6 +8973,21 @@
           Spieler&nbsp;2 und 3 und im WLAN-Mehrspieler. Aus: das Auto wird nach Gr&uuml;n
           stattdessen 2&nbsp;s lang ausgebremst.</small></div>
         <label class="tgl"><input type="checkbox" id="race-fruehstart-zeit" checked><span></span></label></div>
+      <!-- STARTAMPEL (74-startampel.js): echte Ampel am Tisch, ein Raspberry Pi per Bluetooth LE.
+           Der Gegenpart liegt in tools/startampel/. -->
+      <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi)
+          <span class="wip-tag">experimentell</span>
+          <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab
+          &bdquo;Rennen starten&ldquo;; Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
+          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.
+          <span id="ampel-status">Nicht verbunden.</span></small></div>
+        <button type="button" id="ampel-verbinden">Verbinden</button></div>
+      <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
+          mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
+          Fr&uuml;hstart h&auml;lt den Countdown an, Gelb blinkt am Tisch, und &bdquo;Rennen
+          starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
+          oben.</small></div>
+        <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Gelbe Flagge deaktivieren<small>An: Der Knopf
           &bdquo;Gelbe Flagge&ldquo; und das Halten der Boxentaste rufen kein Gelb mehr aus.</small></div>
         <label class="tgl"><input type="checkbox" id="race-gelb-aus"><span></span></label></div>
