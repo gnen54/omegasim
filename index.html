@@ -10164,7 +10164,7 @@
         <label class="tgl"><input type="checkbox" id="setting-announce-pit" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Akku ansagen<small>Einmal, wenn der Akku unter 25&nbsp;% f&auml;llt. Erst nach dem Laden wieder scharf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-battery"><span></span></label></div>
-      <div class="opt-row"><div class="opt-label">Akku kritisch ansagen<small>Einmal je Auto, wenn der Akku unter 5&nbsp;% f&auml;llt: &bdquo;Session abbrechen, Box anfahren!&ldquo; Erst nach dem Laden wieder scharf.</small></div>
+      <div class="opt-row"><div class="opt-label">Akku kritisch ansagen<small>Einmal je Auto, wenn der Akku auf 6&nbsp;% f&auml;llt &ndash; die letzte Stufe vor dem Stehenbleiben: &bdquo;Session abbrechen, Box anfahren!&ldquo; Erst nach dem Laden wieder scharf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-battery-crit" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Regen<small>Select oder W. Reifen kommen beim Boxenstopp passend.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-rain"><span></span></label></div>
@@ -13371,7 +13371,7 @@
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
     "Akku kritisch ansagen": "Announce critical battery",
-    "Einmal je Auto, wenn der Akku unter 5 % fällt: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops below 5 %: “Abort session, box now!” Armed again only after charging.",
+    "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops to 6 % – the last step before the car stops: “Abort session, box now!” Armed again only after charging.",
     "An: Der Knopf „Gelbe Flagge“ und das Halten der Boxentaste rufen kein Gelb mehr aus.": "On: neither the “Yellow flag” button nor holding the pit key calls a yellow any more.",
     "Gelbe Flagge ist deaktiviert": "Yellow flag is disabled",
     "Statistiken": "Statistics",
@@ -16035,7 +16035,7 @@
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
     "Akku kritisch ansagen": "Anunciar batería crítica",
-    "Einmal je Auto, wenn der Akku unter 5 % fällt: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja del 5 %: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
+    "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja al 6 % – el último paso antes de que se pare: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
     "Gelbe Flagge ist deaktiviert": "La bandera amarilla está desactivada",
     "Statistiken": "Estadísticas",
     "Kilometer, Sitzungen, Fahrzeit, Rennen, Siege, Medaillen und das Ranking deiner Autos.": "Kilómetros, sesiones, tiempo de conducción, carreras, victorias, medallas y la clasificación de tus coches.",
@@ -45224,9 +45224,10 @@
   // darunter bleibt das Auto bald stehen, und das soll man auch hoeren, wer die 25 % aus hat.
   //
   // AUFLOESUNG: batteryPercent() hat nur 17 Stufen (Rohwert 138..155), also rund 6 % je
-  // Stufe - die Anzeige springt von 6 % auf 0 %. "Unter 5 %" faellt deshalb genau dann, wenn
-  // 0 % angezeigt wird. Wer frueher gewarnt werden will, setzt hier 0.06 (= Anzeige 6 %).
-  const AKKU_KRITISCH = 0.05;
+  // Stufe - die Anzeige springt von 6 % auf 0 %. Mit 5 % fiel die Meldung erst bei 0 %, und
+  // GEMELDET: "Bei 0 % stehen die Fahrzeuge schon." Deshalb 6 %: die letzte Stufe, auf der
+  // das Auto noch faehrt (Rohwert 139). Die naechste waere 0.12 (Anzeige 12 %).
+  const AKKU_KRITISCH = 0.06;
   const AKKU_KRITISCH_HYSTERESE = 0.15;   // erst nach dem Laden wieder scharf
   const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
                      batterycrit: true };
@@ -45234,7 +45235,7 @@
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
   const batteryLatchSet = new Set();
-  // Dasselbe fuer die kritische Stufe (5 %), je Auto.
+  // Dasselbe fuer die kritische Stufe (6 %), je Auto.
   const batteryKritLatchSet = new Set();
 
   // Die kritische Akku-Meldung. Reihenfolge: die eigene Aufnahme ('batterycrit', sobald
@@ -45365,8 +45366,8 @@
     const bts = w.batteries;
     if (Array.isArray(bts) && bts.length) {
       for (const b of bts) {
-        // KRITISCH (5 %) zuerst. Faellt der Akku in einem Schritt von ueber 25 % auf unter
-        // 5 %, wird nur die kritische Meldung gesagt - die 25-%-Sperre wird dabei still
+        // KRITISCH (6 %) zuerst. Faellt der Akku in einem Schritt von ueber 25 % auf unter
+        // 6 %, wird nur die kritische Meldung gesagt - die 25-%-Sperre wird dabei still
         // mitgesetzt, sonst kaemen zwei Saetze uebereinander.
         if (b.value <= AKKU_KRITISCH && !batteryKritLatchSet.has(b.car)) {
           batteryKritLatchSet.add(b.car);
@@ -73684,13 +73685,13 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
   });
 
-  // ---- Akku kritisch: unter 5 % "Session abbrechen, Box anfahren!" ----
+  // ---- Akku kritisch: bei 6 % "Session abbrechen, Box anfahren!" ----
   //
   // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage generieren: Session
-  // abbrechen, Box anfahren!" Geprueft: faellt einmal je Auto, nicht doppelt mit der
+  // abbrechen, Box anfahren!" - auf 6 % angehoben, weil die Autos bei 0 % schon stehen. Geprueft: faellt einmal je Auto, nicht doppelt mit der
   // 25-%-Meldung, bleibt unter der Hysterese still, nach dem Laden wieder scharf; mit einem
   // Auto ohne Namen, mit mehreren mit Namen; auch der alte Einzelwert-Weg.
-  stAdd('Ansagen: Akku kritisch unter 5 % (Session abbrechen, Box anfahren)', () => {
+  stAdd('Ansagen: Akku kritisch bei 6 % (Session abbrechen, Box anfahren)', () => {
     if (!window.OMEGA_TEST || !OMEGA_TEST.ansagenFolge) {
       return { skip: true, mass: 'ansagenFolge nicht vorhanden' };
     }
@@ -73699,15 +73700,17 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     const a = { blinking: true }, b = { blinking: true };
     const eins = (v) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
                            batteries: [{ car: a, label: 'Alpha', value: v }] });
-    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.03), eins(0.02), eins(0.10),
-                                        eins(0.03), eins(0.50), eins(0.04)]);
+    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.12), eins(0.06), eins(0.00), eins(0.12),
+                                        eins(0.06), eins(0.50), eins(0.06)]);
     const f1 = r1.folge.map((x) => x.fiel.join(','));
-    const soll1 = ['', 'batterycrit', '', '', '', '', 'batterycrit'];
+    const soll1 = ['', 'battery', 'batterycrit', '', '', '', '', 'batterycrit'];
     if (f1.join('|') !== soll1.join('|')) schlecht.push('ein Auto: ' + f1.map((x) => x || '-').join(' '));
     const krit1 = r1.gesagt.filter((s) => satz.test(s));
     if (krit1.length !== 2) schlecht.push(krit1.length + ' kritische Saetze statt 2');
     if (krit1.some((s) => /Alpha/.test(s))) schlecht.push('ein Auto: Name mitgesagt');
-    if (r1.gesagt.length !== krit1.length) schlecht.push('zusaetzlich gesagt: ' + r1.gesagt.join(' ; '));
+    // Gesagt: 25-%-Meldung bei 12 %, dann zweimal kritisch (die 25-%-Meldung nach dem Laden
+    // faellt nicht, weil die kritische sie still mitsperrt).
+    if (r1.gesagt.length !== 3) schlecht.push('gesagt: ' + r1.gesagt.join(' ; '));
     // Zwei Autos: der Name gehoert dazu, und die 25-%-Meldung des anderen bleibt eigen.
     const zwei = (va, vb) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
       batteries: [{ car: a, label: 'Alpha', value: va }, { car: b, label: 'Beta', value: vb }] });
@@ -73723,7 +73726,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     const f3 = r3.folge.map((x) => x.fiel.join(','));
     if (f3.join('|') !== '|batterycrit|') schlecht.push('Einzelwert: ' + f3.map((x) => x || '-').join(' '));
     return { ok: !schlecht.length, mass: schlecht.length ? schlecht.join(' | ')
-      : 'einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
+      : 'faellt bei 6 % (nicht bei 12 %), einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
   });
 
   // ---- Und die fuenf Schalter schalten wirklich ab ----

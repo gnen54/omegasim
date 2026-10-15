@@ -4967,13 +4967,13 @@
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
   });
 
-  // ---- Akku kritisch: unter 5 % "Session abbrechen, Box anfahren!" ----
+  // ---- Akku kritisch: bei 6 % "Session abbrechen, Box anfahren!" ----
   //
   // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage generieren: Session
-  // abbrechen, Box anfahren!" Geprueft: faellt einmal je Auto, nicht doppelt mit der
+  // abbrechen, Box anfahren!" - auf 6 % angehoben, weil die Autos bei 0 % schon stehen. Geprueft: faellt einmal je Auto, nicht doppelt mit der
   // 25-%-Meldung, bleibt unter der Hysterese still, nach dem Laden wieder scharf; mit einem
   // Auto ohne Namen, mit mehreren mit Namen; auch der alte Einzelwert-Weg.
-  stAdd('Ansagen: Akku kritisch unter 5 % (Session abbrechen, Box anfahren)', () => {
+  stAdd('Ansagen: Akku kritisch bei 6 % (Session abbrechen, Box anfahren)', () => {
     if (!window.OMEGA_TEST || !OMEGA_TEST.ansagenFolge) {
       return { skip: true, mass: 'ansagenFolge nicht vorhanden' };
     }
@@ -4982,15 +4982,17 @@
     const a = { blinking: true }, b = { blinking: true };
     const eins = (v) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
                            batteries: [{ car: a, label: 'Alpha', value: v }] });
-    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.03), eins(0.02), eins(0.10),
-                                        eins(0.03), eins(0.50), eins(0.04)]);
+    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.12), eins(0.06), eins(0.00), eins(0.12),
+                                        eins(0.06), eins(0.50), eins(0.06)]);
     const f1 = r1.folge.map((x) => x.fiel.join(','));
-    const soll1 = ['', 'batterycrit', '', '', '', '', 'batterycrit'];
+    const soll1 = ['', 'battery', 'batterycrit', '', '', '', '', 'batterycrit'];
     if (f1.join('|') !== soll1.join('|')) schlecht.push('ein Auto: ' + f1.map((x) => x || '-').join(' '));
     const krit1 = r1.gesagt.filter((s) => satz.test(s));
     if (krit1.length !== 2) schlecht.push(krit1.length + ' kritische Saetze statt 2');
     if (krit1.some((s) => /Alpha/.test(s))) schlecht.push('ein Auto: Name mitgesagt');
-    if (r1.gesagt.length !== krit1.length) schlecht.push('zusaetzlich gesagt: ' + r1.gesagt.join(' ; '));
+    // Gesagt: 25-%-Meldung bei 12 %, dann zweimal kritisch (die 25-%-Meldung nach dem Laden
+    // faellt nicht, weil die kritische sie still mitsperrt).
+    if (r1.gesagt.length !== 3) schlecht.push('gesagt: ' + r1.gesagt.join(' ; '));
     // Zwei Autos: der Name gehoert dazu, und die 25-%-Meldung des anderen bleibt eigen.
     const zwei = (va, vb) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
       batteries: [{ car: a, label: 'Alpha', value: va }, { car: b, label: 'Beta', value: vb }] });
@@ -5006,7 +5008,7 @@
     const f3 = r3.folge.map((x) => x.fiel.join(','));
     if (f3.join('|') !== '|batterycrit|') schlecht.push('Einzelwert: ' + f3.map((x) => x || '-').join(' '));
     return { ok: !schlecht.length, mass: schlecht.length ? schlecht.join(' | ')
-      : 'einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
+      : 'faellt bei 6 % (nicht bei 12 %), einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
   });
 
   // ---- Und die fuenf Schalter schalten wirklich ab ----
