@@ -10164,6 +10164,8 @@
         <label class="tgl"><input type="checkbox" id="setting-announce-pit" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Akku ansagen<small>Einmal, wenn der Akku unter 25&nbsp;% f&auml;llt. Erst nach dem Laden wieder scharf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-battery"><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Akku kritisch ansagen<small>Einmal je Auto, wenn der Akku unter 5&nbsp;% f&auml;llt: &bdquo;Session abbrechen, Box anfahren!&ldquo; Erst nach dem Laden wieder scharf.</small></div>
+        <label class="tgl"><input type="checkbox" id="setting-announce-battery-crit" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Regen<small>Select oder W. Reifen kommen beim Boxenstopp passend.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-rain"><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Strecken-Ambience<small>Vorbeifahrten, Regen, Donner.</small></div>
@@ -13368,6 +13370,8 @@
     "NPC Knockout: Bahnmodus „Auf der Bahn“": "NPC Knockout: track mode “On the track”",
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
+    "Akku kritisch ansagen": "Announce critical battery",
+    "Einmal je Auto, wenn der Akku unter 5 % fällt: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops below 5 %: “Abort session, box now!” Armed again only after charging.",
     "An: Der Knopf „Gelbe Flagge“ und das Halten der Boxentaste rufen kein Gelb mehr aus.": "On: neither the “Yellow flag” button nor holding the pit key calls a yellow any more.",
     "Gelbe Flagge ist deaktiviert": "Yellow flag is disabled",
     "Statistiken": "Statistics",
@@ -16030,6 +16034,8 @@
     "NPC Knockout: Bahnmodus „Auf der Bahn“": "NPC Knockout: modo de pista «En pista»",
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
+    "Akku kritisch ansagen": "Anunciar batería crítica",
+    "Einmal je Auto, wenn der Akku unter 5 % fällt: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja del 5 %: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
     "Gelbe Flagge ist deaktiviert": "La bandera amarilla está desactivada",
     "Statistiken": "Estadísticas",
     "Kilometer, Sitzungen, Fahrzeit, Rennen, Siege, Medaillen und das Ranking deiner Autos.": "Kilómetros, sesiones, tiempo de conducción, carreras, victorias, medallas y la clasificación de tus coches.",
@@ -45213,11 +45219,37 @@
   // Akku: BESTELLT "Akku-Ansage < 25 %" - eine eigene Schwelle, nicht die 10 % oben.
   const AKKU_SCHWELLE = 0.25;
   const AKKU_HYSTERESE = 0.32;
-  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false };
-  const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false };
+  // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage: Session abbrechen, Box
+  // anfahren!" Eine ZWEITE Stufe unter der 25-%-Meldung, mit eigenem Schalter und ab Werk an:
+  // darunter bleibt das Auto bald stehen, und das soll man auch hoeren, wer die 25 % aus hat.
+  //
+  // AUFLOESUNG: batteryPercent() hat nur 17 Stufen (Rohwert 138..155), also rund 6 % je
+  // Stufe - die Anzeige springt von 6 % auf 0 %. "Unter 5 %" faellt deshalb genau dann, wenn
+  // 0 % angezeigt wird. Wer frueher gewarnt werden will, setzt hier 0.06 (= Anzeige 6 %).
+  const AKKU_KRITISCH = 0.05;
+  const AKKU_KRITISCH_HYSTERESE = 0.15;   // erst nach dem Laden wieder scharf
+  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
+                     batterycrit: true };
+  const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false };
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
   const batteryLatchSet = new Set();
+  // Dasselbe fuer die kritische Stufe (5 %), je Auto.
+  const batteryKritLatchSet = new Set();
+
+  // Die kritische Akku-Meldung. Reihenfolge: die eigene Aufnahme ('batterycrit', sobald
+  // tools/voice_synth.py sie gerendert hat), sonst die Live-Stimme, und ohne beides (App-
+  // WebView) wenigstens die Aufnahme "Akku fast leer" - stumm bleiben darf diese Meldung
+  // nicht. Der Hinweis im Cockpit kommt immer, auch ohne Ton.
+  function akkuKritischMelden(name) {
+    if (!ansageAn.batterycrit) return false;
+    const de = lang === 'de';
+    const satz = de ? 'Session abbrechen, Box anfahren!' : 'Abort session, box now!';
+    const text = name ? name + ': ' + satz : satz;
+    if (typeof showHudToast === 'function') showHudToast(text);
+    if (ansage('batterycrit', text)) return true;
+    return playAnsageClip('battery');
+  }
 
   // HIER STAND DER FUNKFILTER als Live-Effekt auf der Browserstimme, und er ist auf Bitte
   // des Nutzers wieder heraus. Was er konnte: Knacken beim Aufschalten, ein Rauschteppich
@@ -45333,6 +45365,18 @@
     const bts = w.batteries;
     if (Array.isArray(bts) && bts.length) {
       for (const b of bts) {
+        // KRITISCH (5 %) zuerst. Faellt der Akku in einem Schritt von ueber 25 % auf unter
+        // 5 %, wird nur die kritische Meldung gesagt - die 25-%-Sperre wird dabei still
+        // mitgesetzt, sonst kaemen zwei Saetze uebereinander.
+        if (b.value <= AKKU_KRITISCH && !batteryKritLatchSet.has(b.car)) {
+          batteryKritLatchSet.add(b.car);
+          batteryLatchSet.add(b.car);
+          // Den Namen nur, wenn mehrere Autos einen Akku melden - allein ist klar, wer gemeint ist.
+          if (akkuKritischMelden(bts.length > 1 ? (b.label || '') : '')) raus.push('batterycrit');
+          continue;
+        } else if (b.value > AKKU_KRITISCH_HYSTERESE) {
+          batteryKritLatchSet.delete(b.car);
+        }
         if (b.value <= AKKU_SCHWELLE && !batteryLatchSet.has(b.car)) {
           batteryLatchSet.add(b.car);
           // Ansage UND Blinken haengen an demselben Kaestchen: ausgeschaltet heisst keine
@@ -45360,6 +45404,13 @@
         }
       }
     } else if (w.battery !== null && w.battery !== undefined) {
+      if (w.battery <= AKKU_KRITISCH && !ansageLatch.batterycrit) {
+        ansageLatch.batterycrit = true;
+        ansageLatch.battery = true;
+        if (akkuKritischMelden('')) raus.push('batterycrit');
+      } else if (w.battery > AKKU_KRITISCH_HYSTERESE) {
+        ansageLatch.batterycrit = false;
+      }
       if (w.battery <= AKKU_SCHWELLE && !ansageLatch.battery) {
         ansageLatch.battery = true;
         if (ansage('battery', de ? 'Akku fast leer' : 'Battery low')) raus.push('battery');
@@ -45385,7 +45436,8 @@
   const ANSAGE_KAESTCHEN = { 'setting-announce': 'lap', 'setting-announce-damage': 'damage',
                              'setting-announce-fuel': 'fuel', 'setting-announce-tyre': 'tyre',
                              'setting-announce-rain': 'rain', 'setting-announce-pit': 'pit',
-                             'setting-announce-battery': 'battery' };
+                             'setting-announce-battery': 'battery',
+                             'setting-announce-battery-crit': 'batterycrit' };
   Object.keys(ANSAGE_KAESTCHEN).forEach((id) => {
     const el = $(id);
     if (!el) return;
@@ -60891,7 +60943,8 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       const merk = {};
       const kaesten = { lap: 'setting-announce', damage: 'setting-announce-damage',
                         fuel: 'setting-announce-fuel', tyre: 'setting-announce-tyre',
-                        rain: 'setting-announce-rain', battery: 'setting-announce-battery' };
+                        rain: 'setting-announce-rain', battery: 'setting-announce-battery',
+                        batterycrit: 'setting-announce-battery-crit' };
       // Die Kaestchen setzen und hinterher zuruecklegen: der Test darf die Einstellung
       // des Nutzers nicht behalten.
       try {
@@ -60913,12 +60966,14 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
         // und der naechste Test in der Datei erbte ein bereits 'rain: true' geflanktes
         // Latch - eine Meldung fiel, die zur eigenen Zustandsfolge gar nicht gehoerte.
         const merkLatch = Object.assign({}, ansageLatch);
-        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false });
+        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
         // Das Akku-Latch ist JE AUTO (batteryLatchSet in 80-sound.js) und genauso geteilt -
         // dieselbe Vorsicht wie oben: eine vorangegangene Probe darf kein Auto-Latch
         // hinterlassen.
         const merkBatt = new Set(batteryLatchSet);
         batteryLatchSet.clear();
+        const merkKrit = new Set(batteryKritLatchSet);
+        batteryKritLatchSet.clear();
         // BESTELLT: die Aufnahme hat jetzt IMMER Vorrang vor der Live-Stimme (ansage()),
         // nicht nur ohne speechSynthesis. Diese Probe will aber ausdruecklich den
         // Live-Pfad beobachten (ueber die Attrappe unten) - ist der Browser, in dem der
@@ -60944,6 +60999,8 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
           Object.assign(ansageLatch, merkLatch);
           batteryLatchSet.clear();
           merkBatt.forEach((c) => batteryLatchSet.add(c));
+          batteryKritLatchSet.clear();
+          merkKrit.forEach((c) => batteryKritLatchSet.add(c));
           Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
           Object.assign(voiceBuffers, echtBuffers);
         }
@@ -60967,7 +61024,8 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     ansagenFunkProbe(schritte) {
       const kaesten = { lap: 'setting-announce', damage: 'setting-announce-damage',
                         fuel: 'setting-announce-fuel', tyre: 'setting-announce-tyre',
-                        rain: 'setting-announce-rain', battery: 'setting-announce-battery' };
+                        rain: 'setting-announce-rain', battery: 'setting-announce-battery',
+                        batterycrit: 'setting-announce-battery-crit' };
       const merk = {};
       try {
         Object.keys(kaesten).forEach((art) => {
@@ -60991,9 +61049,11 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
         // Zustand, eine vorangegangene Probe kann eine Flanke hinterlassen haben, die
         // zu DIESER Zustandsfolge nicht gehoert.
         const merkLatch = Object.assign({}, ansageLatch);
-        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false });
+        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
         const merkBatt = new Set(batteryLatchSet);
         batteryLatchSet.clear();
+        const merkKrit = new Set(batteryKritLatchSet);
+        batteryKritLatchSet.clear();
         try {
           delete window.speechSynthesis;
           const folge = schritte.map((w) => ({ w, fiel: ansagenPruefen(w) }));
@@ -61009,6 +61069,8 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
           Object.assign(ansageLatch, merkLatch);
           batteryLatchSet.clear();
           merkBatt.forEach((c) => batteryLatchSet.add(c));
+          batteryKritLatchSet.clear();
+          merkKrit.forEach((c) => batteryKritLatchSet.add(c));
         }
       } finally {
         Object.keys(merk).forEach((art) => {
@@ -61037,7 +61099,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       playFx = (puffer) => { abgespielt.push(puffer && puffer.markiert); return true; };
       const gesagt = [];
       const merkLatch = Object.assign({}, ansageLatch);
-      Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false });
+      Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
       try {
         Object.defineProperty(window, 'speechSynthesis', {
           configurable: true,
@@ -73622,6 +73684,48 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
   });
 
+  // ---- Akku kritisch: unter 5 % "Session abbrechen, Box anfahren!" ----
+  //
+  // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage generieren: Session
+  // abbrechen, Box anfahren!" Geprueft: faellt einmal je Auto, nicht doppelt mit der
+  // 25-%-Meldung, bleibt unter der Hysterese still, nach dem Laden wieder scharf; mit einem
+  // Auto ohne Namen, mit mehreren mit Namen; auch der alte Einzelwert-Weg.
+  stAdd('Ansagen: Akku kritisch unter 5 % (Session abbrechen, Box anfahren)', () => {
+    if (!window.OMEGA_TEST || !OMEGA_TEST.ansagenFolge) {
+      return { skip: true, mass: 'ansagenFolge nicht vorhanden' };
+    }
+    const schlecht = [];
+    const satz = /Session abbrechen, Box anfahren!|Abort session, box now!/;
+    const a = { blinking: true }, b = { blinking: true };
+    const eins = (v) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
+                           batteries: [{ car: a, label: 'Alpha', value: v }] });
+    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.03), eins(0.02), eins(0.10),
+                                        eins(0.03), eins(0.50), eins(0.04)]);
+    const f1 = r1.folge.map((x) => x.fiel.join(','));
+    const soll1 = ['', 'batterycrit', '', '', '', '', 'batterycrit'];
+    if (f1.join('|') !== soll1.join('|')) schlecht.push('ein Auto: ' + f1.map((x) => x || '-').join(' '));
+    const krit1 = r1.gesagt.filter((s) => satz.test(s));
+    if (krit1.length !== 2) schlecht.push(krit1.length + ' kritische Saetze statt 2');
+    if (krit1.some((s) => /Alpha/.test(s))) schlecht.push('ein Auto: Name mitgesagt');
+    if (r1.gesagt.length !== krit1.length) schlecht.push('zusaetzlich gesagt: ' + r1.gesagt.join(' ; '));
+    // Zwei Autos: der Name gehoert dazu, und die 25-%-Meldung des anderen bleibt eigen.
+    const zwei = (va, vb) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
+      batteries: [{ car: a, label: 'Alpha', value: va }, { car: b, label: 'Beta', value: vb }] });
+    const r2 = OMEGA_TEST.ansagenFolge([zwei(0.50, 0.50), zwei(0.03, 0.20)]);
+    const f2 = r2.folge.map((x) => x.fiel.join(','));
+    if (f2[1] !== 'batterycrit,battery') schlecht.push('zwei Autos: ' + f2[1]);
+    if (!r2.gesagt.some((s) => /Alpha/.test(s) && satz.test(s))) schlecht.push('zwei Autos: Name fehlt');
+    // Einzelwert (alter Aufrufer).
+    const r3 = OMEGA_TEST.ansagenFolge([
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.50 },
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.03 },
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.02 }]);
+    const f3 = r3.folge.map((x) => x.fiel.join(','));
+    if (f3.join('|') !== '|batterycrit|') schlecht.push('Einzelwert: ' + f3.map((x) => x || '-').join(' '));
+    return { ok: !schlecht.length, mass: schlecht.length ? schlecht.join(' | ')
+      : 'einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
+  });
+
   // ---- Und die fuenf Schalter schalten wirklich ab ----
   //
   // Die Gegenprobe zum Test darueber: mit allen Kaestchen AUS darf keine einzige Meldung
@@ -73723,14 +73827,22 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       man = await fetch('audio/voice.json', { cache: 'reload' }).then((r) => r.json());
     } catch (e) { return { skip: true, mass: 'Manifest nicht ladbar: ' + e.message }; }
     const erwartet = ['damage', 'fuel', 'tyre', 'rainstart', 'rainstop', 'battery'];
+    // 'batterycrit' (Akku < 5 %) darf fehlen: die Aufnahme braucht die Windows-Stimmen von
+    // tools/voice_synth.py. Bis dahin spricht die Live-Stimme. Ist sie da, dann vollstaendig.
+    const freiwillig = ['batterycrit'];
     const schlecht = [];
+    for (const k of freiwillig) {
+      if (man[k] && !(man[k].de && man[k].en)) schlecht.push(k + ': nicht beide Sprachen');
+    }
     for (const k of erwartet) {
       if (!man[k]) { schlecht.push(k + ' fehlt ganz'); continue; }
       for (const spr of ['de', 'en']) {
         if (!man[k][spr]) schlecht.push(k + '/' + spr + ' fehlt');
       }
     }
-    for (const k of Object.keys(man)) if (erwartet.indexOf(k) < 0) schlecht.push(k + ' unerwartet im Manifest');
+    for (const k of Object.keys(man)) {
+      if (erwartet.indexOf(k) < 0 && freiwillig.indexOf(k) < 0) schlecht.push(k + ' unerwartet im Manifest');
+    }
     return { ok: schlecht.length === 0,
              mass: erwartet.length + ' Meldungen x 2 Sprachen geprueft'
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };

@@ -658,11 +658,37 @@
   // Akku: BESTELLT "Akku-Ansage < 25 %" - eine eigene Schwelle, nicht die 10 % oben.
   const AKKU_SCHWELLE = 0.25;
   const AKKU_HYSTERESE = 0.32;
-  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false };
-  const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false };
+  // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage: Session abbrechen, Box
+  // anfahren!" Eine ZWEITE Stufe unter der 25-%-Meldung, mit eigenem Schalter und ab Werk an:
+  // darunter bleibt das Auto bald stehen, und das soll man auch hoeren, wer die 25 % aus hat.
+  //
+  // AUFLOESUNG: batteryPercent() hat nur 17 Stufen (Rohwert 138..155), also rund 6 % je
+  // Stufe - die Anzeige springt von 6 % auf 0 %. "Unter 5 %" faellt deshalb genau dann, wenn
+  // 0 % angezeigt wird. Wer frueher gewarnt werden will, setzt hier 0.06 (= Anzeige 6 %).
+  const AKKU_KRITISCH = 0.05;
+  const AKKU_KRITISCH_HYSTERESE = 0.15;   // erst nach dem Laden wieder scharf
+  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
+                     batterycrit: true };
+  const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false };
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
   const batteryLatchSet = new Set();
+  // Dasselbe fuer die kritische Stufe (5 %), je Auto.
+  const batteryKritLatchSet = new Set();
+
+  // Die kritische Akku-Meldung. Reihenfolge: die eigene Aufnahme ('batterycrit', sobald
+  // tools/voice_synth.py sie gerendert hat), sonst die Live-Stimme, und ohne beides (App-
+  // WebView) wenigstens die Aufnahme "Akku fast leer" - stumm bleiben darf diese Meldung
+  // nicht. Der Hinweis im Cockpit kommt immer, auch ohne Ton.
+  function akkuKritischMelden(name) {
+    if (!ansageAn.batterycrit) return false;
+    const de = lang === 'de';
+    const satz = de ? 'Session abbrechen, Box anfahren!' : 'Abort session, box now!';
+    const text = name ? name + ': ' + satz : satz;
+    if (typeof showHudToast === 'function') showHudToast(text);
+    if (ansage('batterycrit', text)) return true;
+    return playAnsageClip('battery');
+  }
 
   // HIER STAND DER FUNKFILTER als Live-Effekt auf der Browserstimme, und er ist auf Bitte
   // des Nutzers wieder heraus. Was er konnte: Knacken beim Aufschalten, ein Rauschteppich
@@ -778,6 +804,18 @@
     const bts = w.batteries;
     if (Array.isArray(bts) && bts.length) {
       for (const b of bts) {
+        // KRITISCH (5 %) zuerst. Faellt der Akku in einem Schritt von ueber 25 % auf unter
+        // 5 %, wird nur die kritische Meldung gesagt - die 25-%-Sperre wird dabei still
+        // mitgesetzt, sonst kaemen zwei Saetze uebereinander.
+        if (b.value <= AKKU_KRITISCH && !batteryKritLatchSet.has(b.car)) {
+          batteryKritLatchSet.add(b.car);
+          batteryLatchSet.add(b.car);
+          // Den Namen nur, wenn mehrere Autos einen Akku melden - allein ist klar, wer gemeint ist.
+          if (akkuKritischMelden(bts.length > 1 ? (b.label || '') : '')) raus.push('batterycrit');
+          continue;
+        } else if (b.value > AKKU_KRITISCH_HYSTERESE) {
+          batteryKritLatchSet.delete(b.car);
+        }
         if (b.value <= AKKU_SCHWELLE && !batteryLatchSet.has(b.car)) {
           batteryLatchSet.add(b.car);
           // Ansage UND Blinken haengen an demselben Kaestchen: ausgeschaltet heisst keine
@@ -805,6 +843,13 @@
         }
       }
     } else if (w.battery !== null && w.battery !== undefined) {
+      if (w.battery <= AKKU_KRITISCH && !ansageLatch.batterycrit) {
+        ansageLatch.batterycrit = true;
+        ansageLatch.battery = true;
+        if (akkuKritischMelden('')) raus.push('batterycrit');
+      } else if (w.battery > AKKU_KRITISCH_HYSTERESE) {
+        ansageLatch.batterycrit = false;
+      }
       if (w.battery <= AKKU_SCHWELLE && !ansageLatch.battery) {
         ansageLatch.battery = true;
         if (ansage('battery', de ? 'Akku fast leer' : 'Battery low')) raus.push('battery');
@@ -830,7 +875,8 @@
   const ANSAGE_KAESTCHEN = { 'setting-announce': 'lap', 'setting-announce-damage': 'damage',
                              'setting-announce-fuel': 'fuel', 'setting-announce-tyre': 'tyre',
                              'setting-announce-rain': 'rain', 'setting-announce-pit': 'pit',
-                             'setting-announce-battery': 'battery' };
+                             'setting-announce-battery': 'battery',
+                             'setting-announce-battery-crit': 'batterycrit' };
   Object.keys(ANSAGE_KAESTCHEN).forEach((id) => {
     const el = $(id);
     if (!el) return;

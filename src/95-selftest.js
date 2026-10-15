@@ -4967,6 +4967,48 @@
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
   });
 
+  // ---- Akku kritisch: unter 5 % "Session abbrechen, Box anfahren!" ----
+  //
+  // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage generieren: Session
+  // abbrechen, Box anfahren!" Geprueft: faellt einmal je Auto, nicht doppelt mit der
+  // 25-%-Meldung, bleibt unter der Hysterese still, nach dem Laden wieder scharf; mit einem
+  // Auto ohne Namen, mit mehreren mit Namen; auch der alte Einzelwert-Weg.
+  stAdd('Ansagen: Akku kritisch unter 5 % (Session abbrechen, Box anfahren)', () => {
+    if (!window.OMEGA_TEST || !OMEGA_TEST.ansagenFolge) {
+      return { skip: true, mass: 'ansagenFolge nicht vorhanden' };
+    }
+    const schlecht = [];
+    const satz = /Session abbrechen, Box anfahren!|Abort session, box now!/;
+    const a = { blinking: true }, b = { blinking: true };
+    const eins = (v) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
+                           batteries: [{ car: a, label: 'Alpha', value: v }] });
+    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.03), eins(0.02), eins(0.10),
+                                        eins(0.03), eins(0.50), eins(0.04)]);
+    const f1 = r1.folge.map((x) => x.fiel.join(','));
+    const soll1 = ['', 'batterycrit', '', '', '', '', 'batterycrit'];
+    if (f1.join('|') !== soll1.join('|')) schlecht.push('ein Auto: ' + f1.map((x) => x || '-').join(' '));
+    const krit1 = r1.gesagt.filter((s) => satz.test(s));
+    if (krit1.length !== 2) schlecht.push(krit1.length + ' kritische Saetze statt 2');
+    if (krit1.some((s) => /Alpha/.test(s))) schlecht.push('ein Auto: Name mitgesagt');
+    if (r1.gesagt.length !== krit1.length) schlecht.push('zusaetzlich gesagt: ' + r1.gesagt.join(' ; '));
+    // Zwei Autos: der Name gehoert dazu, und die 25-%-Meldung des anderen bleibt eigen.
+    const zwei = (va, vb) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
+      batteries: [{ car: a, label: 'Alpha', value: va }, { car: b, label: 'Beta', value: vb }] });
+    const r2 = OMEGA_TEST.ansagenFolge([zwei(0.50, 0.50), zwei(0.03, 0.20)]);
+    const f2 = r2.folge.map((x) => x.fiel.join(','));
+    if (f2[1] !== 'batterycrit,battery') schlecht.push('zwei Autos: ' + f2[1]);
+    if (!r2.gesagt.some((s) => /Alpha/.test(s) && satz.test(s))) schlecht.push('zwei Autos: Name fehlt');
+    // Einzelwert (alter Aufrufer).
+    const r3 = OMEGA_TEST.ansagenFolge([
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.50 },
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.03 },
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.02 }]);
+    const f3 = r3.folge.map((x) => x.fiel.join(','));
+    if (f3.join('|') !== '|batterycrit|') schlecht.push('Einzelwert: ' + f3.map((x) => x || '-').join(' '));
+    return { ok: !schlecht.length, mass: schlecht.length ? schlecht.join(' | ')
+      : 'einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
+  });
+
   // ---- Und die fuenf Schalter schalten wirklich ab ----
   //
   // Die Gegenprobe zum Test darueber: mit allen Kaestchen AUS darf keine einzige Meldung
@@ -5068,14 +5110,22 @@
       man = await fetch('audio/voice.json', { cache: 'reload' }).then((r) => r.json());
     } catch (e) { return { skip: true, mass: 'Manifest nicht ladbar: ' + e.message }; }
     const erwartet = ['damage', 'fuel', 'tyre', 'rainstart', 'rainstop', 'battery'];
+    // 'batterycrit' (Akku < 5 %) darf fehlen: die Aufnahme braucht die Windows-Stimmen von
+    // tools/voice_synth.py. Bis dahin spricht die Live-Stimme. Ist sie da, dann vollstaendig.
+    const freiwillig = ['batterycrit'];
     const schlecht = [];
+    for (const k of freiwillig) {
+      if (man[k] && !(man[k].de && man[k].en)) schlecht.push(k + ': nicht beide Sprachen');
+    }
     for (const k of erwartet) {
       if (!man[k]) { schlecht.push(k + ' fehlt ganz'); continue; }
       for (const spr of ['de', 'en']) {
         if (!man[k][spr]) schlecht.push(k + '/' + spr + ' fehlt');
       }
     }
-    for (const k of Object.keys(man)) if (erwartet.indexOf(k) < 0) schlecht.push(k + ' unerwartet im Manifest');
+    for (const k of Object.keys(man)) {
+      if (erwartet.indexOf(k) < 0 && freiwillig.indexOf(k) < 0) schlecht.push(k + ' unerwartet im Manifest');
+    }
     return { ok: schlecht.length === 0,
              mass: erwartet.length + ' Meldungen x 2 Sprachen geprueft'
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
