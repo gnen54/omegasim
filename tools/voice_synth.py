@@ -52,6 +52,9 @@ PHRASES = {
     'rainstart': {'de': 'Es regnet', 'en': 'Rain has started'},
     'rainstop': {'de': 'Der Regen hört auf', 'en': 'The rain is stopping'},
     'battery': {'de': 'Akku fast leer', 'en': 'Battery low'},
+    # Akku kritisch (< 5 %), akkuKritischMelden() in src/80-sound.js. Solange diese
+    # Aufnahme fehlt, spricht die Live-Stimme; ohne Stimme (App-WebView) kommt "Akku fast leer".
+    'batterycrit': {'de': 'Session abbrechen, Box anfahren!', 'en': 'Abort session, box now!'},
 }
 
 # Dieselben zwei Stimmen, die GetInstalledVoices() auf diesem Rechner meldet. Ein anderer
