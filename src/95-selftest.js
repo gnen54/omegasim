@@ -17158,6 +17158,54 @@
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'einmal +5 s auf Runde 1, je Spieler, Schalter wirkt' };
   });
 
+  stAdd('Startampel: Befehle fuer Start, Toene, Gruen, Gelb, Fruehstart und Ende', async () => {
+    const f = [];
+    const gesendet = [];
+    const merk = { k: ampelKanal, g: ampelGeraet, rs: raceState, vs: ampelVorstart,
+                   zg: ampelZeitgesteuert, neu: $('race-ampel-neustart').checked,
+                   timer: raceCountdownTimer, start: $('race-start-btn').disabled,
+                   stop: $('race-stop-btn').disabled, status: $('race-status').textContent };
+    try {
+      ampelGeraet = { name: 'Test', gatt: { connected: true } };
+      ampelKanal = { writeValueWithResponse(d) {
+        gesendet.push(new TextDecoder().decode(d).trim()); return Promise.resolve(); } };
+      ampelVorstart = false; ampelZeitgesteuert = false;
+      // Ohne Startfenster: der Countdown schickt START nach.
+      raceState = 'countdown';
+      ampelCountdown(false);
+      ampelTon(3); ampelTon(2); ampelTon(1);
+      ampelLos();
+      ampelGelb(true); ampelGelb(false);
+      ampelRennende();
+      // Mit Startfenster: START nur einmal.
+      ampelStartfenster(); ampelCountdown(false);
+      // Fruehstart, Schalter an: Start abgebrochen.
+      $('race-ampel-neustart').checked = true;
+      raceState = 'countdown';
+      if (!ampelFruehstart()) f.push('Fruehstart hat nicht abgebrochen');
+      if (raceState !== 'idle') f.push('nach Fruehstart nicht idle');
+      // Mehrspieler (feste Gruenzeit): kein Abbruch, nichts gesendet.
+      raceState = 'countdown'; ampelZeitgesteuert = true;
+      if (ampelFruehstart()) f.push('Mehrspieler-Countdown abgebrochen');
+      ampelZeitgesteuert = false;
+      // Schalter aus: kein Abbruch.
+      $('race-ampel-neustart').checked = false;
+      if (ampelFruehstart()) f.push('Schalter aus: trotzdem abgebrochen');
+      await ampelSchlange;
+      const soll = ['START', 'GRUEN 2', 'GRUEN 3', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
+                    'START', 'FRUEHSTART'];
+      if (gesendet.join('|') !== soll.join('|')) f.push('gesendet: ' + gesendet.join(', '));
+    } finally {
+      ampelKanal = merk.k; ampelGeraet = merk.g; raceState = merk.rs; ampelVorstart = merk.vs;
+      ampelZeitgesteuert = merk.zg; $('race-ampel-neustart').checked = merk.neu;
+      raceCountdownTimer = merk.timer; $('race-start-btn').disabled = merk.start;
+      $('race-stop-btn').disabled = merk.stop; $('race-status').textContent = merk.status;
+      fruehstartReset();
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
+  });
+
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {
     const f = [];
     const merk = { rs: raceState, tab: kAktiverTab() };
