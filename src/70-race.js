@@ -1658,7 +1658,6 @@
     gs.hidden = false;
     gridFokusIdx = -1;
     raceGridFokus(0);
-    ampelStartfenster();   // Startampel: Rot aus, Gelb an
   }
   // v0.10.5 BESTELLT: "Rennstartmenue: mach Abbrechen und Start anwaehlbar, dann mit X
   // bestaetigen." Steuerkreuz links/rechts (oder hoch/runter) waehlt, X drueckt den gewaehlten
@@ -1682,6 +1681,9 @@
   function raceGridStart() {
     const gs = $('race-gridscreen');
     if (gs) gs.hidden = true;
+    // Der eigentliche Start: Startampel auf Gelb und "Gentlemen, start your engines"
+    // (74-startampel.js). Vor dem Countdown, damit die Ansage vor dem ersten Ton kommt.
+    ampelStartKnopf();
     if (typeof aufstellenStoppen === 'function') aufstellenStoppen(false);
     syncRaceGridOrder();
     const w = raceGridWeiter; raceGridWeiter = null;
@@ -2472,8 +2474,7 @@
     const laeuft = raceState === 'racing' || raceState === 'countdown' || raceState === 'finishing';
     if (!laeuft && typeof mpRennenFrage === 'function' && mpRennenFrage()) { updateRaceActButtons(); return; }
     const live = raceState === 'racing' || raceState === 'countdown' || raceState === 'finishing';
-    if (live) requestRaceStop();
-    else { ampelStartKnopf(); raceGridAnzeigen(startRaceCountdown); }   // Startansage (74-startampel.js)
+    if (live) requestRaceStop(); else raceGridAnzeigen(startRaceCountdown);
     updateRaceActButtons();
   }
   $('race-act-start').onclick = toggleRace;
@@ -2702,7 +2703,7 @@
   }
   setInterval(updateRaceActButtons, 400);
 
-  $('race-start-btn').onclick = () => { ampelStartKnopf(); raceGridAnzeigen(startRaceCountdown); };
+  $('race-start-btn').onclick = () => raceGridAnzeigen(startRaceCountdown);
   $('race-stop-btn').onclick = requestRaceStop;
   $('race-export-csv').onclick = () => {
     // Semicolon delimiter + comma decimals: opens directly (no import wizard) in a

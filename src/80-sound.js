@@ -864,7 +864,8 @@
   // ---- STARTANSAGE: "Gentlemen, start your engines" ---------------------------------
   //
   // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch - und NUR beim
-  // Druck auf einen Start-Knopf, wenn nichts laeuft (ampelStartKnopf() in 74-startampel.js).
+  // Start-Knopf im Fenster "Bringe die Autos in Position", wenn nichts laeuft
+  // (ampelStartKnopf() in 74-startampel.js).
   // Mit und ohne angeschlossene Ampel.
   //
   // IMMER ENGLISCH, auch in der deutschen Oberflaeche: der Satz ist ein feststehender Ruf
