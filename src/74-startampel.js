@@ -4,7 +4,7 @@
   // LED-Reihen: oben Rot, in der Mitte Gelb, unten Gruen mit fuenf Spalten.
   //
   //   gesperrt (kein Training/Rennen freigegeben)   Rot
-  //   "Rennen starten" gedrueckt                    Rot aus, Gelb an; OmegaSim sagt
+  //   Start im Fenster "Autos in Position"          Rot aus, Gelb an; OmegaSim sagt
   //                                                 "Gentlemen, start your engines"
   //   Starttoene des Countdowns                     Gruen, Spalte fuer Spalte dazu
   //   Gruen / Los                                   alles aus
@@ -110,25 +110,25 @@
   if ($('ampel-verbinden')) $('ampel-verbinden').addEventListener('click', ampelVerbinden);
 
   // ---- Die Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
-  // "Rennen starten" oeffnet das Startfenster: ab hier ist freigegeben, die Ampel geht auf Gelb.
-  function ampelStartfenster() { ampelSenden('START'); }
-  // Startfenster abgebrochen: zurueck auf Rot.
+  // Startfenster abgebrochen: Rot (bleibt Rot, falls schon Rot).
   function ampelStartAbgebrochen() { ampelSenden('ROT'); }
-  // Der Countdown beginnt. Kam kein Startfenster davor, fehlt START noch.
+  // Der Countdown beginnt. Kam der Start nicht ueber den Knopf im Startfenster (Mehrspieler-
+  // Countdown), fehlt START noch - dann Gelb ohne Ansage.
   function ampelCountdown(zeitgesteuert) {
     ampelZeitgesteuert = !!zeitgesteuert;
     if (!ampelVorstart) ampelSenden('START');
   }
-  // "Gentlemen, start your engines" - von OmegaSim gesprochen (80-sound.js), nicht vom Pi.
+  // DER EIGENTLICHE START: der Start-Knopf im Fenster "Bringe die Autos in Position"
+  // (raceGridStart() in 70-race.js - Tippen und Controller-Taste X laufen beide dort durch).
   //
-  // BESTELLT: "darf NUR bei nicht gestartetem Rennen etc. nach Betaetigen des Start-Buttons
-  // in OmegaSim ausgefuehrt werden." Deshalb haengt sie NICHT am Startfenster oder am
-  // Countdown - die kommen auch von selbst (Challenge nach Stillstand, Mehrspieler-Countdown) -,
-  // sondern an den beiden Start-Knoepfen (70-race.js). Und nur, wenn nichts laeuft: kein
-  // Rennen, kein Training, kein Countdown, keine Challenge. Auch ohne verbundene Ampel.
+  // BESTELLT: "Nur im Menue 'Bringe die Autos in Position' dieser Start-Button soll den
+  // eigentlichen Start ausloesen." Erst hier geht die Ampel auf Gelb, und erst hier sagt
+  // OmegaSim "Gentlemen, start your engines" (80-sound.js) - nicht schon beim Oeffnen des
+  // Fensters ("Rennen starten", Cockpit-Knopf, Challenge nach Stillstand), nicht beim
+  // Mehrspieler-Countdown. Und nur, wenn nichts laeuft. Auch ohne verbundene Ampel.
   function ampelStartKnopf() {
     if (raceState !== 'idle' && raceState !== 'finished') return false;
-    if (typeof challengeLaeuft === 'function' && challengeLaeuft()) return false;
+    ampelSenden('START');
     return typeof startAnsageSprechen === 'function' && startAnsageSprechen();
   }
   // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
