@@ -8,7 +8,7 @@ Drei LED-Reihen: oben **Rot**, in der Mitte **Gelb**, unten **Grün** mit 5 Spal
 | In OmegaSim                                   | Befehl         | Ampel                                    |
 |-----------------------------------------------|----------------|------------------------------------------|
 | nichts freigegeben, Rennende, Abbruch         | `ROT`          | Rot                                      |
-| „Rennen starten“ (Fenster *Autos in Position*) | `START`        | Rot aus, Gelb an, Ansage                 |
+| „Rennen starten“ (Fenster *Autos in Position*) | `START`        | Rot aus, Gelb an                         |
 | Ampelton 1, 2, 3 des Countdowns               | `GRUEN 2/3/5`  | 2, 3, dann alle 5 grünen Spalten (+ Gelb) |
 | Grün / Start (auch freies Training)           | `LOS`          | alles aus                                |
 | Frühstart im Countdown *                      | `FRUEHSTART`   | Grün aus, Gelb blinkt bis zum Neustart   |
@@ -64,8 +64,8 @@ billiger, braucht keine SD-Karte und ist nach dem Einschalten in einer Sekunde b
 Programm: `pico/main.py` (MicroPython), gleicher Bluetooth-Dienst und gleiche Befehle –
 die App merkt keinen Unterschied.
 
-**Einziger Unterschied: kein Ton.** Der Pico hat keinen Audioausgang, die Ansage
-„Gentlemen, start your engines“ entfällt.
+Der Pico hat keinen Audioausgang – das macht nichts: die Ansage „Gentlemen, start your
+engines“ spricht OmegaSim selbst (siehe unten).
 
 ### Verdrahtung Pico
 
@@ -112,7 +112,7 @@ Raspberry Pi OS (Bookworm oder neuer). Keine pip-Pakete nötig.
 
 ```bash
 sudo apt update
-sudo apt install -y python3-gpiozero python3-dbus python3-gi bluez espeak-ng
+sudo apt install -y python3-gpiozero python3-dbus python3-gi bluez
 sudo rfkill unblock bluetooth
 mkdir -p ~/startampel && cp startampel.py ~/startampel/
 sudo python3 ~/startampel/startampel.py
@@ -141,7 +141,13 @@ python3 startampel.py --stdin         # echte LEDs, Befehle eintippen (TEST = La
 python3 startampel.py --tcp 5000      # Befehle übers Netzwerk, z. B. nc <pi> 5000
 ```
 
-## Eigene Ansage
+## Ansage „Gentlemen, start your engines“
 
-Eine Datei `ansage.wav` neben `startampel.py` legen; sie wird bei `START` mit `aplay`
-abgespielt. Ohne Datei spricht `espeak-ng` den Text aus `ANSAGE_TEXT`.
+Die Ansage kommt **von OmegaSim**, nicht von der Ampel: in dem Moment, in dem die Ampel auf
+Gelb geht (Ton → **Startansage**, ab Werk an). So klingt sie aus dem Tablet, egal ob Pi oder
+Pico, und funktioniert auch ganz ohne Ampel.
+
+Soll sie stattdessen vom Pi kommen (z. B. über einen Lautsprecher an der Ampel): in
+`startampel.py` `ANSAGE_AN = True` setzen, `sudo apt install espeak-ng` (oder eine eigene
+`ansage.wav` neben das Skript legen) – und in OmegaSim die Startansage ausschalten, sonst
+kommt sie doppelt.

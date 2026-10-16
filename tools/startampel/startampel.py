@@ -12,8 +12,8 @@ Aufbau der Ampel
 
 Ablauf (Befehle kommen von OmegaSim)
     ROT          Gesperrt: Rot an. Auch bei Rennende und Abbruch.
-    START        "Rennen starten" gedrueckt: Rot aus, Gelb an, Ansage
-                 "Gentlemen, start your engines".
+    START        "Rennen starten" gedrueckt: Rot aus, Gelb an. (Die Ansage "Gentlemen,
+                 start your engines" kommt von OmegaSim; siehe ANSAGE_AN.)
     GRUEN <n>    Ampelton des Countdowns: n gruene Spalten leuchten (die App schickt 2, 3, 5).
     LOS          Gruen/Start: alle LEDs aus, das Rennen laeuft.
     FRUEHSTART   Fruehstart im Countdown: Gruen aus, Gelb blinkt, bis START kommt.
@@ -58,8 +58,12 @@ BLINK_TAKT_S = 0.5       # Halbperiode beim Blinken (an/aus je 0,5 s)
 # Soll Gelb waehrend der Gruenphase weiterleuchten?
 GELB_WAEHREND_GRUEN = True
 
-# Ansage beim Start. Zuerst wird ANSAGE_DATEI (WAV, im Ordner des Skripts) mit aplay
-# abgespielt; gibt es sie nicht, spricht espeak-ng ANSAGE_TEXT. None schaltet ab.
+# Ansage beim Start - AB WERK AUS: "Gentlemen, start your engines" spricht OmegaSim selbst
+# (Ton -> Startansage). Nur einschalten, wenn die Ansage vom Pi kommen soll, und dann in
+# OmegaSim die Startansage ausschalten, sonst kommt sie doppelt.
+# ANSAGE_DATEI (WAV, im Ordner des Skripts) wird mit aplay abgespielt; gibt es sie nicht,
+# spricht espeak-ng ANSAGE_TEXT.
+ANSAGE_AN = False
 ANSAGE_DATEI = "ansage.wav"
 ANSAGE_TEXT = "Gentlemen, start your engines"
 
@@ -289,6 +293,8 @@ class Befehlsschlange:
 
 
 def ansage_abspielen():
+    if not ANSAGE_AN:
+        return
     ordner = os.path.dirname(os.path.abspath(__file__))
     datei = os.path.join(ordner, ANSAGE_DATEI) if ANSAGE_DATEI else None
     try:
