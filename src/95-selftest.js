@@ -5114,7 +5114,7 @@
     const erwartet = ['damage', 'fuel', 'tyre', 'rainstart', 'rainstop', 'battery'];
     // 'batterycrit' (Akku < 5 %) darf fehlen: die Aufnahme braucht die Windows-Stimmen von
     // tools/voice_synth.py. Bis dahin spricht die Live-Stimme. Ist sie da, dann vollstaendig.
-    const freiwillig = ['batterycrit'];
+    const freiwillig = ['batterycrit', 'start'];
     const schlecht = [];
     for (const k of freiwillig) {
       if (man[k] && !(man[k].de && man[k].en)) schlecht.push(k + ': nicht beide Sprachen');
