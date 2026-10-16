@@ -8988,6 +8988,15 @@
           starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
           oben.</small></div>
         <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Wartezeit nach dem Start<small>Nach dem Start im Fenster
+          &bdquo;Bringe die Autos in Position&ldquo; steht die Ampel so lange auf Gelb (mit der Startansage),
+          bis die gr&uuml;nen Lichter beginnen. 0&nbsp;=&nbsp;sofort.</small></div>
+        <div class="opt-slider">
+          <button type="button" data-step="-1" aria-label="weniger">&minus;</button>
+          <input type="range" id="race-start-warte" min="0" max="10" step="1" value="4" data-preset-skip>
+          <button type="button" data-step="1" aria-label="mehr">+</button>
+          <span class="opt-val" id="race-start-warte-val">4 s</span>
+        </div></div>
       <div class="opt-row"><div class="opt-label">Gelbe Flagge deaktivieren<small>An: Der Knopf
           &bdquo;Gelbe Flagge&ldquo; und das Halten der Boxentaste rufen kein Gelb mehr aus.</small></div>
         <label class="tgl"><input type="checkbox" id="race-gelb-aus"><span></span></label></div>

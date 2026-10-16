@@ -131,6 +131,57 @@
     ampelSenden('START');
     return typeof startAnsageSprechen === 'function' && startAnsageSprechen();
   }
+  // ---- WARTEZEIT zwischen Start und erstem gruenen Licht ----
+  //
+  // BESTELLT: "Wir brauchen ein Delay (3-5 Sekunden) nach Betaetigen des Start-Buttons bis
+  // zum Beginn der Sequenz der gruenen LEDs." Nach dem Start im Fenster steht die Ampel auf
+  // Gelb, die Ansage laeuft, und erst nach dieser Zeit beginnt der Countdown (der erste Ton =
+  // die ersten gruenen Spalten). Einstellbar in den Renneinstellungen, ab Werk 4 s, 0 = aus.
+  //
+  // Waehrend des Wartens laeuft noch nichts (raceState bleibt idle): ein zweites Startfenster
+  // wird nicht geoeffnet, und der Start-Knopf im Cockpit bricht das Warten ab (Ampel Rot).
+  const START_WARTE_STORE = 'omegasim-start-warte-s', START_WARTE_VORGABE = 4;
+  let startWarteTimer = null;
+  function startWarteMs() {
+    const el = $('race-start-warte');
+    const v = el ? parseFloat(el.value) : START_WARTE_VORGABE;
+    return (Number.isFinite(v) ? Math.max(0, Math.min(10, v)) : START_WARTE_VORGABE) * 1000;
+  }
+  function ampelStartWartet() { return !!startWarteTimer; }
+  // Aus raceGridStart() (70-race.js): Gelb und Ansage sofort, der Countdown (weiter) danach.
+  function ampelStartVerzoegert(weiter) {
+    if (startWarteTimer) return;
+    ampelStartKnopf();
+    const ms = startWarteMs();
+    if (!ms) { weiter(); return; }
+    $('race-status').textContent = t('Start in {n} s …').replace('{n}', String(Math.round(ms / 1000)));
+    startWarteTimer = setTimeout(() => {
+      startWarteTimer = null;
+      weiter();
+      updateRaceActButtons();
+    }, ms);
+    updateRaceActButtons();
+  }
+  function ampelStartWarteAbbrechen() {
+    if (!startWarteTimer) return;
+    clearTimeout(startWarteTimer);
+    startWarteTimer = null;
+    ampelSenden('ROT');
+    $('race-status').textContent = t('Start abgebrochen');
+    showHudToast(t('Start abgebrochen'));
+    updateRaceActButtons();
+  }
+  if ($('race-start-warte')) {
+    const el = $('race-start-warte');
+    const zeigen = () => { if ($('race-start-warte-val')) $('race-start-warte-val').textContent = Math.round(startWarteMs() / 1000) + ' s'; };
+    try { const w = localStorage.getItem(START_WARTE_STORE); if (w !== null && w !== '') el.value = w; } catch (e) { /* privat */ }
+    el.addEventListener('input', () => {
+      zeigen();
+      try { localStorage.setItem(START_WARTE_STORE, el.value); } catch (e) { /* privat */ }
+    });
+    zeigen();
+  }
+
   // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
   function ampelTon(stufe) {
     const ton = Math.max(1, Math.min(3, 4 - stufe));
