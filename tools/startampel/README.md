@@ -57,6 +57,55 @@ einen **ULN2803** (8 Kanäle, reicht für alle 7) oder je einen Logic-Level-MOSF
 GND vom Pi und vom LED-Netzteil verbinden. Pins und Polarität stehen oben in
 `startampel.py` (`PIN_…`, `AKTIV_HIGH`).
 
+## Variante: Raspberry Pi Pico W / Pico WH
+
+Statt eines Raspberry Pi geht auch ein **Pico W oder Pico WH** (mit Bluetooth). Er ist
+billiger, braucht keine SD-Karte und ist nach dem Einschalten in einer Sekunde bereit.
+Programm: `pico/main.py` (MicroPython), gleicher Bluetooth-Dienst und gleiche Befehle –
+die App merkt keinen Unterschied.
+
+**Einziger Unterschied: kein Ton.** Der Pico hat keinen Audioausgang, die Ansage
+„Gentlemen, start your engines“ entfällt.
+
+### Verdrahtung Pico
+
+| Kanal          | GPIO | Pin am Pico |
+|----------------|-----:|------------:|
+| Rot            | GP16 | 21          |
+| Gelb           | GP17 | 22          |
+| Grün Spalte 1  | GP18 | 24          |
+| Grün Spalte 2  | GP19 | 25          |
+| Grün Spalte 3  | GP20 | 26          |
+| Grün Spalte 4  | GP21 | 27          |
+| Grün Spalte 5  | GP22 | 29          |
+| GND            |      | 23 (oder ein anderer GND) |
+
+Auch hier jede Reihe/Spalte über einen **ULN2803** (schaltet mit 3,3 V am Eingang sicher)
+oder einen Logic-Level-MOSFET – ein Pico-Pin liefert nur wenige mA. Pins und Polarität
+stehen oben in `main.py`.
+
+Stromversorgung: über USB (5 V Netzteil oder Powerbank). Die LED-Reihen bekommen ihre
+eigene Spannung über den Treiber; GND von Pico und LED-Netzteil verbinden.
+
+### Einrichtung Pico
+
+1. **MicroPython für den Pico W** aufspielen (micropython.org → „Raspberry Pi Pico W“, die
+   `.uf2`-Datei, Version 1.22 oder neuer): BOOTSEL-Taste halten, Pico per USB anstecken,
+   die Datei auf das Laufwerk „RPI-RP2“ ziehen.
+2. **Thonny** öffnen (Interpreter: „MicroPython (Raspberry Pi Pico)“), `pico/main.py`
+   öffnen und **als `main.py` auf dem Pico speichern** („Raspberry Pi Pico“ als Ziel).
+3. Pico neu starten. Die **Onboard-LED blinkt**, solange er auf OmegaSim wartet, und
+   **leuchtet**, sobald die App verbunden ist. Die rote Reihe geht an.
+4. In OmegaSim: **Renneinstellungen → Startampel → Verbinden** und „Ampel“ wählen.
+
+Zum Testen ohne App in Thonny im Kommandofenster (Programm vorher mit Strg+C anhalten):
+
+```python
+from main import Ampel
+a = Ampel()
+a.befehl("START"); a.befehl("GRUEN 5"); a.befehl("TEST")
+```
+
 ## Einrichtung auf dem Pi
 
 Raspberry Pi OS (Bookworm oder neuer). Keine pip-Pakete nötig.
