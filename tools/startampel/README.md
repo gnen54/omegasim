@@ -9,7 +9,7 @@ Drei LED-Reihen: oben **Rot**, in der Mitte **Gelb**, unten **Grün** mit 5 Spal
 |-----------------------------------------------|----------------|------------------------------------------|
 | nichts freigegeben, Rennende, Abbruch         | `ROT`          | Rot                                      |
 | Start im Fenster *Bringe die Autos in Position* | `START`      | Rot aus, Gelb an                         |
-| Ampelton 1, 2, 3 des Countdowns               | `GRUEN 2/3/5`  | 2, 3, dann alle 5 grünen Spalten (+ Gelb) |
+| Ampelton 1 bis 5 des Countdowns (1 s Takt)   | `GRUEN 1…5`    | 1, 2, 3, 4, dann alle 5 grünen Spalten (+ Gelb) |
 | Grün / Start (auch freies Training)           | `LOS`          | alles aus                                |
 | Frühstart im Countdown *                      | `FRUEHSTART`   | Grün aus, Gelb blinkt bis zum Neustart   |
 | Gelbe Flagge                                  | `GELB`         | Gelb an                                  |
@@ -24,8 +24,9 @@ Nach dem Start im Fenster steht die Ampel eine **Wartezeit** lang auf Gelb (mit 
 Ansage), erst dann beginnt die grüne Sequenz – Renneinstellungen → **Wartezeit nach dem
 Start**, ab Werk 4 s, 0 = sofort. Der Start-Knopf im Cockpit bricht das Warten ab (Rot).
 
-Der Countdown in OmegaSim hat drei Töne. Wie bei der Ampel-Brücke im Cockpit leuchtet je
-Ton ein anteiliger Teil der fünf Spalten (2, 3, 5), damit Lampen und Töne zusammenpassen.
+Der Countdown in OmegaSim hat fünf Töne im Sekundentakt, wie an einer echten Startampel: je
+Ton leuchtet eine grüne Spalte mehr, nach dem fünften kommt Grün (alles aus). Die Ampel-Brücke
+im Cockpit zeigt dasselbe.
 
 Verliert der Pi die Verbindung zur App, geht die Ampel zur Sicherheit auf Rot
 (`BEI_VERBINDUNGSABBRUCH_ROT`).

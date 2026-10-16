@@ -12,7 +12,7 @@
 # Befehle von OmegaSim (Text, ein Befehl je Schreibvorgang)
 #     ROT          gesperrt, Rennende, Abbruch          -> Rot
 #     START        "Rennen starten"                     -> Gelb
-#     GRUEN <n>    Ampelton (die App schickt 2, 3, 5)   -> n gruene Spalten (+ Gelb)
+#     GRUEN <n>    Ampelton (die App schickt 1 bis 5)   -> n gruene Spalten (+ Gelb)
 #     LOS          Gruen / Start                        -> alles aus
 #     FRUEHSTART   Fruehstart im Countdown              -> Gelb blinkt bis START
 #     GELB         Gelbe Flagge                         -> Gelb ...
