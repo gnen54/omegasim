@@ -18,12 +18,10 @@
   //
   //   ROT | START | GRUEN <1-5> | LOS | FRUEHSTART | GELB | GELB_AUS
   //
-  // DREI TOENE, FUENF SPALTEN: der Countdown hat drei Toene. Wie die Bruecke im Cockpit
-  // (GANTRY_COLS in 70-race.js) leuchtet je Ton ein anteiliger Teil - 2, 3, 5 Spalten -,
-  // damit die Lampen am Tisch und die Toene, die man hoert, uebereinstimmen.
+  // FUENF TOENE, FUENF SPALTEN: der Countdown hat fuenf Toene im Sekundentakt (ampelZeitplan()
+  // in 70-race.js), je Ton leuchtet eine gruene Spalte mehr - wie die Bruecke im Cockpit.
   const AMPEL_SERVICE = 'b5a30001-0e9a-4b7c-8d2f-a3f1c0de5a11';
   const AMPEL_BEFEHL = 'b5a30002-0e9a-4b7c-8d2f-a3f1c0de5a11';
-  const AMPEL_SPALTEN = [0, 2, 3, 5];          // Ton 1..3 -> leuchtende Gruen-Spalten
   let ampelGeraet = null, ampelKanal = null;
   let ampelSchlange = Promise.resolve();
   // Ob die Ampel gerade im Vorstart steht (Gelb). START kommt beim Oeffnen des Startfensters;
@@ -182,10 +180,9 @@
     zeigen();
   }
 
-  // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
-  function ampelTon(stufe) {
-    const ton = Math.max(1, Math.min(3, 4 - stufe));
-    ampelSenden('GRUEN ' + AMPEL_SPALTEN[ton]);
+  // Ein Ampelton: licht = Zahl der leuchtenden Spalten, 1..5 (70-race.js).
+  function ampelTon(licht) {
+    ampelSenden('GRUEN ' + Math.max(1, Math.min(5, licht)));
   }
   function ampelLos() { ampelSenden('LOS'); }
   function ampelRennende() { ampelSenden('ROT'); }

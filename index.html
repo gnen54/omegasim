@@ -34973,15 +34973,20 @@
     return Math.max(0.05, Math.min(1, YELLOW_KMH / top));
   }
 
-  function setRaceLights(step) {
+  // `von` = wie viele Schritte die Abfolge hat: 3 (Anfahrt nach Gelb, 90-ghosts.js) oder 5
+  // (der Rennstart, v. unten). Bei 5 ist step die Zahl der leuchtenden Spalten der Bruecke,
+  // 1..5 aufsteigend wie an einer echten Startampel; die drei Lampen am Rand zeigen den Anteil.
+  function setRaceLights(step, von) {
     // step: 0 = all off, 1-3 = that many reds lit (bottom to top like a real start light
     // sequence), 'go' = green.
     ['race-light-1', 'race-light-2', 'race-light-3', 'race-light-go'].forEach(id => {
       $(id).classList.remove('on-red', 'on-green');
     });
+    const fuenf = von === 5 && step !== 'go' && step > 0;
+    const rand = fuenf ? Math.ceil(Math.min(5, step) * 3 / 5) : step;
     if (step === 'go') { $('race-light-go').classList.add('on-green'); }
-    else for (let i = 1; i <= step; i++) $(`race-light-${i}`).classList.add('on-red');
-    paintGantry(step);
+    else for (let i = 1; i <= Math.min(3, rand); i++) $(`race-light-${i}`).classList.add('on-red');
+    paintGantry(step, fuenf);
   }
 
   // Same state, drawn as the gantry over the cockpit. There are five columns but only three
@@ -34989,8 +34994,11 @@
   // steps over five columns is 2, 3, 5. A real FIA gantry has five one-second steps; this
   // countdown has three, and inventing two extra steps would make the lights disagree with
   // the beeps the driver is actually hearing.
+  // BESTELLT (Startampel): "aus der Dreier-Sequenz eine Fuenfer-Sequenz" - der Rennstart hat
+  // jetzt fuenf Toene, und die Bruecke zeigt dann eine Spalte je Ton (fuenf = true). Die
+  // Anfahrt nach Gelb bleibt bei drei und nutzt die Aufteilung unten.
   const GANTRY_COLS = [0, 2, 3, 5];
-  function paintGantry(step) {
+  function paintGantry(step, fuenf) {
     const g = $('race-gantry');
     if (!g) return;
     const lamps = g.querySelectorAll('.gantry-lamp');
@@ -35003,7 +35011,7 @@
     }
     if (!step) { g.classList.remove('on'); return; }
     g.classList.add('on');
-    const cols = GANTRY_COLS[Math.max(0, Math.min(3, step))] || 0;
+    const cols = fuenf ? Math.max(0, Math.min(5, step)) : (GANTRY_COLS[Math.max(0, Math.min(3, step))] || 0);
     lamps.forEach(l => { if (+l.dataset.col <= cols) l.classList.add('red'); });
   }
 
@@ -35561,8 +35569,16 @@
   // an festen Zeitpunkten vor Gruen statt an einem 1-s-Intervall - so kommt Gruen auf allen
   // Telefonen im selben Moment, wenn alle dieselbe (abgeglichene) Gruenzeit haben. Lokal ist
   // Gruen einfach jetzt + 3 s.
+  //
+  // FUENF LICHTER (BESTELLT: "aus der Dreier-Sequenz der gruenen LEDs eine Fuenfer-Sequenz"):
+  // wie an einer echten Startampel ein Licht je Sekunde, fuenf Sekunden vor Gruen. Die Stufe
+  // zaehlt rueckwaerts (5 = erstes Licht), damit "0 = Gruen" bleibt wie bisher.
+  const AMPEL_SCHRITTE = 5;
   function ampelZeitplan(gruen) {
-    return [[gruen - 3000, 3], [gruen - 2000, 2], [gruen - 1000, 1], [gruen, 0]];
+    const plan = [];
+    for (let k = AMPEL_SCHRITTE; k >= 1; k--) plan.push([gruen - k * 1000, k]);
+    plan.push([gruen, 0]);
+    return plan;
   }
   // gruenZiel: lokale Uhrzeit (ms) fuer Gruen, sonst in 3 s. mpPlan: Wetterplan und Wind eines
   // gemeinsamen Mehrspieler-Rennens (97-sessions.js).
@@ -35868,7 +35884,7 @@
     // auf, und ein Countdown, aus dem man nicht herauskommt, ist eine Falle.
     $('race-stop-btn').disabled = false;
     $('race-status').textContent = 'Countdown…';
-    const plan = ampelZeitplan(gruenBei || Date.now() + 3000);
+    const plan = ampelZeitplan(gruenBei || Date.now() + AMPEL_SCHRITTE * 1000);
     clearTimeout(raceCountdownTimer);
     const schritt = (k) => {
       if (raceState !== 'countdown') return;
@@ -35879,9 +35895,11 @@
       // Kommt der Plan spaet an, werden verpasste Lichter uebersprungen - nur Gruen zaehlt.
       if (stufe > 0 && warte < -400 && k + 1 < plan.length) { schritt(k + 1); return; }
       if (stufe > 0) {
-        setRaceLights(stufe);
-        ampelTon(stufe);
-        playTone(440 + (3 - stufe) * 60, 0.18, 'square', 0.18);
+        // Stufe 5..1 -> 1..5 leuchtende Spalten, und je Licht ein etwas hoeherer Ton.
+        const licht = AMPEL_SCHRITTE + 1 - stufe;
+        setRaceLights(licht, AMPEL_SCHRITTE);
+        ampelTon(licht);
+        playTone(440 + (licht - 1) * 45, 0.18, 'square', 0.18);
         schritt(k + 1);
         return;
       }
@@ -44653,12 +44671,10 @@
   //
   //   ROT | START | GRUEN <1-5> | LOS | FRUEHSTART | GELB | GELB_AUS
   //
-  // DREI TOENE, FUENF SPALTEN: der Countdown hat drei Toene. Wie die Bruecke im Cockpit
-  // (GANTRY_COLS in 70-race.js) leuchtet je Ton ein anteiliger Teil - 2, 3, 5 Spalten -,
-  // damit die Lampen am Tisch und die Toene, die man hoert, uebereinstimmen.
+  // FUENF TOENE, FUENF SPALTEN: der Countdown hat fuenf Toene im Sekundentakt (ampelZeitplan()
+  // in 70-race.js), je Ton leuchtet eine gruene Spalte mehr - wie die Bruecke im Cockpit.
   const AMPEL_SERVICE = 'b5a30001-0e9a-4b7c-8d2f-a3f1c0de5a11';
   const AMPEL_BEFEHL = 'b5a30002-0e9a-4b7c-8d2f-a3f1c0de5a11';
-  const AMPEL_SPALTEN = [0, 2, 3, 5];          // Ton 1..3 -> leuchtende Gruen-Spalten
   let ampelGeraet = null, ampelKanal = null;
   let ampelSchlange = Promise.resolve();
   // Ob die Ampel gerade im Vorstart steht (Gelb). START kommt beim Oeffnen des Startfensters;
@@ -44817,10 +44833,9 @@
     zeigen();
   }
 
-  // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
-  function ampelTon(stufe) {
-    const ton = Math.max(1, Math.min(3, 4 - stufe));
-    ampelSenden('GRUEN ' + AMPEL_SPALTEN[ton]);
+  // Ein Ampelton: licht = Zahl der leuchtenden Spalten, 1..5 (70-race.js).
+  function ampelTon(licht) {
+    ampelSenden('GRUEN ' + Math.max(1, Math.min(5, licht)));
   }
   function ampelLos() { ampelSenden('LOS'); }
   function ampelRennende() { ampelSenden('ROT'); }
@@ -80105,7 +80120,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
   stAdd('Mehrspieler: Ampel nach Frist, Uhrabgleich, gemeinsamer Wetterplan', () => {
     const f = [];
     const z = ampelZeitplan(10000);
-    if (JSON.stringify(z) !== JSON.stringify([[7000, 3], [8000, 2], [9000, 1], [10000, 0]])) f.push('Zeitplan ' + JSON.stringify(z));
+    if (JSON.stringify(z) !== JSON.stringify([[5000, 5], [6000, 4], [7000, 3], [8000, 2], [9000, 1], [10000, 0]])) f.push('Zeitplan ' + JSON.stringify(z));
     const merkP = mp.proben.slice(), merkO = mp.offset;
     try {
       mp.proben = [];
@@ -80136,7 +80151,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       Date.now = merk.now; raceWxStart = merk.wx; raceMode = merk.mode; raceLimit = merk.lim;
       raceState = merk.st; mpWetter = null; setWeather(merk.wetter);
     }
-    return { ok: !f.length, mass: f.length ? f.join('; ') : 'Lichter -3/-2/-1/0 s, Versatz vom kuerzesten Weg, Wetter folgt dem Plan' };
+    return { ok: !f.length, mass: f.length ? f.join('; ') : 'Lichter -5/-4/-3/-2/-1/0 s, Versatz vom kuerzesten Weg, Wetter folgt dem Plan' };
   });
 
   stAdd('Lenkkennlinie: voll genau bei X %, Anfang unter linear, symmetrisch, am Servo', () => {
@@ -86270,7 +86285,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       // Ohne Startfenster: der Countdown schickt START nach.
       raceState = 'countdown';
       ampelCountdown(false);
-      ampelTon(3); ampelTon(2); ampelTon(1);
+      ampelTon(1); ampelTon(2); ampelTon(3); ampelTon(4); ampelTon(5);
       ampelLos();
       ampelGelb(true); ampelGelb(false);
       ampelRennende();
@@ -86289,7 +86304,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       $('race-ampel-neustart').checked = false;
       if (ampelFruehstart()) f.push('Schalter aus: trotzdem abgebrochen');
       await ampelSchlange;
-      const soll = ['START', 'GRUEN 2', 'GRUEN 3', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
+      const soll = ['START', 'GRUEN 1', 'GRUEN 2', 'GRUEN 3', 'GRUEN 4', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
                     'START', 'FRUEHSTART'];
       if (gesendet.join('|') !== soll.join('|')) f.push('gesendet: ' + gesendet.join(', '));
     } finally {
@@ -86300,7 +86315,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       fruehstartReset();
     }
     return { ok: !f.length, mass: f.length ? f.join(' | ')
-      : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
+      : 'START, GRUEN 1-5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
   });
 
   stAdd('Startansage und Gelb: nur der Start-Knopf in "Bringe die Autos in Position"', () => {
