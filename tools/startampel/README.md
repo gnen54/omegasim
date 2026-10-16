@@ -127,6 +127,21 @@ Die Ausgabe zeigt „Sichtbar als "Ampel"“. Dann in OmegaSim: **Renneinstellun
 Startampel (Raspberry Pi) → Verbinden** und „Ampel“ wählen. Geht in Chrome/Edge (PC,
 Android) und in der OmegaSim-Android-App, nicht in Firefox oder Safari.
 
+### Wenn das Tablet eine Kopplungsanfrage zeigt und der Pi gleich wieder trennt
+
+Der Pi 3 kann auch klassisches Bluetooth, und Android versucht dann, ihn klassisch zu
+koppeln. Das Programm fängt das ab: es schaltet den Pi beim Start auf **reines Bluetooth LE**
+(`NUR_LE = True`) und beantwortet Kopplungsanfragen selbst, ohne PIN. Im Terminal steht dann
+„Bluetooth: nur LE“ und „Kopplungsagent aktiv“. Falls es trotzdem trennt:
+
+1. Am Tablet unter **Einstellungen → Bluetooth** einen alten Eintrag „Ampel“ oder
+   „raspberrypi“ **entkoppeln** (von einem früheren Versuch).
+2. Am Pi Bluetooth neu starten: `sudo systemctl restart bluetooth`, dann das Programm neu.
+3. Steht im Terminal „btmgmt fehlt“: in `/etc/bluetooth/main.conf` unter `[General]` die
+   Zeile `ControllerMode = le` eintragen und `sudo systemctl restart bluetooth`.
+4. In Chrome neu verbinden (Renneinstellungen → Startampel → Verbinden). Eine
+   Kopplungsanfrage darf man bestätigen – sie geht jetzt durch.
+
 ### Autostart
 
 ```bash
