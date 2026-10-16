@@ -17213,7 +17213,9 @@
     const echtBuffers = Object.assign({}, voiceBuffers);
     const gs = $('race-gridscreen');
     const merk = { vs: ampelVorstart, k: ampelKanal, g: ampelGeraet, rs: raceState,
-                   an: $('setting-announce-start').checked, gs: gs ? gs.hidden : true, w: raceGridWeiter };
+                   an: $('setting-announce-start').checked, gs: gs ? gs.hidden : true, w: raceGridWeiter,
+                   warte: $('race-start-warte').value };
+    $('race-start-warte').value = '0';   // Wartezeit hat ihren eigenen Test
     const el = $('setting-announce-start');
     // START wird ueber eine Schlange gesendet (asynchron); sofort sichtbar ist ampelVorstart,
     // das ampelSenden('START') im selben Aufruf setzt.
@@ -17255,6 +17257,7 @@
       ampelVorstart = merk.vs; ampelKanal = merk.k; ampelGeraet = merk.g; raceState = merk.rs;
       if (gs) gs.hidden = merk.gs;
       raceGridWeiter = merk.w;
+      $('race-start-warte').value = merk.warte;
       el.checked = merk.an; el.dispatchEvent(new Event('change', { bubbles: true }));
     }
     return ampelSchlange.then(() => {
@@ -17262,6 +17265,53 @@
       return { ok: !f.length, mass: f.length ? f.join(' | ')
         : 'Fenster oeffnen: nichts; Start im Fenster: Gelb + Ansage; laufend: nichts; Mehrspieler: Gelb ohne Ansage' };
     });
+  });
+
+  stAdd('Startampel: Wartezeit nach dem Start bis zum ersten gruenen Licht', async () => {
+    const f = [];
+    const gs = $('race-gridscreen');
+    const el = $('race-start-warte');
+    const merk = { warte: el.value, rs: raceState, gs: gs ? gs.hidden : true, w: raceGridWeiter,
+                   an: $('setting-announce-start').checked, vs: ampelVorstart };
+    const ansage = $('setting-announce-start');
+    let gestartet = 0;
+    const weiter = () => { gestartet++; };
+    try {
+      ansage.checked = false; ansage.dispatchEvent(new Event('change', { bubbles: true }));
+      raceState = 'idle';
+      el.value = '1';
+      // Start: Gelb sofort, Countdown erst nach 1 s.
+      raceGridAnzeigen(weiter); raceGridStart();
+      if (!ampelVorstart) f.push('kein Gelb beim Start');
+      if (gestartet !== 0) f.push('Countdown sofort statt nach 1 s');
+      if (!ampelStartWartet()) f.push('wartet nicht');
+      // Waehrend des Wartens: kein zweites Startfenster.
+      raceGridAnzeigen(weiter);
+      if (gs && !gs.hidden) f.push('zweites Startfenster im Warten');
+      await new Promise((r) => setTimeout(r, 1150));
+      if (gestartet !== 1) f.push('nach 1 s ' + gestartet + 'x gestartet statt 1x');
+      if (ampelStartWartet()) f.push('wartet nach Ablauf noch');
+      // Abbrechen im Warten: Rot, kein Countdown.
+      raceState = 'idle';
+      raceGridAnzeigen(weiter); raceGridStart();
+      toggleRace();
+      if (ampelStartWartet()) f.push('Abbrechen beendet das Warten nicht');
+      if (ampelVorstart) f.push('nach Abbrechen nicht Rot');
+      await new Promise((r) => setTimeout(r, 1150));
+      if (gestartet !== 1) f.push('nach Abbrechen trotzdem gestartet');
+      // 0 = sofort.
+      el.value = '0';
+      raceGridAnzeigen(weiter); raceGridStart();
+      if (gestartet !== 2) f.push('Wartezeit 0: nicht sofort');
+    } finally {
+      if (ampelStartWartet()) ampelStartWarteAbbrechen();
+      el.value = merk.warte; raceState = merk.rs; raceGridWeiter = merk.w; ampelVorstart = merk.vs;
+      if (gs) gs.hidden = merk.gs;
+      ansage.checked = merk.an; ansage.dispatchEvent(new Event('change', { bubbles: true }));
+      updateRaceActButtons();
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'Gelb sofort, Countdown nach der Wartezeit, kein zweites Fenster, Abbrechen = Rot, 0 = sofort' };
   });
 
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {
