@@ -17258,6 +17258,40 @@
       : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
   });
 
+  stAdd('Startansage: "Gentlemen, start your engines" einmal je Start, englisch, abschaltbar', () => {
+    const f = [];
+    const gesagt = [];
+    const echt = window.speechSynthesis;
+    const echtBuffers = Object.assign({}, voiceBuffers);
+    const merk = { vs: ampelVorstart, k: ampelKanal, an: $('setting-announce-start').checked };
+    try {
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true,
+        value: { cancel() {}, getVoices() { return []; }, speak(u) { gesagt.push(u.lang + ':' + u.text); } } });
+      ampelKanal = null;   // ohne Ampel: die Ansage kommt trotzdem
+      const el = $('setting-announce-start');
+      el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true }));
+      ampelVorstart = false;
+      ampelStartfenster(); ampelCountdown(false);          // Startfenster: einmal
+      ampelSenden('ROT'); ampelCountdown(false);            // ohne Startfenster: einmal
+      ampelSenden('ROT');
+      el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true }));
+      ampelStartfenster();                                  // ausgeschaltet: nichts
+      const soll = ['en-US:Gentlemen, start your engines', 'en-US:Gentlemen, start your engines'];
+      if (gesagt.join('|') !== soll.join('|')) f.push('gesagt: ' + (gesagt.join(' ; ') || 'nichts'));
+    } finally {
+      if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
+      else delete window.speechSynthesis;
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.assign(voiceBuffers, echtBuffers);
+      ampelVorstart = merk.vs; ampelKanal = merk.k;
+      const el = $('setting-announce-start');
+      el.checked = merk.an; el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'einmal beim Startfenster, einmal beim Countdown ohne Fenster, englisch, aus = still' };
+  });
+
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {
     const f = [];
     const merk = { rs: raceState, tab: kAktiverTab() };
