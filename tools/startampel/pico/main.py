@@ -19,8 +19,8 @@
 #     GELB_AUS     ... bis zur Freigabe                 -> aus
 #     TEST         Lampentest: 2 s alles an
 #
-# Unterschied zum Raspberry Pi: der Pico hat keinen Ton, also keine Ansage
-# "Gentlemen, start your engines" (siehe README, Abschnitt Pico).
+# Die Ansage "Gentlemen, start your engines" spricht OmegaSim selbst - der Pico braucht
+# keinen Ton.
 #
 # Die Onboard-LED zeigt den Bluetooth-Zustand: blinkt = wartet auf OmegaSim, an = verbunden.
 

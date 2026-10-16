@@ -55,6 +55,9 @@ PHRASES = {
     # Akku kritisch (6 %), akkuKritischMelden() in src/80-sound.js. Solange diese
     # Aufnahme fehlt, spricht die Live-Stimme; ohne Stimme (App-WebView) kommt "Akku fast leer".
     'batterycrit': {'de': 'Session abbrechen, Box anfahren!', 'en': 'Abort session, box now!'},
+    # Startansage, startAnsageSprechen() in src/80-sound.js - in beiden Sprachen englisch
+    # (feststehender Ruf). Fuer 'de' am besten auch mit der englischen Stimme rendern.
+    'start': {'de': 'Gentlemen, start your engines', 'en': 'Gentlemen, start your engines'},
 }
 
 # Dieselben zwei Stimmen, die GetInstalledVoices() auf diesem Rechner meldet. Ein anderer

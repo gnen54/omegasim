@@ -8978,7 +8978,7 @@
       <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi)
           <span class="wip-tag">experimentell</span>
           <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab
-          &bdquo;Rennen starten&ldquo;; Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
+          &bdquo;Rennen starten&ldquo; (die Ansage kommt von OmegaSim, siehe Ton); Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
           bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.
           <span id="ampel-status">Nicht verbunden.</span></small></div>
         <button type="button" id="ampel-verbinden">Verbinden</button></div>
@@ -10177,6 +10177,8 @@
         <label class="tgl"><input type="checkbox" id="setting-announce-rain" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Boxenstopp ansagen<small>Wenn der Stopp &uuml;ber den doppelten Start-Ausdruck ausgel&ouml;st wird: &bdquo;Boxenstopp eingeleitet&ldquo;. Nicht beim Knopf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-pit" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Startansage<small>Bei &bdquo;Rennen starten&ldquo;, wenn die Startampel auf Gelb geht: &bdquo;Gentlemen, start your engines&ldquo; (immer englisch).</small></div>
+        <label class="tgl"><input type="checkbox" id="setting-announce-start" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Akku ansagen<small>Einmal, wenn der Akku unter 25&nbsp;% f&auml;llt. Erst nach dem Laden wieder scharf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-battery"><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Akku kritisch ansagen<small>Einmal je Auto, wenn der Akku auf 6&nbsp;% f&auml;llt &ndash; die letzte Stufe vor dem Stehenbleiben: &bdquo;Session abbrechen, Box anfahren!&ldquo; Erst nach dem Laden wieder scharf.</small></div>
@@ -13387,8 +13389,10 @@
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
     "Akku kritisch ansagen": "Announce critical battery",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops to 6 % – the last step before the car stops: “Abort session, box now!” Armed again only after charging.",
+    "Startansage": "Start announcement",
+    "Bei „Rennen starten“, wenn die Startampel auf Gelb geht: „Gentlemen, start your engines“ (immer englisch).": "On “Start race”, when the start light turns yellow: “Gentlemen, start your engines”.",
     "Startampel (Raspberry Pi)": "Start light (Raspberry Pi)",
-    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab „Rennen starten“; Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "A real start light at the table: red while nothing is released; yellow from “Start race”; green column by column with the start beeps; everything off at green; yellow under a yellow flag; red again after the race.",
+    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab „Rennen starten“ (die Ansage kommt von OmegaSim, siehe Ton); Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "A real start light at the table: red while nothing is released; yellow from “Start race” (OmegaSim makes the announcement, see Sound); green column by column with the start beeps; everything off at green; yellow under a yellow flag; red again after the race.",
     "Startampel: Frühstart bricht den Start ab": "Start light: a jump start aborts the start",
     "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Only with a connected start light, not in Wi-Fi multiplayer and not in challenges: a jump start stops the countdown, yellow flashes at the table, and “Start race” begins the sequence again. Off: the lights carry on, penalty as above.",
     "Verbunden: {n}": "Connected: {n}",
@@ -16060,8 +16064,10 @@
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
     "Akku kritisch ansagen": "Anunciar batería crítica",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja al 6 % – el último paso antes de que se pare: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
+    "Startansage": "Anuncio de salida",
+    "Bei „Rennen starten“, wenn die Startampel auf Gelb geht: „Gentlemen, start your engines“ (immer englisch).": "Al pulsar «Iniciar carrera», cuando el semáforo pasa a amarillo: «Gentlemen, start your engines» (siempre en inglés).",
     "Startampel (Raspberry Pi)": "Semáforo de salida (Raspberry Pi)",
-    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab „Rennen starten“; Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "Un semáforo de salida real en la mesa: rojo mientras nada está liberado; amarillo desde «Iniciar carrera»; verde columna a columna al ritmo de los pitidos; todo apagado con el verde; amarillo con bandera amarilla; rojo de nuevo tras la carrera.",
+    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb ab „Rennen starten“ (die Ansage kommt von OmegaSim, siehe Ton); Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "Un semáforo de salida real en la mesa: rojo mientras nada está liberado; amarillo desde «Iniciar carrera» (el anuncio lo hace OmegaSim, ver Sonido); verde columna a columna al ritmo de los pitidos; todo apagado con el verde; amarillo con bandera amarilla; rojo de nuevo tras la carrera.",
     "Startampel: Frühstart bricht den Start ab": "Semáforo: una salida en falso cancela la salida",
     "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Solo con el semáforo conectado, no en multijugador por WiFi ni en desafíos: una salida en falso detiene la cuenta atrás, el amarillo parpadea en la mesa y «Iniciar carrera» reinicia la secuencia. Desactivado: el semáforo continúa, con la penalización de arriba.",
     "Verbunden: {n}": "Conectado: {n}",
@@ -44608,7 +44614,8 @@
   // LED-Reihen: oben Rot, in der Mitte Gelb, unten Gruen mit fuenf Spalten.
   //
   //   gesperrt (kein Training/Rennen freigegeben)   Rot
-  //   "Rennen starten" gedrueckt                    Rot aus, Gelb an (+ Ansage am Pi)
+  //   "Rennen starten" gedrueckt                    Rot aus, Gelb an; OmegaSim sagt
+  //                                                 "Gentlemen, start your engines"
   //   Starttoene des Countdowns                     Gruen, Spalte fuer Spalte dazu
   //   Gruen / Los                                   alles aus
   //   Fruehstart im Countdown                       Gruen aus, Gelb blinkt bis zum Neustart
@@ -44714,13 +44721,18 @@
 
   // ---- Die Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
   // "Rennen starten" oeffnet das Startfenster: ab hier ist freigegeben, die Ampel geht auf Gelb.
-  function ampelStartfenster() { ampelSenden('START'); }
+  function ampelStartfenster() { ampelSenden('START'); startAnsage(); }
   // Startfenster abgebrochen: zurueck auf Rot.
   function ampelStartAbgebrochen() { ampelSenden('ROT'); }
   // Der Countdown beginnt. Kam kein Startfenster davor, fehlt START noch.
   function ampelCountdown(zeitgesteuert) {
     ampelZeitgesteuert = !!zeitgesteuert;
-    if (!ampelVorstart) ampelSenden('START');
+    if (!ampelVorstart) { ampelSenden('START'); startAnsage(); }
+  }
+  // "Gentlemen, start your engines" - von OmegaSim gesprochen (80-sound.js), nicht vom Pi.
+  // Haengt am selben Moment wie START: die Ampel geht auf Gelb. Auch ohne verbundene Ampel.
+  function startAnsage() {
+    if (typeof startAnsageSprechen === 'function') startAnsageSprechen();
   }
   // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
   function ampelTon(stufe) {
@@ -45428,7 +45440,7 @@
   const AKKU_KRITISCH = 0.06;
   const AKKU_KRITISCH_HYSTERESE = 0.15;   // erst nach dem Laden wieder scharf
   const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
-                     batterycrit: true };
+                     batterycrit: true, start: true };
   const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false };
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
@@ -45620,6 +45632,36 @@
     return raus;
   }
 
+  // ---- STARTANSAGE: "Gentlemen, start your engines" ---------------------------------
+  //
+  // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch. Gesagt wird
+  // sie, wenn die Ampel auf Gelb geht - beim Oeffnen des Startfensters, oder beim Countdown,
+  // wenn es kein Startfenster gab (74-startampel.js). Mit und ohne angeschlossene Ampel.
+  //
+  // IMMER ENGLISCH, auch in der deutschen Oberflaeche: der Satz ist ein feststehender Ruf
+  // (Indianapolis), und eine deutsche Stimme spricht ihn falsch aus. Reihenfolge wie bei den
+  // anderen Meldungen: eigene Aufnahme ('start', sobald tools/voice_synth.py sie rendert),
+  // sonst die englische Live-Stimme.
+  const START_ANSAGE = 'Gentlemen, start your engines';
+  function startAnsageSprechen() {
+    if (!ansageAn.start) return false;
+    if (playAnsageClip('start')) return true;
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      window.speechSynthesis.cancel();
+      announceCancels++;
+      const u = new SpeechSynthesisUtterance(START_ANSAGE);
+      u.lang = 'en-US';
+      u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
+      const stimmen = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      const en = stimmen.find((v) => /^en[-_]US/i.test(v.lang)) || stimmen.find((v) => /^en/i.test(v.lang));
+      if (en) u.voice = en;
+      window.speechSynthesis.speak(u);
+      announceCalls++;
+      return true;
+    } catch (e) { return false; }
+  }
+
   function speakLap(ms, istBest) {
     // Ohne Sprachausgabe (App-WebView): die Zahlen-Clips.
     if (!('speechSynthesis' in window)) {
@@ -45636,7 +45678,8 @@
                              'setting-announce-fuel': 'fuel', 'setting-announce-tyre': 'tyre',
                              'setting-announce-rain': 'rain', 'setting-announce-pit': 'pit',
                              'setting-announce-battery': 'battery',
-                             'setting-announce-battery-crit': 'batterycrit' };
+                             'setting-announce-battery-crit': 'batterycrit',
+                             'setting-announce-start': 'start' };
   Object.keys(ANSAGE_KAESTCHEN).forEach((id) => {
     const el = $(id);
     if (!el) return;
@@ -86174,6 +86217,40 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     }
     return { ok: !f.length, mass: f.length ? f.join(' | ')
       : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
+  });
+
+  stAdd('Startansage: "Gentlemen, start your engines" einmal je Start, englisch, abschaltbar', () => {
+    const f = [];
+    const gesagt = [];
+    const echt = window.speechSynthesis;
+    const echtBuffers = Object.assign({}, voiceBuffers);
+    const merk = { vs: ampelVorstart, k: ampelKanal, an: $('setting-announce-start').checked };
+    try {
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true,
+        value: { cancel() {}, getVoices() { return []; }, speak(u) { gesagt.push(u.lang + ':' + u.text); } } });
+      ampelKanal = null;   // ohne Ampel: die Ansage kommt trotzdem
+      const el = $('setting-announce-start');
+      el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true }));
+      ampelVorstart = false;
+      ampelStartfenster(); ampelCountdown(false);          // Startfenster: einmal
+      ampelSenden('ROT'); ampelCountdown(false);            // ohne Startfenster: einmal
+      ampelSenden('ROT');
+      el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true }));
+      ampelStartfenster();                                  // ausgeschaltet: nichts
+      const soll = ['en-US:Gentlemen, start your engines', 'en-US:Gentlemen, start your engines'];
+      if (gesagt.join('|') !== soll.join('|')) f.push('gesagt: ' + (gesagt.join(' ; ') || 'nichts'));
+    } finally {
+      if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
+      else delete window.speechSynthesis;
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.assign(voiceBuffers, echtBuffers);
+      ampelVorstart = merk.vs; ampelKanal = merk.k;
+      const el = $('setting-announce-start');
+      el.checked = merk.an; el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'einmal beim Startfenster, einmal beim Countdown ohne Fenster, englisch, aus = still' };
   });
 
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {

@@ -669,7 +669,7 @@
   const AKKU_KRITISCH = 0.06;
   const AKKU_KRITISCH_HYSTERESE = 0.15;   // erst nach dem Laden wieder scharf
   const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
-                     batterycrit: true };
+                     batterycrit: true, start: true };
   const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false };
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
@@ -861,6 +861,36 @@
     return raus;
   }
 
+  // ---- STARTANSAGE: "Gentlemen, start your engines" ---------------------------------
+  //
+  // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch. Gesagt wird
+  // sie, wenn die Ampel auf Gelb geht - beim Oeffnen des Startfensters, oder beim Countdown,
+  // wenn es kein Startfenster gab (74-startampel.js). Mit und ohne angeschlossene Ampel.
+  //
+  // IMMER ENGLISCH, auch in der deutschen Oberflaeche: der Satz ist ein feststehender Ruf
+  // (Indianapolis), und eine deutsche Stimme spricht ihn falsch aus. Reihenfolge wie bei den
+  // anderen Meldungen: eigene Aufnahme ('start', sobald tools/voice_synth.py sie rendert),
+  // sonst die englische Live-Stimme.
+  const START_ANSAGE = 'Gentlemen, start your engines';
+  function startAnsageSprechen() {
+    if (!ansageAn.start) return false;
+    if (playAnsageClip('start')) return true;
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      window.speechSynthesis.cancel();
+      announceCancels++;
+      const u = new SpeechSynthesisUtterance(START_ANSAGE);
+      u.lang = 'en-US';
+      u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
+      const stimmen = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      const en = stimmen.find((v) => /^en[-_]US/i.test(v.lang)) || stimmen.find((v) => /^en/i.test(v.lang));
+      if (en) u.voice = en;
+      window.speechSynthesis.speak(u);
+      announceCalls++;
+      return true;
+    } catch (e) { return false; }
+  }
+
   function speakLap(ms, istBest) {
     // Ohne Sprachausgabe (App-WebView): die Zahlen-Clips.
     if (!('speechSynthesis' in window)) {
@@ -877,7 +907,8 @@
                              'setting-announce-fuel': 'fuel', 'setting-announce-tyre': 'tyre',
                              'setting-announce-rain': 'rain', 'setting-announce-pit': 'pit',
                              'setting-announce-battery': 'battery',
-                             'setting-announce-battery-crit': 'batterycrit' };
+                             'setting-announce-battery-crit': 'batterycrit',
+                             'setting-announce-start': 'start' };
   Object.keys(ANSAGE_KAESTCHEN).forEach((id) => {
     const el = $(id);
     if (!el) return;

@@ -4,7 +4,8 @@
   // LED-Reihen: oben Rot, in der Mitte Gelb, unten Gruen mit fuenf Spalten.
   //
   //   gesperrt (kein Training/Rennen freigegeben)   Rot
-  //   "Rennen starten" gedrueckt                    Rot aus, Gelb an (+ Ansage am Pi)
+  //   "Rennen starten" gedrueckt                    Rot aus, Gelb an; OmegaSim sagt
+  //                                                 "Gentlemen, start your engines"
   //   Starttoene des Countdowns                     Gruen, Spalte fuer Spalte dazu
   //   Gruen / Los                                   alles aus
   //   Fruehstart im Countdown                       Gruen aus, Gelb blinkt bis zum Neustart
@@ -110,13 +111,18 @@
 
   // ---- Die Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
   // "Rennen starten" oeffnet das Startfenster: ab hier ist freigegeben, die Ampel geht auf Gelb.
-  function ampelStartfenster() { ampelSenden('START'); }
+  function ampelStartfenster() { ampelSenden('START'); startAnsage(); }
   // Startfenster abgebrochen: zurueck auf Rot.
   function ampelStartAbgebrochen() { ampelSenden('ROT'); }
   // Der Countdown beginnt. Kam kein Startfenster davor, fehlt START noch.
   function ampelCountdown(zeitgesteuert) {
     ampelZeitgesteuert = !!zeitgesteuert;
-    if (!ampelVorstart) ampelSenden('START');
+    if (!ampelVorstart) { ampelSenden('START'); startAnsage(); }
+  }
+  // "Gentlemen, start your engines" - von OmegaSim gesprochen (80-sound.js), nicht vom Pi.
+  // Haengt am selben Moment wie START: die Ampel geht auf Gelb. Auch ohne verbundene Ampel.
+  function startAnsage() {
+    if (typeof startAnsageSprechen === 'function') startAnsageSprechen();
   }
   // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
   function ampelTon(stufe) {
