@@ -17206,38 +17206,50 @@
       : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
   });
 
-  stAdd('Startansage: "Gentlemen, start your engines" einmal je Start, englisch, abschaltbar', () => {
+  stAdd('Startansage: nur per Start-Knopf und nur, wenn nichts laeuft', () => {
     const f = [];
     const gesagt = [];
     const echt = window.speechSynthesis;
     const echtBuffers = Object.assign({}, voiceBuffers);
-    const merk = { vs: ampelVorstart, k: ampelKanal, an: $('setting-announce-start').checked };
+    const merk = { vs: ampelVorstart, k: ampelKanal, rs: raceState, an: $('setting-announce-start').checked };
+    const el = $('setting-announce-start');
+    const fall = (name, soll, tun) => {
+      const vor = gesagt.length; tun();
+      const n = gesagt.length - vor;
+      if (n !== soll) f.push(name + ': ' + n + ' statt ' + soll);
+    };
     try {
       Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
       Object.defineProperty(window, 'speechSynthesis', { configurable: true,
         value: { cancel() {}, getVoices() { return []; }, speak(u) { gesagt.push(u.lang + ':' + u.text); } } });
       ampelKanal = null;   // ohne Ampel: die Ansage kommt trotzdem
-      const el = $('setting-announce-start');
       el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true }));
-      ampelVorstart = false;
-      ampelStartfenster(); ampelCountdown(false);          // Startfenster: einmal
-      ampelSenden('ROT'); ampelCountdown(false);            // ohne Startfenster: einmal
+      raceState = 'idle';
+      fall('Start-Knopf, nichts laeuft', 1, () => ampelStartKnopf());
+      raceState = 'finished';
+      fall('Start-Knopf nach Rennende', 1, () => ampelStartKnopf());
+      for (const rs of ['countdown', 'racing', 'finishing']) {
+        raceState = rs;
+        fall('Start-Knopf waehrend ' + rs, 0, () => ampelStartKnopf());
+      }
+      raceState = 'idle'; ampelVorstart = false;
+      fall('Startfenster von selbst (Challenge)', 0, () => ampelStartfenster());
+      ampelSenden('ROT');
+      fall('Countdown ohne Knopf (Mehrspieler)', 0, () => ampelCountdown(true));
       ampelSenden('ROT');
       el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true }));
-      ampelStartfenster();                                  // ausgeschaltet: nichts
-      const soll = ['en-US:Gentlemen, start your engines', 'en-US:Gentlemen, start your engines'];
-      if (gesagt.join('|') !== soll.join('|')) f.push('gesagt: ' + (gesagt.join(' ; ') || 'nichts'));
+      fall('ausgeschaltet', 0, () => ampelStartKnopf());
+      if (gesagt.some((x) => x !== 'en-US:Gentlemen, start your engines')) f.push('Text/Sprache: ' + gesagt.join(' ; '));
     } finally {
       if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
       else delete window.speechSynthesis;
       Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
       Object.assign(voiceBuffers, echtBuffers);
-      ampelVorstart = merk.vs; ampelKanal = merk.k;
-      const el = $('setting-announce-start');
+      ampelVorstart = merk.vs; ampelKanal = merk.k; raceState = merk.rs;
       el.checked = merk.an; el.dispatchEvent(new Event('change', { bubbles: true }));
     }
     return { ok: !f.length, mass: f.length ? f.join(' | ')
-      : 'einmal beim Startfenster, einmal beim Countdown ohne Fenster, englisch, aus = still' };
+      : 'Knopf bei idle/finished: ja; bei Countdown/Rennen, Challenge-Fenster, Mehrspieler-Countdown, aus: nein' };
   });
 
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {

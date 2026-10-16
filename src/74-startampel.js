@@ -111,18 +111,25 @@
 
   // ---- Die Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
   // "Rennen starten" oeffnet das Startfenster: ab hier ist freigegeben, die Ampel geht auf Gelb.
-  function ampelStartfenster() { ampelSenden('START'); startAnsage(); }
+  function ampelStartfenster() { ampelSenden('START'); }
   // Startfenster abgebrochen: zurueck auf Rot.
   function ampelStartAbgebrochen() { ampelSenden('ROT'); }
   // Der Countdown beginnt. Kam kein Startfenster davor, fehlt START noch.
   function ampelCountdown(zeitgesteuert) {
     ampelZeitgesteuert = !!zeitgesteuert;
-    if (!ampelVorstart) { ampelSenden('START'); startAnsage(); }
+    if (!ampelVorstart) ampelSenden('START');
   }
   // "Gentlemen, start your engines" - von OmegaSim gesprochen (80-sound.js), nicht vom Pi.
-  // Haengt am selben Moment wie START: die Ampel geht auf Gelb. Auch ohne verbundene Ampel.
-  function startAnsage() {
-    if (typeof startAnsageSprechen === 'function') startAnsageSprechen();
+  //
+  // BESTELLT: "darf NUR bei nicht gestartetem Rennen etc. nach Betaetigen des Start-Buttons
+  // in OmegaSim ausgefuehrt werden." Deshalb haengt sie NICHT am Startfenster oder am
+  // Countdown - die kommen auch von selbst (Challenge nach Stillstand, Mehrspieler-Countdown) -,
+  // sondern an den beiden Start-Knoepfen (70-race.js). Und nur, wenn nichts laeuft: kein
+  // Rennen, kein Training, kein Countdown, keine Challenge. Auch ohne verbundene Ampel.
+  function ampelStartKnopf() {
+    if (raceState !== 'idle' && raceState !== 'finished') return false;
+    if (typeof challengeLaeuft === 'function' && challengeLaeuft()) return false;
+    return typeof startAnsageSprechen === 'function' && startAnsageSprechen();
   }
   // Ein Ampelton. stufe ist die Zaehlung von 70-race.js: 3, 2, 1 - Ton 1, 2, 3.
   function ampelTon(stufe) {

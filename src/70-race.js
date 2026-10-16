@@ -2472,7 +2472,8 @@
     const laeuft = raceState === 'racing' || raceState === 'countdown' || raceState === 'finishing';
     if (!laeuft && typeof mpRennenFrage === 'function' && mpRennenFrage()) { updateRaceActButtons(); return; }
     const live = raceState === 'racing' || raceState === 'countdown' || raceState === 'finishing';
-    if (live) requestRaceStop(); else raceGridAnzeigen(startRaceCountdown);
+    if (live) requestRaceStop();
+    else { ampelStartKnopf(); raceGridAnzeigen(startRaceCountdown); }   // Startansage (74-startampel.js)
     updateRaceActButtons();
   }
   $('race-act-start').onclick = toggleRace;
@@ -2701,7 +2702,7 @@
   }
   setInterval(updateRaceActButtons, 400);
 
-  $('race-start-btn').onclick = () => raceGridAnzeigen(startRaceCountdown);
+  $('race-start-btn').onclick = () => { ampelStartKnopf(); raceGridAnzeigen(startRaceCountdown); };
   $('race-stop-btn').onclick = requestRaceStop;
   $('race-export-csv').onclick = () => {
     // Semicolon delimiter + comma decimals: opens directly (no import wizard) in a

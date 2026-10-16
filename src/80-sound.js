@@ -818,9 +818,9 @@
 
   // ---- STARTANSAGE: "Gentlemen, start your engines" ---------------------------------
   //
-  // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch. Gesagt wird
-  // sie, wenn die Ampel auf Gelb geht - beim Oeffnen des Startfensters, oder beim Countdown,
-  // wenn es kein Startfenster gab (74-startampel.js). Mit und ohne angeschlossene Ampel.
+  // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch - und NUR beim
+  // Druck auf einen Start-Knopf, wenn nichts laeuft (ampelStartKnopf() in 74-startampel.js).
+  // Mit und ohne angeschlossene Ampel.
   //
   // IMMER ENGLISCH, auch in der deutschen Oberflaeche: der Satz ist ein feststehender Ruf
   // (Indianapolis), und eine deutsche Stimme spricht ihn falsch aus. Reihenfolge wie bei den

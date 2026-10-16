@@ -143,8 +143,10 @@ python3 startampel.py --tcp 5000      # Befehle übers Netzwerk, z. B. nc <pi> 5
 
 ## Ansage „Gentlemen, start your engines“
 
-Die Ansage kommt **von OmegaSim**, nicht von der Ampel: in dem Moment, in dem die Ampel auf
-Gelb geht (Ton → **Startansage**, ab Werk an). So klingt sie aus dem Tablet, egal ob Pi oder
+Die Ansage kommt **von OmegaSim**, nicht von der Ampel – und **nur, wenn du in OmegaSim
+„Rennen starten“ drückst und gerade kein Rennen, Training oder keine Challenge läuft**
+(Ton → **Startansage**, ab Werk an). Kein Ton bei Challenges, die von selbst starten, und
+beim Mehrspieler-Countdown. So klingt sie aus dem Tablet, egal ob Pi oder
 Pico, und funktioniert auch ganz ohne Ampel.
 
 Soll sie stattdessen vom Pi kommen (z. B. über einen Lautsprecher an der Ampel): in
