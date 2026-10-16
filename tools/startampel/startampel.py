@@ -72,6 +72,11 @@ BLE_NAME = "Ampel"   # kurz halten: Name + Dienst-UUID muessen in 31 Byte Werbun
 AMPEL_SERVICE = "b5a30001-0e9a-4b7c-8d2f-a3f1c0de5a11"
 AMPEL_BEFEHL = "b5a30002-0e9a-4b7c-8d2f-a3f1c0de5a11"
 BEI_VERBINDUNGSABBRUCH_ROT = True   # Sicherheit: App weg -> Rot
+# NUR BLUETOOTH LE: der Pi 3 kann auch klassisches Bluetooth, und dann versucht Android, ihn
+# klassisch zu koppeln (Kopplungsanfrage am Tablet, danach trennt BlueZ). Mit True schaltet
+# das Programm den Pi beim Start auf reines LE (btmgmt bredr off). Klassisches Bluetooth
+# (Tastatur, Lautsprecher am Pi) geht dann nicht - fuer eine Ampel egal. False = aus.
+NUR_LE = True
 
 # Befehle -> Aktion. Links die Texte, die OmegaSim sendet.
 BEFEHLE = {
@@ -312,6 +317,20 @@ def ansage_abspielen():
 # ============================================================================
 
 
+def nur_le_schalten():
+    """Pi auf reines Bluetooth LE schalten (siehe NUR_LE). Braucht root und btmgmt (bluez)."""
+    if not shutil.which("btmgmt"):
+        log("btmgmt fehlt - klassisches Bluetooth bleibt an. Alternativ in "
+            "/etc/bluetooth/main.conf: ControllerMode = le")
+        return
+    try:
+        for schritt in (["power", "off"], ["bredr", "off"], ["le", "on"], ["power", "on"]):
+            subprocess.run(["btmgmt", "-i", "hci0"] + schritt, capture_output=True, timeout=10)
+        log("Bluetooth: nur LE (klassisches Bluetooth aus).")
+    except (OSError, subprocess.SubprocessError) as fehler:
+        log(f"Nur-LE nicht gesetzt: {fehler}")
+
+
 def starte_ble(ampel, schlange):
     try:
         import dbus
@@ -417,6 +436,54 @@ def starte_ble(ampel, schlange):
         def Release(self):
             log("Bluetooth-Werbung von BlueZ beendet.")
 
+    class Kopplungsagent(dbus.service.Object):
+        """Beantwortet Kopplungsanfragen ohne PIN ("Just Works"). Ohne Agent haengt eine
+        Kopplung, die Android anstoesst, ins Leere, und BlueZ trennt die Verbindung."""
+        AGENT = "org.bluez.Agent1"
+
+        def __init__(self, bus):
+            self.path = BASIS + "/agent"
+            super().__init__(bus, self.path)
+
+        @dbus.service.method(AGENT)
+        def Release(self):
+            pass
+
+        @dbus.service.method(AGENT, in_signature="os")
+        def AuthorizeService(self, geraet, uuid):
+            log("Kopplung: Dienst freigegeben.")
+
+        @dbus.service.method(AGENT, in_signature="o", out_signature="s")
+        def RequestPinCode(self, geraet):
+            return "0000"
+
+        @dbus.service.method(AGENT, in_signature="o", out_signature="u")
+        def RequestPasskey(self, geraet):
+            return dbus.UInt32(0)
+
+        @dbus.service.method(AGENT, in_signature="ouq")
+        def DisplayPasskey(self, geraet, passkey, eingegeben):
+            pass
+
+        @dbus.service.method(AGENT, in_signature="os")
+        def DisplayPinCode(self, geraet, pincode):
+            pass
+
+        @dbus.service.method(AGENT, in_signature="ou")
+        def RequestConfirmation(self, geraet, passkey):
+            log("Kopplung bestaetigt.")
+
+        @dbus.service.method(AGENT, in_signature="o")
+        def RequestAuthorization(self, geraet):
+            log("Kopplung bestaetigt.")
+
+        @dbus.service.method(AGENT)
+        def Cancel(self):
+            log("Kopplung vom Tablet abgebrochen.")
+
+    if NUR_LE:
+        nur_le_schalten()
+
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     bus = dbus.SystemBus()
 
@@ -427,8 +494,21 @@ def starte_ble(ampel, schlange):
             break
     if not adapter:
         sys.exit("Kein Bluetooth-LE-Adapter gefunden (laeuft bluetoothd?).")
-    dbus.Interface(bus.get_object(BLUEZ, adapter), PROPS).Set(
-        "org.bluez.Adapter1", "Powered", dbus.Boolean(True))
+    adapter_props = dbus.Interface(bus.get_object(BLUEZ, adapter), PROPS)
+    adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(True))
+    try:
+        adapter_props.Set("org.bluez.Adapter1", "Pairable", dbus.Boolean(True))
+    except dbus.DBusException as e:
+        log(f"Pairable nicht gesetzt: {e}")
+
+    agent = Kopplungsagent(bus)
+    try:
+        agenten = dbus.Interface(bus.get_object(BLUEZ, "/org/bluez"), "org.bluez.AgentManager1")
+        agenten.RegisterAgent(agent.path, "NoInputNoOutput")
+        agenten.RequestDefaultAgent(agent.path)
+        log("Kopplungsagent aktiv (ohne PIN).")
+    except dbus.DBusException as e:
+        log(f"Kopplungsagent nicht angemeldet: {e}")
 
     app = Anwendung(bus)
     dienst = Dienst(bus, AMPEL_SERVICE)
@@ -458,6 +538,12 @@ def starte_ble(ampel, schlange):
             return
         if geaendert["Connected"]:
             log(f"Verbunden: {path}")
+            # Vertrauen, damit eine spaetere Verbindung ohne Rueckfrage geht.
+            try:
+                dbus.Interface(bus.get_object(BLUEZ, path), PROPS).Set(
+                    "org.bluez.Device1", "Trusted", dbus.Boolean(True))
+            except dbus.DBusException:
+                pass
         else:
             log(f"Getrennt: {path}")
             if BEI_VERBINDUNGSABBRUCH_ROT:
