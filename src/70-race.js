@@ -1134,15 +1134,20 @@
     return Math.max(0.05, Math.min(1, YELLOW_KMH / top));
   }
 
-  function setRaceLights(step) {
+  // `von` = wie viele Schritte die Abfolge hat: 3 (Anfahrt nach Gelb, 90-ghosts.js) oder 5
+  // (der Rennstart, v. unten). Bei 5 ist step die Zahl der leuchtenden Spalten der Bruecke,
+  // 1..5 aufsteigend wie an einer echten Startampel; die drei Lampen am Rand zeigen den Anteil.
+  function setRaceLights(step, von) {
     // step: 0 = all off, 1-3 = that many reds lit (bottom to top like a real start light
     // sequence), 'go' = green.
     ['race-light-1', 'race-light-2', 'race-light-3', 'race-light-go'].forEach(id => {
       $(id).classList.remove('on-red', 'on-green');
     });
+    const fuenf = von === 5 && step !== 'go' && step > 0;
+    const rand = fuenf ? Math.ceil(Math.min(5, step) * 3 / 5) : step;
     if (step === 'go') { $('race-light-go').classList.add('on-green'); }
-    else for (let i = 1; i <= step; i++) $(`race-light-${i}`).classList.add('on-red');
-    paintGantry(step);
+    else for (let i = 1; i <= Math.min(3, rand); i++) $(`race-light-${i}`).classList.add('on-red');
+    paintGantry(step, fuenf);
   }
 
   // Same state, drawn as the gantry over the cockpit. There are five columns but only three
@@ -1150,8 +1155,11 @@
   // steps over five columns is 2, 3, 5. A real FIA gantry has five one-second steps; this
   // countdown has three, and inventing two extra steps would make the lights disagree with
   // the beeps the driver is actually hearing.
+  // BESTELLT (Startampel): "aus der Dreier-Sequenz eine Fuenfer-Sequenz" - der Rennstart hat
+  // jetzt fuenf Toene, und die Bruecke zeigt dann eine Spalte je Ton (fuenf = true). Die
+  // Anfahrt nach Gelb bleibt bei drei und nutzt die Aufteilung unten.
   const GANTRY_COLS = [0, 2, 3, 5];
-  function paintGantry(step) {
+  function paintGantry(step, fuenf) {
     const g = $('race-gantry');
     if (!g) return;
     const lamps = g.querySelectorAll('.gantry-lamp');
@@ -1164,7 +1172,7 @@
     }
     if (!step) { g.classList.remove('on'); return; }
     g.classList.add('on');
-    const cols = GANTRY_COLS[Math.max(0, Math.min(3, step))] || 0;
+    const cols = fuenf ? Math.max(0, Math.min(5, step)) : (GANTRY_COLS[Math.max(0, Math.min(3, step))] || 0);
     lamps.forEach(l => { if (+l.dataset.col <= cols) l.classList.add('red'); });
   }
 
@@ -1722,8 +1730,16 @@
   // an festen Zeitpunkten vor Gruen statt an einem 1-s-Intervall - so kommt Gruen auf allen
   // Telefonen im selben Moment, wenn alle dieselbe (abgeglichene) Gruenzeit haben. Lokal ist
   // Gruen einfach jetzt + 3 s.
+  //
+  // FUENF LICHTER (BESTELLT: "aus der Dreier-Sequenz der gruenen LEDs eine Fuenfer-Sequenz"):
+  // wie an einer echten Startampel ein Licht je Sekunde, fuenf Sekunden vor Gruen. Die Stufe
+  // zaehlt rueckwaerts (5 = erstes Licht), damit "0 = Gruen" bleibt wie bisher.
+  const AMPEL_SCHRITTE = 5;
   function ampelZeitplan(gruen) {
-    return [[gruen - 3000, 3], [gruen - 2000, 2], [gruen - 1000, 1], [gruen, 0]];
+    const plan = [];
+    for (let k = AMPEL_SCHRITTE; k >= 1; k--) plan.push([gruen - k * 1000, k]);
+    plan.push([gruen, 0]);
+    return plan;
   }
   // gruenZiel: lokale Uhrzeit (ms) fuer Gruen, sonst in 3 s. mpPlan: Wetterplan und Wind eines
   // gemeinsamen Mehrspieler-Rennens (97-sessions.js).
@@ -2029,7 +2045,7 @@
     // auf, und ein Countdown, aus dem man nicht herauskommt, ist eine Falle.
     $('race-stop-btn').disabled = false;
     $('race-status').textContent = 'Countdown…';
-    const plan = ampelZeitplan(gruenBei || Date.now() + 3000);
+    const plan = ampelZeitplan(gruenBei || Date.now() + AMPEL_SCHRITTE * 1000);
     clearTimeout(raceCountdownTimer);
     const schritt = (k) => {
       if (raceState !== 'countdown') return;
@@ -2040,9 +2056,11 @@
       // Kommt der Plan spaet an, werden verpasste Lichter uebersprungen - nur Gruen zaehlt.
       if (stufe > 0 && warte < -400 && k + 1 < plan.length) { schritt(k + 1); return; }
       if (stufe > 0) {
-        setRaceLights(stufe);
-        ampelTon(stufe);
-        playTone(440 + (3 - stufe) * 60, 0.18, 'square', 0.18);
+        // Stufe 5..1 -> 1..5 leuchtende Spalten, und je Licht ein etwas hoeherer Ton.
+        const licht = AMPEL_SCHRITTE + 1 - stufe;
+        setRaceLights(licht, AMPEL_SCHRITTE);
+        ampelTon(licht);
+        playTone(440 + (licht - 1) * 45, 0.18, 'square', 0.18);
         schritt(k + 1);
         return;
       }

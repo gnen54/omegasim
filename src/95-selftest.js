@@ -11060,7 +11060,7 @@
   stAdd('Mehrspieler: Ampel nach Frist, Uhrabgleich, gemeinsamer Wetterplan', () => {
     const f = [];
     const z = ampelZeitplan(10000);
-    if (JSON.stringify(z) !== JSON.stringify([[7000, 3], [8000, 2], [9000, 1], [10000, 0]])) f.push('Zeitplan ' + JSON.stringify(z));
+    if (JSON.stringify(z) !== JSON.stringify([[5000, 5], [6000, 4], [7000, 3], [8000, 2], [9000, 1], [10000, 0]])) f.push('Zeitplan ' + JSON.stringify(z));
     const merkP = mp.proben.slice(), merkO = mp.offset;
     try {
       mp.proben = [];
@@ -11091,7 +11091,7 @@
       Date.now = merk.now; raceWxStart = merk.wx; raceMode = merk.mode; raceLimit = merk.lim;
       raceState = merk.st; mpWetter = null; setWeather(merk.wetter);
     }
-    return { ok: !f.length, mass: f.length ? f.join('; ') : 'Lichter -3/-2/-1/0 s, Versatz vom kuerzesten Weg, Wetter folgt dem Plan' };
+    return { ok: !f.length, mass: f.length ? f.join('; ') : 'Lichter -5/-4/-3/-2/-1/0 s, Versatz vom kuerzesten Weg, Wetter folgt dem Plan' };
   });
 
   stAdd('Lenkkennlinie: voll genau bei X %, Anfang unter linear, symmetrisch, am Servo', () => {
@@ -17225,7 +17225,7 @@
       // Ohne Startfenster: der Countdown schickt START nach.
       raceState = 'countdown';
       ampelCountdown(false);
-      ampelTon(3); ampelTon(2); ampelTon(1);
+      ampelTon(1); ampelTon(2); ampelTon(3); ampelTon(4); ampelTon(5);
       ampelLos();
       ampelGelb(true); ampelGelb(false);
       ampelRennende();
@@ -17244,7 +17244,7 @@
       $('race-ampel-neustart').checked = false;
       if (ampelFruehstart()) f.push('Schalter aus: trotzdem abgebrochen');
       await ampelSchlange;
-      const soll = ['START', 'GRUEN 2', 'GRUEN 3', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
+      const soll = ['START', 'GRUEN 1', 'GRUEN 2', 'GRUEN 3', 'GRUEN 4', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
                     'START', 'FRUEHSTART'];
       if (gesendet.join('|') !== soll.join('|')) f.push('gesendet: ' + gesendet.join(', '));
     } finally {
@@ -17255,7 +17255,7 @@
       fruehstartReset();
     }
     return { ok: !f.length, mass: f.length ? f.join(' | ')
-      : 'START, GRUEN 2/3/5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
+      : 'START, GRUEN 1-5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
   });
 
   stAdd('Startansage und Gelb: nur der Start-Knopf in "Bringe die Autos in Position"', () => {
