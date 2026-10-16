@@ -20,6 +20,10 @@ Drei LED-Reihen: oben **Rot**, in der Mitte **Gelb**, unten **Grün** mit 5 Spal
 Countdown an, und „Rennen starten“ beginnt die Abfolge neu. Ist der Schalter aus, läuft
 die Ampel weiter und es gilt die normale Frühstart-Strafe.
 
+Nach dem Start im Fenster steht die Ampel eine **Wartezeit** lang auf Gelb (mit der
+Ansage), erst dann beginnt die grüne Sequenz – Renneinstellungen → **Wartezeit nach dem
+Start**, ab Werk 4 s, 0 = sofort. Der Start-Knopf im Cockpit bricht das Warten ab (Rot).
+
 Der Countdown in OmegaSim hat drei Töne. Wie bei der Ampel-Brücke im Cockpit leuchtet je
 Ton ein anteiliger Teil der fünf Spalten (2, 3, 5), damit Lampen und Töne zusammenpassen.
 

@@ -846,8 +846,16 @@
     "NPC Knockout: Bahnmodus „Auf der Bahn“": "NPC Knockout: track mode “On the track”",
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
+<<<<<<< HEAD
     "Akku kritisch ansagen": "Announce critical battery",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops to 6 % – the last step before the car stops: “Abort session, box now!” Armed again only after charging.",
+=======
+    "Wartezeit nach dem Start": "Delay after start",
+    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. 0 = sofort.": "After Start in the “Bring the cars into position” window, the light stays yellow this long (with the start announcement) before the green lights begin. 0 = immediately.",
+    "Start in {n} s …": "Start in {n} s …",
+    "Start abgebrochen": "Start aborted",
+    "Start … abbrechen": "Start … cancel",
+>>>>>>> startampel
     "Startansage": "Start announcement",
     "Beim Start im Fenster „Bringe die Autos in Position“: „Gentlemen, start your engines“ (immer englisch).": "On Start in the “Bring the cars into position” window: “Gentlemen, start your engines”.",
     "Startampel (Raspberry Pi)": "Start light (Raspberry Pi)",
@@ -3521,8 +3529,16 @@
     "NPC Knockout: Bahnmodus „Auf der Bahn“": "NPC Knockout: modo de pista «En pista»",
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
+<<<<<<< HEAD
     "Akku kritisch ansagen": "Anunciar batería crítica",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja al 6 % – el último paso antes de que se pare: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
+=======
+    "Wartezeit nach dem Start": "Espera tras la salida",
+    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. 0 = sofort.": "Tras pulsar Iniciar en «Coloca los coches en posición», el semáforo se queda en amarillo este tiempo (con el anuncio de salida) antes de que empiecen las luces verdes. 0 = inmediato.",
+    "Start in {n} s …": "Salida en {n} s …",
+    "Start abgebrochen": "Salida cancelada",
+    "Start … abbrechen": "Salida … cancelar",
+>>>>>>> startampel
     "Startansage": "Anuncio de salida",
     "Beim Start im Fenster „Bringe die Autos in Position“: „Gentlemen, start your engines“ (immer englisch).": "Al pulsar Iniciar en la ventana «Coloca los coches en posición»: «Gentlemen, start your engines» (siempre en inglés).",
     "Startampel (Raspberry Pi)": "Semáforo de salida (Raspberry Pi)",

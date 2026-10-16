@@ -1626,6 +1626,8 @@
     host.appendChild(img);
   }
   function raceGridAnzeigen(weiter) {
+    // Waehrend der Wartezeit nach dem Start (74-startampel.js) kein zweites Startfenster.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) return;
     raceGridWeiter = typeof weiter === 'function' ? weiter : null;
     const gs = $('race-gridscreen');
     if (!gs) { if (raceGridWeiter) raceGridWeiter(); return; }
@@ -1681,13 +1683,12 @@
   function raceGridStart() {
     const gs = $('race-gridscreen');
     if (gs) gs.hidden = true;
-    // Der eigentliche Start: Startampel auf Gelb und "Gentlemen, start your engines"
-    // (74-startampel.js). Vor dem Countdown, damit die Ansage vor dem ersten Ton kommt.
-    ampelStartKnopf();
     if (typeof aufstellenStoppen === 'function') aufstellenStoppen(false);
     syncRaceGridOrder();
     const w = raceGridWeiter; raceGridWeiter = null;
-    if (w) w();
+    // Der eigentliche Start (74-startampel.js): Startampel auf Gelb und "Gentlemen, start
+    // your engines" sofort, der Countdown (w) erst nach der eingestellten Wartezeit.
+    if (w) ampelStartVerzoegert(w); else ampelStartKnopf();
   }
   // BESTELLT: "X auf dem Controller soll auf dem Autos-in-Position-Schirm funktionieren".
   // flagTasteTick() fragt das ab, bevor es den normalen Cockpit-Weg (Boxenstopp/Gelb) nimmt.
@@ -2467,6 +2468,8 @@
   // and RB/R1. There used to be a second, near-identical abort path inlined here, which is
   // how the two could drift apart.
   function toggleRace() {
+    // In der Wartezeit nach dem Start bricht der Knopf das Warten ab (Ampel wieder Rot).
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     // Wartet eine Challenge noch auf Stillstand, bricht die Rennen-Taste sie ab, statt die Ampel
     // ohne Pruefung zu starten.
     if (typeof challengeToggle === 'function' && challengeToggle()) { updateRaceActButtons(); return; }
@@ -2667,10 +2670,11 @@
       // Waehrend des Countdowns zeigt der Knopf, dass er laeuft. Vorher stand dort schon
       // "Rennen abbrechen", ohne dass sichtbar war, dass ueberhaupt etwas laeuft - ein Druck
       // in dieser Zeit brach still ab, und das sah aus wie "der Knopf tut nichts".
-      a.textContent = raceState === 'countdown'
-        ? 'Countdown … abbrechen'
+      const wartet = typeof ampelStartWartet === 'function' && ampelStartWartet();
+      a.textContent = wartet ? 'Start … abbrechen'
+        : raceState === 'countdown' ? 'Countdown … abbrechen'
         : (live ? 'Rennen abbrechen' : 'Rennen starten');
-      a.classList.toggle('warn', live);
+      a.classList.toggle('warn', live || wartet);
     }
     const p = $('race-act-pit');
     if (p) {
