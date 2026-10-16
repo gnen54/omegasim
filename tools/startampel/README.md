@@ -8,7 +8,7 @@ Drei LED-Reihen: oben **Rot**, in der Mitte **Gelb**, unten **Grün** mit 5 Spal
 | In OmegaSim                                   | Befehl         | Ampel                                    |
 |-----------------------------------------------|----------------|------------------------------------------|
 | nichts freigegeben, Rennende, Abbruch         | `ROT`          | Rot                                      |
-| „Rennen starten“ (Fenster *Autos in Position*) | `START`        | Rot aus, Gelb an                         |
+| Start im Fenster *Bringe die Autos in Position* | `START`      | Rot aus, Gelb an                         |
 | Ampelton 1, 2, 3 des Countdowns               | `GRUEN 2/3/5`  | 2, 3, dann alle 5 grünen Spalten (+ Gelb) |
 | Grün / Start (auch freies Training)           | `LOS`          | alles aus                                |
 | Frühstart im Countdown *                      | `FRUEHSTART`   | Grün aus, Gelb blinkt bis zum Neustart   |
@@ -143,10 +143,11 @@ python3 startampel.py --tcp 5000      # Befehle übers Netzwerk, z. B. nc <pi> 5
 
 ## Ansage „Gentlemen, start your engines“
 
-Die Ansage kommt **von OmegaSim**, nicht von der Ampel – und **nur, wenn du in OmegaSim
-„Rennen starten“ drückst und gerade kein Rennen, Training oder keine Challenge läuft**
-(Ton → **Startansage**, ab Werk an). Kein Ton bei Challenges, die von selbst starten, und
-beim Mehrspieler-Countdown. So klingt sie aus dem Tablet, egal ob Pi oder
+Die Ansage kommt **von OmegaSim**, nicht von der Ampel – und **nur beim Start-Knopf im
+Fenster „Bringe die Autos in Position“** (Tippen oder Controller-Taste X), wenn gerade nichts
+läuft (Ton → **Startansage**, ab Werk an). Im selben Moment geht die Ampel auf Gelb. Das
+Öffnen des Fensters („Rennen starten“, Cockpit-Knopf, Challenge) löst noch nichts aus; der
+Mehrspieler-Countdown schaltet Gelb ohne Ansage. So klingt sie aus dem Tablet, egal ob Pi oder
 Pico, und funktioniert auch ganz ohne Ampel.
 
 Soll sie stattdessen vom Pi kommen (z. B. über einen Lautsprecher an der Ampel): in

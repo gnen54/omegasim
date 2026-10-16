@@ -12,7 +12,7 @@ Aufbau der Ampel
 
 Ablauf (Befehle kommen von OmegaSim)
     ROT          Gesperrt: Rot an. Auch bei Rennende und Abbruch.
-    START        "Rennen starten" gedrueckt: Rot aus, Gelb an. (Die Ansage "Gentlemen,
+    START        Start im Fenster "Bringe die Autos in Position": Rot aus, Gelb an. (Die Ansage "Gentlemen,
                  start your engines" kommt von OmegaSim; siehe ANSAGE_AN.)
     GRUEN <n>    Ampelton des Countdowns: n gruene Spalten leuchten (die App schickt 2, 3, 5).
     LOS          Gruen/Start: alle LEDs aus, das Rennen laeuft.
