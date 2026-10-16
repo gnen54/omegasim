@@ -46,3 +46,7 @@ target_practice.pptx
 
 # Originalfotos (bis 4080 px). Ins Repo kommen nur die verkleinerten Fassungen aus tools/bilder.py.
 photos/
+
+# Python-Cache
+__pycache__/
+*.pyc
