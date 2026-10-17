@@ -62,7 +62,7 @@ einen **ULN2803** (8 Kanäle, reicht für alle 7) oder je einen Logic-Level-MOSF
 GND vom Pi und vom LED-Netzteil verbinden. Pins und Polarität stehen oben in
 `startampel.py` (`PIN_…`, `AKTIV_HIGH`).
 
-## Betrieb ohne OmegaSim: Steckverbinder und Steuerseite (nur Raspberry Pi)
+## Betrieb ohne OmegaSim: Steckverbinder und Steuerseite
 
 Ohne OmegaSim kann die Ampel ihre **eigene Startsequenz** fahren (Befehl `SEQUENZ`): Gelb,
 Wartezeit (ab Werk 4 s), fünf grüne Spalten im Sekundentakt, dann alles aus. Auslösen lässt
@@ -132,10 +132,11 @@ dem Pi selbst erreichbar (`TCP_ADRESSE = "127.0.0.1"`).
 
 ## Variante: Raspberry Pi Pico W / Pico WH
 
-Statt eines Raspberry Pi geht auch ein **Pico W oder Pico WH** (mit Bluetooth). Er ist
-billiger, braucht keine SD-Karte und ist nach dem Einschalten in einer Sekunde bereit.
-Programm: `pico/main.py` (MicroPython), gleicher Bluetooth-Dienst und gleiche Befehle –
-die App merkt keinen Unterschied.
+Statt eines Raspberry Pi geht auch ein **Pico W oder Pico WH** (mit Bluetooth und WLAN). Er
+ist kleiner und billiger, braucht keine SD-Karte, verträgt ein Abschalten ohne Herunterfahren
+und ist nach dem Einschalten in einer Sekunde bereit. Programm: `pico/main.py` und
+`pico/steuerseite.html` (MicroPython). Gleicher Bluetooth-Dienst, gleiche Befehle, dieselbe
+Steuerseite und dieselben Eingänge wie beim Pi – die App merkt keinen Unterschied.
 
 Der Pico hat keinen Audioausgang – das macht nichts: die Ansage „Gentlemen, start your
 engines“ spricht OmegaSim selbst (siehe unten).
@@ -153,6 +154,16 @@ engines“ spricht OmegaSim selbst (siehe unten).
 | Grün Spalte 5  | GP22 | 29          |
 | GND            |      | 23 (oder ein anderer GND) |
 
+Eingänge über Optokoppler (Schaltung wie oben beim Pi, PC817):
+
+| Eingang     | Befehl        | GPIO | Pin am Pico |
+|-------------|---------------|-----:|------------:|
+| Start       | `SEQUENZ`     | GP10 | 14          |
+| Gelb        | `GELB` (Dauer)| GP11 | 15          |
+| Rot / Stopp | `ROT`         | GP12 | 16          |
+| Frühstart   | `FRUEHSTART`  | GP13 | 17          |
+| GND         |               |      | 13 oder 18  |
+
 Auch hier jede Reihe/Spalte über einen **ULN2803** (schaltet mit 3,3 V am Eingang sicher)
 oder einen Logic-Level-MOSFET – ein Pico-Pin liefert nur wenige mA. Pins und Polarität
 stehen oben in `main.py`.
@@ -165,18 +176,42 @@ eigene Spannung über den Treiber; GND von Pico und LED-Netzteil verbinden.
 1. **MicroPython für den Pico W** aufspielen (micropython.org → „Raspberry Pi Pico W“, die
    `.uf2`-Datei, Version 1.22 oder neuer): BOOTSEL-Taste halten, Pico per USB anstecken,
    die Datei auf das Laufwerk „RPI-RP2“ ziehen.
-2. **Thonny** öffnen (Interpreter: „MicroPython (Raspberry Pi Pico)“), `pico/main.py`
-   öffnen und **als `main.py` auf dem Pico speichern** („Raspberry Pi Pico“ als Ziel).
-3. Pico neu starten. Die **Onboard-LED blinkt**, solange er auf OmegaSim wartet, und
-   **leuchtet**, sobald die App verbunden ist. Die rote Reihe geht an.
-4. In OmegaSim: **Optionen → AddOn → Startampel → Verbinden** und „Ampel“ wählen.
+2. **Thonny** öffnen (Interpreter: „MicroPython (Raspberry Pi Pico)“) und **beide Dateien
+   auf den Pico speichern** („Raspberry Pi Pico“ als Ziel): `pico/main.py` als `main.py`
+   und `pico/steuerseite.html` als `steuerseite.html`.
+3. Oben in `main.py` das **WLAN** wählen (siehe unten). Ab Werk macht der Pico ein eigenes
+   WLAN auf.
+4. Pico neu starten. Die **Onboard-LED blinkt**, solange er auf OmegaSim wartet, und
+   **leuchtet**, sobald die App verbunden ist. Die rote Reihe geht an. In Thonny steht unten,
+   unter welcher Adresse die Steuerseite erreichbar ist.
+5. In OmegaSim: **Optionen → AddOn → Startampel → Verbinden** und „Ampel“ wählen.
+
+### WLAN und Steuerseite (Pico)
+
+Oben in `main.py`:
+
+- `WLAN_MODUS = "eigenes"` (ab Werk): Der Pico macht ein **eigenes WLAN „Startampel“** auf
+  (Passwort `startampel`, in `EIGENES_WLAN_PASSWORT` änderbar). Handy damit verbinden, dann
+  **http://192.168.4.1** öffnen. Kein Router nötig – praktisch an jeder Bahn. Solange das
+  Handy damit verbunden ist, hat es kein Internet; OmegaSim läuft trotzdem, wenn die Seite
+  schon geladen war.
+- `WLAN_MODUS = "heim"`: Der Pico meldet sich im Heim-WLAN an (`HEIM_WLAN_NAME`,
+  `HEIM_WLAN_PASSWORT` eintragen). Die Adresse steht in Thonny, meist geht auch
+  **http://startampel.local**. Ist das Heim-WLAN nicht erreichbar, macht der Pico nach 15 s
+  automatisch sein eigenes auf.
+- `WLAN_MODUS = None`: kein WLAN, keine Steuerseite (Bluetooth und Eingänge gehen weiter).
+
+Die Steuerseite ist dieselbe wie beim Pi: Ampel live, Startsequenz, Gelbphase, Frühstart,
+Lampentest, Alles aus, Rot / Stopp und die Wartezeit (wird auf dem Pico gespeichert). Mit
+`WEB_PIN` lässt sie sich mit einer Zahl absichern. Ist OmegaSim verbunden, geht von dort nur
+Rot / Stopp.
 
 Zum Testen ohne App in Thonny im Kommandofenster (Programm vorher mit Strg+C anhalten):
 
 ```python
 from main import Ampel
 a = Ampel()
-a.befehl("START"); a.befehl("GRUEN 5"); a.befehl("TEST")
+a.befehl("START"); a.befehl("GRUEN 5"); a.befehl("ROT")
 ```
 
 ## Einrichtung auf dem Pi
