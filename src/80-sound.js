@@ -828,9 +828,18 @@
   // anderen Meldungen: eigene Aufnahme ('start', sobald tools/voice_synth.py sie rendert),
   // sonst die englische Live-Stimme.
   const START_ANSAGE = 'Gentlemen, start your engines';
-  function startAnsageSprechen() {
+  // `beginn` (optional) wird gerufen, sobald die Ansage WIRKLICH zu hoeren ist: bei der
+  // Aufnahme sofort, bei der Live-Stimme erst bei u.onstart. Daran haengt die Wartezeit bis
+  // zum ersten Licht (74-startampel.js).
+  //
+  // GEMELDET: "Nach dem ersten Start wird die Ansage erst nach Ablauf der Startsequenz
+  // gesagt, ab dem zweiten Start stimmt die Reihenfolge." Chrome auf Android faehrt die
+  // Sprachausgabe erst beim ersten speak() hoch, und das dauert Sekunden - der Satz kam
+  // nach der Ampel. Deshalb wird sie beim Oeffnen des Startfensters vorgewaermt
+  // (startAnsageVorwaermen) und die Ampel wartet auf den Beginn der Ansage.
+  function startAnsageSprechen(beginn) {
     if (!ansageAn.start) return false;
-    if (playAnsageClip('start')) return true;
+    if (playAnsageClip('start')) { if (beginn) beginn(); return true; }
     if (!('speechSynthesis' in window)) return false;
     try {
       window.speechSynthesis.cancel();
@@ -838,13 +847,37 @@
       const u = new SpeechSynthesisUtterance(START_ANSAGE);
       u.lang = 'en-US';
       u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
-      const stimmen = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-      const en = stimmen.find((v) => /^en[-_]US/i.test(v.lang)) || stimmen.find((v) => /^en/i.test(v.lang));
+      const en = englischeStimme();
       if (en) u.voice = en;
+      if (beginn) {
+        let einmal = false;
+        const los = () => { if (!einmal) { einmal = true; beginn(); } };
+        u.onstart = los;
+        u.onerror = los;   // keine Stimme: die Ampel soll trotzdem laufen
+      }
       window.speechSynthesis.speak(u);
       announceCalls++;
       return true;
     } catch (e) { return false; }
+  }
+  function englischeStimme() {
+    const stimmen = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    return stimmen.find((v) => /^en[-_]US/i.test(v.lang)) || stimmen.find((v) => /^en/i.test(v.lang)) || null;
+  }
+  // Einmal je Seite: ein stummer Satz, damit die Sprachausgabe laeuft, bevor sie gebraucht
+  // wird. Muss aus einer Nutzergeste kommen (Tippen auf "Rennen starten") - Chrome laesst
+  // speak() ohne Geste nicht zu. Die Stimmenliste wird dabei gleich mitgeladen.
+  let startAnsageWarm = false;
+  function startAnsageVorwaermen() {
+    if (startAnsageWarm || !ansageAn.start || !('speechSynthesis' in window)) return;
+    startAnsageWarm = true;
+    try {
+      if (window.speechSynthesis.getVoices) window.speechSynthesis.getVoices();
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* ohne Vorwaermen geht es auch, nur beim ersten Mal spaeter */ }
   }
 
   function speakLap(ms, istBest) {
