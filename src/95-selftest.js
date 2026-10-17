@@ -17258,7 +17258,7 @@
       : 'START, GRUEN 1-5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
   });
 
-  stAdd('Startansage und Gelb: nur der Start-Knopf in "Bringe die Autos in Position"', () => {
+  stAdd('Startansage und Gelb: nur der Start-Knopf in "Bringe die Autos in Position"', async () => {
     const f = [];
     const gesagt = [], befehle = [];
     const echt = window.speechSynthesis;
@@ -17271,35 +17271,38 @@
     const el = $('setting-announce-start');
     // START wird ueber eine Schlange gesendet (asynchron); sofort sichtbar ist ampelVorstart,
     // das ampelSenden('START') im selben Aufruf setzt.
-    const fall = (name, sollAnsage, sollStart, tun) => {
+    const fall = async (name, sollAnsage, sollStart, tun) => {
       const a0 = gesagt.length; ampelVorstart = false; tun();
       const a = gesagt.length - a0, b = ampelVorstart ? 1 : 0;
       if (a !== sollAnsage) f.push(name + ': Ansage ' + a + ' statt ' + sollAnsage);
       if (b !== sollStart) f.push(name + ': START ' + b + ' statt ' + sollStart);
+      await new Promise((r) => setTimeout(r, 30));   // Wartezeit 0 laeuft ueber einen Zeitgeber
     };
     try {
       Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
       Object.defineProperty(window, 'speechSynthesis', { configurable: true,
-        value: { cancel() {}, getVoices() { return []; }, speak(u) { gesagt.push(u.lang + ':' + u.text); } } });
+        value: { cancel() {}, getVoices() { return []; }, speak(u) {
+          if (u.volume === 0) return;   // stummes Vorwaermen zaehlt nicht
+          gesagt.push(u.lang + ':' + u.text); if (u.onstart) setTimeout(u.onstart, 0); } } });
       ampelGeraet = { name: 'Test', gatt: { connected: true } };
       ampelKanal = { writeValueWithResponse(d) { befehle.push(new TextDecoder().decode(d).trim()); return Promise.resolve(); } };
       el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true }));
       raceState = 'idle';
       // Fenster oeffnen ("Rennen starten", Cockpit, Challenge): noch nichts.
-      fall('Fenster oeffnen', 0, 0, () => raceGridAnzeigen(() => {}));
+      await fall('Fenster oeffnen', 0, 0, () => raceGridAnzeigen(() => {}));
       // Start im Fenster: Gelb und Ansage. raceGridWeiter ist eine Attrappe - kein echtes Rennen.
-      fall('Start im Fenster', 1, 1, () => raceGridStart());
+      await fall('Start im Fenster', 1, 1, () => raceGridStart());
       raceState = 'finished';
-      fall('Start im Fenster nach Rennende', 1, 1, () => { raceGridWeiter = () => {}; raceGridStart(); });
+      await fall('Start im Fenster nach Rennende', 1, 1, () => { raceGridWeiter = () => {}; raceGridStart(); });
       for (const rs of ['countdown', 'racing', 'finishing']) {
         raceState = rs;
-        fall('Start waehrend ' + rs, 0, 0, () => ampelStartKnopf());
+        await fall('Start waehrend ' + rs, 0, 0, () => ampelStartKnopf());
       }
       raceState = 'idle'; ampelSenden('ROT');
-      fall('Mehrspieler-Countdown', 0, 1, () => ampelCountdown(true));
+      await fall('Mehrspieler-Countdown', 0, 1, () => ampelCountdown(true));
       ampelSenden('ROT');
       el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true }));
-      fall('Ansage ausgeschaltet', 0, 1, () => ampelStartKnopf());
+      await fall('Ansage ausgeschaltet', 0, 1, () => ampelStartKnopf());
       if (gesagt.some((x) => x !== 'en-US:Gentlemen, start your engines')) f.push('Text/Sprache: ' + gesagt.join(' ; '));
     } finally {
       if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
@@ -17354,6 +17357,7 @@
       // 0 = sofort.
       el.value = '0';
       raceGridAnzeigen(weiter); raceGridStart();
+      await new Promise((r) => setTimeout(r, 30));
       if (gestartet !== 2) f.push('Wartezeit 0: nicht sofort');
     } finally {
       if (ampelStartWartet()) ampelStartWarteAbbrechen();
@@ -17364,6 +17368,53 @@
     }
     return { ok: !f.length, mass: f.length ? f.join(' | ')
       : 'Gelb sofort, Countdown nach der Wartezeit, kein zweites Fenster, Abbrechen = Rot, 0 = sofort' };
+  });
+
+  stAdd('Startansage: Wartezeit beginnt erst, wenn die Ansage spricht (Android-Erststart)', async () => {
+    // GEMELDET: beim ersten Start kam die Ansage erst nach der Ampel - die Sprachausgabe auf
+    // Android braucht beim ersten Mal Sekunden. Nachgestellt: die Stimme beginnt 600 ms nach
+    // speak(). Selbst mit Wartezeit 0 darf der Countdown nicht vor der Stimme beginnen.
+    const f = [];
+    const echt = window.speechSynthesis;
+    const echtBuffers = Object.assign({}, voiceBuffers);
+    const gs = $('race-gridscreen');
+    const el = $('race-start-warte'), an = $('setting-announce-start');
+    const merk = { warte: el.value, rs: raceState, gs: gs ? gs.hidden : true, w: raceGridWeiter,
+                   an: an.checked, vs: ampelVorstart };
+    let gesprochenUm = 0, gestartetUm = 0;
+    try {
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true,
+        value: { cancel() {}, getVoices() { return []; }, speak(u) {
+          if (u.volume === 0) return;
+          setTimeout(() => { gesprochenUm = performance.now(); if (u.onstart) u.onstart(); }, 600); } } });
+      an.checked = true; an.dispatchEvent(new Event('change', { bubbles: true }));
+      el.value = '0';
+      raceState = 'idle';
+      const t0 = performance.now();
+      raceGridAnzeigen(() => { gestartetUm = performance.now(); });
+      raceGridStart();
+      await new Promise((r) => setTimeout(r, 1000));
+      if (!gesprochenUm) f.push('Ansage nicht gesprochen');
+      if (!gestartetUm) f.push('Countdown nicht gestartet');
+      else if (gestartetUm < gesprochenUm) f.push('Countdown vor der Ansage');
+      else if (gestartetUm - t0 < 550) f.push('Countdown nach ' + Math.round(gestartetUm - t0) + ' ms - wartet nicht auf die Ansage');
+      // Wird die Stimme nie gestartet, geht es nach ANSAGE_MAX_MS trotzdem los (hier nicht gewartet,
+      // nur geprueft, dass die Grenze existiert und vernuenftig ist).
+      if (!(ANSAGE_MAX_MS >= 5000 && ANSAGE_MAX_MS <= 15000)) f.push('ANSAGE_MAX_MS ' + ANSAGE_MAX_MS);
+      return { ok: !f.length, mass: f.length ? f.join(' | ')
+        : 'Stimme nach 600 ms, Countdown nach ' + Math.round(gestartetUm - t0) + ' ms (erst mit der Ansage, Wartezeit 0)' };
+    } finally {
+      if (ampelStartWartet()) ampelStartWarteAbbrechen();
+      if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
+      else delete window.speechSynthesis;
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.assign(voiceBuffers, echtBuffers);
+      el.value = merk.warte; raceState = merk.rs; raceGridWeiter = merk.w; ampelVorstart = merk.vs;
+      if (gs) gs.hidden = merk.gs;
+      an.checked = merk.an; an.dispatchEvent(new Event('change', { bubbles: true }));
+      updateRaceActButtons();
+    }
   });
 
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {

@@ -1668,6 +1668,8 @@
     gs.hidden = false;
     gridFokusIdx = -1;
     raceGridFokus(0);
+    // Sprachausgabe fuer "Gentlemen, start your engines" schon jetzt aufwecken (80-sound.js).
+    if (typeof startAnsageVorwaermen === 'function') startAnsageVorwaermen();
   }
   // v0.10.5 BESTELLT: "Rennstartmenue: mach Abbrechen und Start anwaehlbar, dann mit X
   // bestaetigen." Steuerkreuz links/rechts (oder hoch/runter) waehlt, X drueckt den gewaehlten
