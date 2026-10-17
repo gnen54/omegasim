@@ -50,3 +50,4 @@ photos/
 # Python-Cache
 __pycache__/
 *.pyc
+tools/startampel/einstellungen.json
