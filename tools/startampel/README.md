@@ -62,6 +62,74 @@ einen **ULN2803** (8 Kanäle, reicht für alle 7) oder je einen Logic-Level-MOSF
 GND vom Pi und vom LED-Netzteil verbinden. Pins und Polarität stehen oben in
 `startampel.py` (`PIN_…`, `AKTIV_HIGH`).
 
+## Betrieb ohne OmegaSim: Steckverbinder und Steuerseite (nur Raspberry Pi)
+
+Ohne OmegaSim kann die Ampel ihre **eigene Startsequenz** fahren (Befehl `SEQUENZ`): Gelb,
+Wartezeit (ab Werk 4 s), fünf grüne Spalten im Sekundentakt, dann alles aus. Auslösen lässt
+sie sich über den Steckverbinder, die Steuerseite im Browser oder einen Befehl auf dem Pi.
+
+**Vorrang:** Ist OmegaSim verbunden, steuert die App. Steckverbinder und Steuerseite können
+dann nur noch **Rot / Stopp** auslösen (`OMEGASIM_VORRANG`). Ein Befehl von OmegaSim bricht
+eine laufende eigene Sequenz ab.
+
+### Steuerseite im Browser
+
+Läuft das Programm, zeigt der Pi im WLAN eine Steuerseite:
+
+**http://raspberrypi.local:8080** (oder `http://<IP-des-Pi>:8080`; die IP zeigt `hostname -I`)
+
+Sie zeigt die Ampel live und hat Knöpfe für Startsequenz, Gelbphase, Frühstart, Lampentest,
+„Alles aus“ und Rot / Stopp, dazu den Regler für die Wartezeit (wird gespeichert). Das Handy
+muss im selben WLAN sein wie der Pi.
+
+Ohne Weiteres kann **jeder im WLAN** die Seite bedienen. Wer das nicht will, setzt oben in
+`startampel.py` eine Zahl als `WEB_PIN`; die Seite fragt dann einmal danach.
+
+### Steckverbinder mit Optokopplern
+
+Vier Eingänge, jeder über einen Optokoppler (z. B. **PC817**), damit fremde Spannungen nie
+an den Pi kommen – die GPIO-Pins vertragen nur 3,3 V.
+
+| Eingang     | Befehl        | Art                                  | GPIO | Pin am Pi |
+|-------------|---------------|--------------------------------------|-----:|----------:|
+| Start       | `SEQUENZ`     | beim Einschalten des Signals         | 6    | 31        |
+| Gelb        | `GELB`        | solange das Signal anliegt           | 13   | 33        |
+| Rot / Stopp | `ROT`         | beim Einschalten des Signals         | 19   | 35        |
+| Frühstart   | `FRUEHSTART`  | beim Einschalten des Signals         | 26   | 37        |
+| GND         |               |                                      |      | 39        |
+
+Schaltung je Eingang:
+
+```
+ Signal + ──[ R ]──┬──► PC817 Pin 1 (Anode)        PC817 Pin 4 (Kollektor) ──► GPIO (z. B. 6)
+                   │                               PC817 Pin 3 (Emitter)   ──► GND am Pi (Pin 39)
+ Signal − ─────────┴──► PC817 Pin 2 (Kathode)
+         (1N4148 antiparallel zu Pin 1/2 als Verpolschutz)
+```
+
+Vorwiderstand R je nach Signalspannung: **5 V → 330–470 Ω**, **12 V → 1,2–2,2 kΩ**,
+**24 V → 2,2–4,7 kΩ**. Einen Pull-up braucht es nicht, das Programm schaltet den internen ein.
+Liegt das Signal an, leuchtet die LED im Optokoppler, und der Pin geht auf GND – das Programm
+wertet das als „aktiv“ (`EINGANG_AKTIV_LOW = True`).
+
+Die Zuordnung steht oben in `startampel.py` in der Tabelle `EINGAENGE` und lässt sich ändern,
+z. B. ein Eingang weniger oder `LOS` statt `SEQUENZ`.
+
+Ohne Hardware testen: `python3 startampel.py --sim --stdin` und dann `PIN 6 1` / `PIN 6 0`
+eintippen.
+
+### Per App (z. B. RaspController)
+
+Statt GPIO-Pins direkt zu schalten (das liefe am Programm vorbei), schickt man einen Befehl
+an das laufende Programm. In RaspController als eigenen Befehl („Custom command“) anlegen:
+
+```bash
+python3 /home/pi/startampel/startampel.py --befehl SEQUENZ
+```
+
+Genauso `ROT`, `GELB`, `GELB_AUS`, `FRUEHSTART`, `TEST`. Der Befehlsport (5000) ist nur auf
+dem Pi selbst erreichbar (`TCP_ADRESSE = "127.0.0.1"`).
+
 ## Variante: Raspberry Pi Pico W / Pico WH
 
 Statt eines Raspberry Pi geht auch ein **Pico W oder Pico WH** (mit Bluetooth). Er ist
