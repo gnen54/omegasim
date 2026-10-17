@@ -4582,6 +4582,7 @@
   <button class="tab-btn" data-tab="challenges">Challenges</button>
   <button class="tab-btn" data-tab="mp">WLAN Mehrspieler</button>
   <button class="tab-btn" data-tab="info" data-parent="options" hidden style="display:none">Info</button>
+  <button class="tab-btn" data-tab="addon" data-parent="options" hidden style="display:none">AddOn</button>
   <button class="tab-btn" data-tab="misc">Entwicklertools</button>
   <!-- Nicht in der Leiste, aber weiter als Tab-Knopf vorhanden: showTab() sucht genau
        diese Knoepfe, und die drei Kacheln unter "Sonstige" rufen showTab() auf. Ein
@@ -8973,30 +8974,6 @@
           Spieler&nbsp;2 und 3 und im WLAN-Mehrspieler. Aus: das Auto wird nach Gr&uuml;n
           stattdessen 2&nbsp;s lang ausgebremst.</small></div>
         <label class="tgl"><input type="checkbox" id="race-fruehstart-zeit" checked><span></span></label></div>
-      <!-- STARTAMPEL (74-startampel.js): echte Ampel am Tisch, ein Raspberry Pi per Bluetooth LE.
-           Der Gegenpart liegt in tools/startampel/. -->
-      <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi)
-          <span class="wip-tag">experimentell</span>
-          <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim
-          Start im Fenster &bdquo;Bringe die Autos in Position&ldquo; (die Ansage kommt von OmegaSim, siehe Ton); Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
-          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.
-          <span id="ampel-status">Nicht verbunden.</span></small></div>
-        <button type="button" id="ampel-verbinden">Verbinden</button></div>
-      <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
-          mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
-          Fr&uuml;hstart h&auml;lt den Countdown an, Gelb blinkt am Tisch, und &bdquo;Rennen
-          starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
-          oben.</small></div>
-        <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
-      <div class="opt-row"><div class="opt-label">Wartezeit nach dem Start<small>Nach dem Start im Fenster
-          &bdquo;Bringe die Autos in Position&ldquo; steht die Ampel so lange auf Gelb (mit der Startansage),
-          bis die gr&uuml;nen Lichter beginnen. 0&nbsp;=&nbsp;sofort.</small></div>
-        <div class="opt-slider">
-          <button type="button" data-step="-1" aria-label="weniger">&minus;</button>
-          <input type="range" id="race-start-warte" min="0" max="10" step="1" value="4" data-preset-skip>
-          <button type="button" data-step="1" aria-label="mehr">+</button>
-          <span class="opt-val" id="race-start-warte-val">4 s</span>
-        </div></div>
       <div class="opt-row"><div class="opt-label">Gelbe Flagge deaktivieren<small>An: Der Knopf
           &bdquo;Gelbe Flagge&ldquo; und das Halten der Boxentaste rufen kein Gelb mehr aus.</small></div>
         <label class="tgl"><input type="checkbox" id="race-gelb-aus"><span></span></label></div>
@@ -9188,6 +9165,41 @@
   </section>
 
   <!-- OPTIONEN TAB: player-facing settings (feel, sound, controller bindings) -->
+  <!-- ADDON: Einstellungen, die nur mit ZUSATZ-HARDWARE Sinn ergeben (BESTELLT: "die
+       Einstellungen bezueglich Startampel in ein separates Menue AddOn legen - so ist klar
+       ersichtlich, dass das nur mit Zusatz-Hardware genutzt werden kann"). Eigene tabpage wie
+       die Renneinstellungen, erreichbar ueber die Kachel "AddOn" in den Optionen. -->
+  <section class="tabpage" id="tab-addon">
+    <button class="misc-back goto-tab" data-tab="options">&larr; Optionen</button>
+    <div class="card" id="addon-card">
+      <h2>AddOn &middot; Zusatz-Hardware</h2>
+      <p class="muted">Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm f&uuml;r Raspberry Pi und Pico liegen im Projekt unter tools/startampel.</p>
+      <h3>Startampel</h3>
+      <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi / Pico)
+          <span class="wip-tag">experimentell</span>
+          <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim
+          Start im Fenster &bdquo;Bringe die Autos in Position&ldquo; (die Ansage kommt von OmegaSim, siehe Ton); Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
+          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.
+          <span id="ampel-status">Nicht verbunden.</span></small></div>
+        <button type="button" id="ampel-verbinden">Verbinden</button></div>
+      <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
+          mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
+          Fr&uuml;hstart h&auml;lt den Countdown an, Gelb blinkt am Tisch, und &bdquo;Rennen
+          starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
+          oben.</small></div>
+        <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Wartezeit nach dem Start<small>Nach dem Start im Fenster
+          &bdquo;Bringe die Autos in Position&ldquo; steht die Ampel so lange auf Gelb (mit der Startansage),
+          bis die gr&uuml;nen Lichter beginnen. Gilt f&uuml;r jeden Start, auch ohne Ampel. 0&nbsp;=&nbsp;sofort.</small></div>
+        <div class="opt-slider">
+          <button type="button" data-step="-1" aria-label="weniger">&minus;</button>
+          <input type="range" id="race-start-warte" min="0" max="10" step="1" value="4" data-preset-skip>
+          <button type="button" data-step="1" aria-label="mehr">+</button>
+          <span class="opt-val" id="race-start-warte-val">4 s</span>
+        </div></div>
+    </div>
+  </section>
+
   <section class="tabpage" id="tab-options">
     <div class="ch-sperre-hinweis" id="ch-sperre" hidden>W&auml;hrend einer Challenge sind die Einstellungen gesperrt.</div>
     <div class="card subpage-home" id="sub-home-options">
@@ -9216,6 +9228,13 @@
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6v36"/><path d="M10 8h24l-5 7 5 7H10" fill="var(--bad)" stroke="var(--bad)" stroke-linejoin="round"/></svg>
           <b>Renneinstellungen</b>
           <span>Renntyp, Dauer, Wetter, Pflichtstopps, Rennen starten.</span>
+        </button>
+        <!-- ADDON (#tab-addon): Zusatz-Hardware wie die Startampel am Tisch. -->
+        <button class="misc-tile goto-tab" data-tab="addon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="16" y="5" width="16" height="38" rx="4"/><circle cx="24" cy="14" r="3.5" fill="var(--bad)" stroke="var(--bad)"/><circle cx="24" cy="24" r="3.5"/><circle cx="24" cy="34" r="3.5" fill="var(--good)" stroke="var(--good)"/></svg>
+          <b>AddOn</b>
+          <span>Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).</span>
         </button>
         <button class="misc-tile subpage-open" data-sub="opt-sound">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
@@ -13398,14 +13417,19 @@
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
     "Akku kritisch ansagen": "Announce critical battery",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops to 6 % – the last step before the car stops: “Abort session, box now!” Armed again only after charging.",
+    "AddOn · Zusatz-Hardware": "Add-on · extra hardware",
+    "Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm für Raspberry Pi und Pico liegen im Projekt unter tools/startampel.": "These settings need your own hardware at the table. Build guide and program for Raspberry Pi and Pico are in the project under tools/startampel.",
+    "Startampel": "Start light",
+    "AddOn": "Add-on",
+    "Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).": "Extra hardware: start light at the table (Raspberry Pi / Pico).",
     "Wartezeit nach dem Start": "Delay after start",
-    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. 0 = sofort.": "After Start in the “Bring the cars into position” window, the light stays yellow this long (with the start announcement) before the green lights begin. 0 = immediately.",
+    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. Gilt für jeden Start, auch ohne Ampel. 0 = sofort.": "After Start in the “Bring the cars into position” window, the light stays yellow this long (with the start announcement) before the green lights begin. Applies to every start, even without a light. 0 = immediately.",
     "Start in {n} s …": "Start in {n} s …",
     "Start abgebrochen": "Start aborted",
     "Start … abbrechen": "Start … cancel",
     "Startansage": "Start announcement",
     "Beim Start im Fenster „Bringe die Autos in Position“: „Gentlemen, start your engines“ (immer englisch).": "On Start in the “Bring the cars into position” window: “Gentlemen, start your engines”.",
-    "Startampel (Raspberry Pi)": "Start light (Raspberry Pi)",
+    "Startampel (Raspberry Pi / Pico)": "Start light (Raspberry Pi / Pico)",
     "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim Start im Fenster „Bringe die Autos in Position“ (die Ansage kommt von OmegaSim, siehe Ton); Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "A real start light at the table: red while nothing is released; yellow on Start in the “Bring the cars into position” window (OmegaSim makes the announcement, see Sound); green column by column with the start beeps; everything off at green; yellow under a yellow flag; red again after the race.",
     "Startampel: Frühstart bricht den Start ab": "Start light: a jump start aborts the start",
     "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Only with a connected start light, not in Wi-Fi multiplayer and not in challenges: a jump start stops the countdown, yellow flashes at the table, and “Start race” begins the sequence again. Off: the lights carry on, penalty as above.",
@@ -16078,14 +16102,19 @@
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
     "Akku kritisch ansagen": "Anunciar batería crítica",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja al 6 % – el último paso antes de que se pare: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
+    "AddOn · Zusatz-Hardware": "Complemento · hardware adicional",
+    "Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm für Raspberry Pi und Pico liegen im Projekt unter tools/startampel.": "Estos ajustes necesitan hardware propio en la mesa. La guía de montaje y el programa para Raspberry Pi y Pico están en el proyecto, en tools/startampel.",
+    "Startampel": "Semáforo de salida",
+    "AddOn": "Complemento",
+    "Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).": "Hardware adicional: semáforo de salida en la mesa (Raspberry Pi / Pico).",
     "Wartezeit nach dem Start": "Espera tras la salida",
-    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. 0 = sofort.": "Tras pulsar Iniciar en «Coloca los coches en posición», el semáforo se queda en amarillo este tiempo (con el anuncio de salida) antes de que empiecen las luces verdes. 0 = inmediato.",
+    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. Gilt für jeden Start, auch ohne Ampel. 0 = sofort.": "Tras pulsar Iniciar en «Coloca los coches en posición», el semáforo se queda en amarillo este tiempo (con el anuncio de salida) antes de que empiecen las luces verdes. Vale para cada salida, también sin semáforo. 0 = inmediato.",
     "Start in {n} s …": "Salida en {n} s …",
     "Start abgebrochen": "Salida cancelada",
     "Start … abbrechen": "Salida … cancelar",
     "Startansage": "Anuncio de salida",
     "Beim Start im Fenster „Bringe die Autos in Position“: „Gentlemen, start your engines“ (immer englisch).": "Al pulsar Iniciar en la ventana «Coloca los coches en posición»: «Gentlemen, start your engines» (siempre en inglés).",
-    "Startampel (Raspberry Pi)": "Semáforo de salida (Raspberry Pi)",
+    "Startampel (Raspberry Pi / Pico)": "Semáforo de salida (Raspberry Pi / Pico)",
     "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim Start im Fenster „Bringe die Autos in Position“ (die Ansage kommt von OmegaSim, siehe Ton); Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "Un semáforo de salida real en la mesa: rojo mientras nada está liberado; amarillo al pulsar Iniciar en «Coloca los coches en posición» (el anuncio lo hace OmegaSim, ver Sonido); verde columna a columna al ritmo de los pitidos; todo apagado con el verde; amarillo con bandera amarilla; rojo de nuevo tras la carrera.",
     "Startampel: Frühstart bricht den Start ab": "Semáforo: una salida en falso cancela la salida",
     "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Solo con el semáforo conectado, no en multijugador por WiFi ni en desafíos: una salida en falso detiene la cuenta atrás, el amarillo parpadea en la mesa y «Iniciar carrera» reinicia la secuencia. Desactivado: el semáforo continúa, con la penalización de arriba.",
@@ -25556,7 +25585,7 @@
   const K_EBENE1 = ['fahren', 'challenges', 'mp', 'options', 'misc'];
   const K_NAME = {
     home: 'Titel', fahren: 'Fahren', garage: 'Garage', race: 'Cockpit',
-    options: 'Optionen', control: 'Renneinstellungen', track: 'Strecke', mp: 'WLAN Mehrspieler',
+    options: 'Optionen', control: 'Renneinstellungen', addon: 'AddOn', track: 'Strecke', mp: 'WLAN Mehrspieler',
     info: 'Info', challenges: 'Challenges', misc: 'Entwickler', doc: 'Doku', school: 'Programmierschule',
     dev: 'BLE-Werkbank', selftest: 'Selbsttest', probe: 'Code-Sonde', numtrain: 'Zahlensysteme',
     record: 'Aufnahme-Modus',
@@ -25564,7 +25593,7 @@
   // Zu welchem Reiter der Ebene 1 eine tiefe Seite gehoert: der Reiter bleibt hervorgehoben,
   // und Kreis fuehrt dorthin, wenn der Stapel leer ist.
   const K_ELTERN = {
-    garage: 'fahren', info: 'options', control: 'fahren', track: 'fahren',
+    garage: 'fahren', info: 'options', control: 'fahren', track: 'fahren', addon: 'options',
     doc: 'misc', school: 'misc', dev: 'misc', selftest: 'misc', probe: 'misc',
     numtrain: 'misc', record: 'misc',
   };
@@ -44789,7 +44818,7 @@
   // BESTELLT: "Wir brauchen ein Delay (3-5 Sekunden) nach Betaetigen des Start-Buttons bis
   // zum Beginn der Sequenz der gruenen LEDs." Nach dem Start im Fenster steht die Ampel auf
   // Gelb, die Ansage laeuft, und erst nach dieser Zeit beginnt der Countdown (der erste Ton =
-  // die ersten gruenen Spalten). Einstellbar in den Renneinstellungen, ab Werk 4 s, 0 = aus.
+  // die ersten gruenen Spalten). Einstellbar unter Optionen -> AddOn, ab Werk 4 s, 0 = aus.
   //
   // Waehrend des Wartens laeuft noch nichts (raceState bleibt idle): ein zweites Startfenster
   // wird nicht geoeffnet, und der Start-Knopf im Cockpit bricht das Warten ab (Ampel Rot).
