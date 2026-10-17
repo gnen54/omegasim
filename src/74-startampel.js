@@ -134,7 +134,7 @@
   // BESTELLT: "Wir brauchen ein Delay (3-5 Sekunden) nach Betaetigen des Start-Buttons bis
   // zum Beginn der Sequenz der gruenen LEDs." Nach dem Start im Fenster steht die Ampel auf
   // Gelb, die Ansage laeuft, und erst nach dieser Zeit beginnt der Countdown (der erste Ton =
-  // die ersten gruenen Spalten). Einstellbar in den Renneinstellungen, ab Werk 4 s, 0 = aus.
+  // die ersten gruenen Spalten). Einstellbar unter Optionen -> AddOn, ab Werk 4 s, 0 = aus.
   //
   // Waehrend des Wartens laeuft noch nichts (raceState bleibt idle): ein zweites Startfenster
   // wird nicht geoeffnet, und der Start-Knopf im Cockpit bricht das Warten ab (Ampel Rot).

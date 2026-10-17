@@ -3,7 +3,7 @@
 """
 Startampel fuer OmegaSim - Raspberry Pi 3, Bluetooth Low Energy.
 
-Gegenpart in der App: src/74-startampel.js (Renneinstellungen -> "Startampel (Raspberry Pi)").
+Gegenpart in der App: src/74-startampel.js (Optionen -> AddOn -> "Startampel").
 
 Aufbau der Ampel
     Oben    : rote Reihe   (1 Kanal)

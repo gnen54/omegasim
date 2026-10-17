@@ -15,13 +15,13 @@ Drei LED-Reihen: oben **Rot**, in der Mitte **Gelb**, unten **Grün** mit 5 Spal
 | Gelbe Flagge                                  | `GELB`         | Gelb an                                  |
 | Gelbe Flagge aufgehoben (nach der Anfahr-Ampel) | `GELB_AUS`   | Gelb aus                                 |
 
-\* Nur wenn in den Renneinstellungen „Startampel: Frühstart bricht den Start ab“ an ist
+\* Nur wenn unter Optionen → AddOn „Startampel: Frühstart bricht den Start ab“ an ist
 (ab Werk an), nicht im WLAN-Mehrspieler und nicht in Challenges. Dann hält OmegaSim den
 Countdown an, und „Rennen starten“ beginnt die Abfolge neu. Ist der Schalter aus, läuft
 die Ampel weiter und es gilt die normale Frühstart-Strafe.
 
 Nach dem Start im Fenster steht die Ampel eine **Wartezeit** lang auf Gelb (mit der
-Ansage), erst dann beginnt die grüne Sequenz – Renneinstellungen → **Wartezeit nach dem
+Ansage), erst dann beginnt die grüne Sequenz – Optionen → AddOn → **Wartezeit nach dem
 Start**, ab Werk 4 s, 0 = sofort. Der Start-Knopf im Cockpit bricht das Warten ab (Rot).
 
 Der Countdown in OmegaSim hat fünf Töne im Sekundentakt, wie an einer echten Startampel: je
@@ -169,7 +169,7 @@ eigene Spannung über den Treiber; GND von Pico und LED-Netzteil verbinden.
    öffnen und **als `main.py` auf dem Pico speichern** („Raspberry Pi Pico“ als Ziel).
 3. Pico neu starten. Die **Onboard-LED blinkt**, solange er auf OmegaSim wartet, und
    **leuchtet**, sobald die App verbunden ist. Die rote Reihe geht an.
-4. In OmegaSim: **Renneinstellungen → Startampel → Verbinden** und „Ampel“ wählen.
+4. In OmegaSim: **Optionen → AddOn → Startampel → Verbinden** und „Ampel“ wählen.
 
 Zum Testen ohne App in Thonny im Kommandofenster (Programm vorher mit Strg+C anhalten):
 
@@ -191,8 +191,8 @@ mkdir -p ~/startampel && cp startampel.py ~/startampel/
 sudo python3 ~/startampel/startampel.py
 ```
 
-Die Ausgabe zeigt „Sichtbar als "Ampel"“. Dann in OmegaSim: **Renneinstellungen →
-Startampel (Raspberry Pi) → Verbinden** und „Ampel“ wählen. Geht in Chrome/Edge (PC,
+Die Ausgabe zeigt „Sichtbar als "Ampel"“. Dann in OmegaSim: **Optionen → AddOn →
+Startampel → Verbinden** und „Ampel“ wählen. Geht in Chrome/Edge (PC,
 Android) und in der OmegaSim-Android-App, nicht in Firefox oder Safari.
 
 ### Wenn das Tablet eine Kopplungsanfrage zeigt und der Pi gleich wieder trennt
@@ -207,7 +207,7 @@ koppeln. Das Programm fängt das ab: es schaltet den Pi beim Start auf **reines 
 2. Am Pi Bluetooth neu starten: `sudo systemctl restart bluetooth`, dann das Programm neu.
 3. Steht im Terminal „btmgmt fehlt“: in `/etc/bluetooth/main.conf` unter `[General]` die
    Zeile `ControllerMode = le` eintragen und `sudo systemctl restart bluetooth`.
-4. In Chrome neu verbinden (Renneinstellungen → Startampel → Verbinden). Eine
+4. In Chrome neu verbinden (Optionen → AddOn → Startampel → Verbinden). Eine
    Kopplungsanfrage darf man bestätigen – sie geht jetzt durch.
 
 ### Autostart
