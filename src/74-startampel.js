@@ -124,10 +124,10 @@
   // OmegaSim "Gentlemen, start your engines" (80-sound.js) - nicht schon beim Oeffnen des
   // Fensters ("Rennen starten", Cockpit-Knopf, Challenge nach Stillstand), nicht beim
   // Mehrspieler-Countdown. Und nur, wenn nichts laeuft. Auch ohne verbundene Ampel.
-  function ampelStartKnopf() {
+  function ampelStartKnopf(beginn) {
     if (raceState !== 'idle' && raceState !== 'finished') return false;
     ampelSenden('START');
-    return typeof startAnsageSprechen === 'function' && startAnsageSprechen();
+    return typeof startAnsageSprechen === 'function' && startAnsageSprechen(beginn);
   }
   // ---- WARTEZEIT zwischen Start und erstem gruenen Licht ----
   //
@@ -147,23 +147,40 @@
   }
   function ampelStartWartet() { return !!startWarteTimer; }
   // Aus raceGridStart() (70-race.js): Gelb und Ansage sofort, der Countdown (weiter) danach.
+  //
+  // DIE WARTEZEIT BEGINNT MIT DER ANSAGE, nicht mit dem Knopf: beim ersten Start braucht die
+  // Sprachausgabe auf Android Sekunden, bis sie spricht, und die Ampel war dann schon durch.
+  // Jetzt laeuft die Uhr erst ab dem ersten gesprochenen Wort (oder sofort, wenn es keine
+  // Ansage gibt) - spaetestens aber nach ANSAGE_MAX_MS, damit eine haengende Stimme den
+  // Start nicht blockiert.
+  const ANSAGE_MAX_MS = 10000;
+  let startWarteNr = 0;
   function ampelStartVerzoegert(weiter) {
     if (startWarteTimer) return;
-    ampelStartKnopf();
+    const nr = ++startWarteNr;
     const ms = startWarteMs();
-    if (!ms) { weiter(); return; }
+    let laeuft = false;
+    const uhrStarten = () => {
+      if (laeuft || nr !== startWarteNr || !startWarteTimer) return;   // schon gestartet/abgebrochen
+      laeuft = true;
+      clearTimeout(startWarteTimer);
+      startWarteTimer = setTimeout(() => {
+        startWarteTimer = null;
+        weiter();
+        updateRaceActButtons();
+      }, ms);
+    };
+    // Platzhalter, damit das Warten ab jetzt zaehlt (kein zweites Fenster, Abbrechen geht).
+    startWarteTimer = setTimeout(uhrStarten, ANSAGE_MAX_MS);
     $('race-status').textContent = t('Start in {n} s …').replace('{n}', String(Math.round(ms / 1000)));
-    startWarteTimer = setTimeout(() => {
-      startWarteTimer = null;
-      weiter();
-      updateRaceActButtons();
-    }, ms);
     updateRaceActButtons();
+    if (!ampelStartKnopf(uhrStarten)) uhrStarten();
   }
   function ampelStartWarteAbbrechen() {
     if (!startWarteTimer) return;
     clearTimeout(startWarteTimer);
     startWarteTimer = null;
+    startWarteNr++;
     ampelSenden('ROT');
     $('race-status').textContent = t('Start abgebrochen');
     showHudToast(t('Start abgebrochen'));
