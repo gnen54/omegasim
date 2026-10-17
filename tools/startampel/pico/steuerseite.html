@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Startampel</title>
+<style>
+  :root { --bg:#111418; --karte:#1b2027; --text:#e8ecf1; --leise:#8b95a3; --rand:#2b323c;
+          --rot:#ff3b30; --gelb:#ffcc00; --gruen:#34c759; --aus:#2a2f36; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font:16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:4px 0 2px; }
+  .zeile { color:var(--leise); font-size:14px; min-height:20px; }
+  .ampel { background:#000; border:1px solid var(--rand); border-radius:14px; padding:14px;
+           display:grid; gap:10px; margin:14px 0; }
+  .reihe { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .lampe { aspect-ratio:1; border-radius:50%; background:var(--aus); transition:background .1s, box-shadow .1s; }
+  .an.r { background:var(--rot); box-shadow:0 0 14px var(--rot); }
+  .an.y { background:var(--gelb); box-shadow:0 0 14px var(--gelb); }
+  .an.g { background:var(--gruen); box-shadow:0 0 14px var(--gruen); }
+  .hinweis { background:#3a2a00; color:#ffd666; border-radius:10px; padding:10px 12px; font-size:14px; margin-bottom:12px; }
+  .knoepfe { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  button { font:inherit; font-weight:600; color:var(--text); background:var(--karte); border:1px solid var(--rand);
+           border-radius:12px; padding:16px 10px; min-height:56px; cursor:pointer; }
+  button:active { transform:scale(.98); }
+  button:disabled { opacity:.35; cursor:not-allowed; }
+  .gross { grid-column:1 / -1; background:#123d1f; border-color:#1f6b35; font-size:18px; }
+  .stopp { grid-column:1 / -1; background:#4a1210; border-color:#8a221d; font-size:18px; }
+  .karte { background:var(--karte); border:1px solid var(--rand); border-radius:12px; padding:12px 14px; margin-top:14px; }
+  .regler { display:flex; align-items:center; gap:12px; }
+  input[type=range] { flex:1; accent-color:var(--gruen); }
+  .wert { min-width:44px; text-align:right; font-variant-numeric:tabular-nums; }
+  .fehler { color:#ff8a80; }
+</style></head><body><main>
+  <h1>Startampel</h1>
+  <div class="zeile" id="zustand">Verbinde …</div>
+  <div class="ampel" aria-label="Ampel">
+    <div class="reihe" id="r-rot"></div><div class="reihe" id="r-gelb"></div><div class="reihe" id="r-gruen"></div>
+  </div>
+  <div class="hinweis" id="hinweis" hidden>OmegaSim ist verbunden – die App steuert die Ampel. Hier geht nur Rot / Stopp.</div>
+  <div class="knoepfe">
+    <button class="gross" data-b="SEQUENZ">Startsequenz</button>
+    <button data-b="GELB" id="k-gelb">Gelbphase</button>
+    <button data-b="FRUEHSTART">Frühstart</button>
+    <button data-b="TEST">Lampentest</button>
+    <button data-b="LOS">Alles aus</button>
+    <button class="stopp" data-b="ROT">Rot / Stopp</button>
+  </div>
+  <div class="karte">
+    <div>Wartezeit vor Grün</div>
+    <div class="regler"><input type="range" id="warte" min="0" max="10" step="1"><span class="wert" id="warte-wert"></span></div>
+  </div>
+  <div class="zeile fehler" id="fehler"></div>
+</main><script>
+const TEXTE = { gesperrt:'Gesperrt – Rot', vorstart:'Vorstart – Gelb', startsequenz:'Startsequenz läuft',
+  rennen:'Rennen läuft', gelbphase:'Gelbphase', fruehstart:'Frühstart – Gelb blinkt' };
+const reihe = (id, n, k) => { const el = document.getElementById(id);
+  for (let i = 0; i < n; i++) { const d = document.createElement('div'); d.className = 'lampe ' + k; el.appendChild(d); } };
+reihe('r-rot', 5, 'r'); reihe('r-gelb', 5, 'y'); reihe('r-gruen', 5, 'g');
+let pin = ''; try { pin = localStorage.getItem('ampel-pin') || ''; } catch (e) {}
+let stand = null, warteZiehen = false;
+async function ruf(pfad, daten) {
+  const r = await fetch(pfad, { method: daten ? 'POST' : 'GET', headers: { 'X-Pin': pin },
+                                body: daten ? JSON.stringify(daten) : undefined, cache: 'no-store' });
+  if (r.status === 401) { pin = prompt('PIN der Ampel') || ''; try { localStorage.setItem('ampel-pin', pin); } catch (e) {}
+                          throw new Error('PIN nötig'); }
+  if (!r.ok) throw new Error((await r.text()) || r.status);
+  return r.json();
+}
+function zeigen(s) {
+  stand = s;
+  document.getElementById('zustand').textContent = (TEXTE[s.zustand] || s.zustand) + (s.omegasim ? ' · OmegaSim verbunden' : '');
+  document.querySelectorAll('#r-rot .lampe').forEach(l => l.classList.toggle('an', s.rot));
+  document.querySelectorAll('#r-gelb .lampe').forEach(l => l.classList.toggle('an', s.gelb));
+  document.querySelectorAll('#r-gruen .lampe').forEach((l, i) => l.classList.toggle('an', i < s.gruen));
+  document.getElementById('hinweis').hidden = !s.omegasim;
+  document.querySelectorAll('button[data-b]').forEach(b => { b.disabled = s.omegasim && b.dataset.b !== 'ROT'; });
+  const g = document.getElementById('k-gelb');
+  g.dataset.b = s.zustand === 'gelbphase' ? 'GELB_AUS' : 'GELB';
+  g.textContent = s.zustand === 'gelbphase' ? 'Gelbphase aufheben' : 'Gelbphase';
+  if (s.omegasim) g.disabled = true;
+  if (!warteZiehen) { document.getElementById('warte').value = s.warte; }
+  document.getElementById('warte-wert').textContent = document.getElementById('warte').value + ' s';
+  document.getElementById('fehler').textContent = '';
+}
+async function holen() { try { zeigen(await ruf('/status')); }
+  catch (e) { document.getElementById('fehler').textContent = 'Keine Verbindung zur Ampel (' + e.message + ')'; } }
+document.querySelectorAll('button[data-b]').forEach(b => b.addEventListener('click', async () => {
+  try { zeigen(await ruf('/befehl', { befehl: b.dataset.b })); setTimeout(holen, 150); }
+  catch (e) { document.getElementById('fehler').textContent = e.message; } }));
+const w = document.getElementById('warte');
+w.addEventListener('input', () => { warteZiehen = true; document.getElementById('warte-wert').textContent = w.value + ' s'; });
+w.addEventListener('change', async () => { try { zeigen(await ruf('/einstellung', { warte: Number(w.value) })); }
+  catch (e) { document.getElementById('fehler').textContent = e.message; } warteZiehen = false; });
+holen(); setInterval(holen, 400);
+</script></body></html>
