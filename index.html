@@ -36035,6 +36035,9 @@
   // The lap in progress is discarded rather than recorded — it was never completed, and
   // counting a partial lap would poison the fastest-lap column.
   function requestRaceStop() {
+    // In der Wartezeit nach dem Start (74-startampel.js) laeuft noch kein Rennen - der Knopf
+    // bricht dann das Warten ab, die Ampel geht auf Rot.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     if (raceState !== 'racing' && raceState !== 'countdown' && raceState !== 'finishing') return;
     if (raceCountdownTimer) { clearInterval(raceCountdownTimer); raceCountdownTimer = null; }
     setRaceLights(0);
@@ -44830,8 +44833,8 @@
   // Sprachausgabe auf Android Sekunden, bis sie spricht, und die Ampel war dann schon durch.
   // Jetzt laeuft die Uhr erst ab dem ersten gesprochenen Wort (oder sofort, wenn es keine
   // Ansage gibt) - spaetestens aber nach ANSAGE_MAX_MS, damit eine haengende Stimme den
-  // Start nicht blockiert.
-  const ANSAGE_MAX_MS = 10000;
+  // Start nicht blockiert. 4 s statt vorher 10 s: am Tisch wirkten 10 s wie "Gruen kommt nicht".
+  const ANSAGE_MAX_MS = 4000;
   let startWarteNr = 0;
   function ampelStartVerzoegert(weiter) {
     if (startWarteTimer) return;
@@ -44851,6 +44854,9 @@
     // Platzhalter, damit das Warten ab jetzt zaehlt (kein zweites Fenster, Abbrechen geht).
     startWarteTimer = setTimeout(uhrStarten, ANSAGE_MAX_MS);
     $('race-status').textContent = t('Start in {n} s …').replace('{n}', String(Math.round(ms / 1000)));
+    // Schon im Warten abbrechbar (GEMELDET: "Rennabbruch per OmegaSim funktioniert nicht" -
+    // der Knopf war bis zum Countdown gesperrt). requestRaceStop() bricht dann das Warten ab.
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = false;
     updateRaceActButtons();
     if (!ampelStartKnopf(uhrStarten)) uhrStarten();
   }
@@ -44860,6 +44866,8 @@
     startWarteTimer = null;
     startWarteNr++;
     ampelSenden('ROT');
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+    if ($('race-start-btn')) $('race-start-btn').disabled = false;
     $('race-status').textContent = t('Start abgebrochen');
     showHudToast(t('Start abgebrochen'));
     updateRaceActButtons();
@@ -45748,24 +45756,41 @@
   // Sprachausgabe erst beim ersten speak() hoch, und das dauert Sekunden - der Satz kam
   // nach der Ampel. Deshalb wird sie beim Oeffnen des Startfensters vorgewaermt
   // (startAnsageVorwaermen) und die Ampel wartet auf den Beginn der Ansage.
+  //
+  // GEMELDET (am Tisch, Android-Chrome): "Gruen-Sequenz laeuft nicht, Rennabbruch geht nicht."
+  // Die Ampel wartete auf u.onstart, und das kam nicht. Drei bekannte Eigenheiten von Chrome:
+  //   1. Ein SpeechSynthesisUtterance ohne Verweis darauf wird weggeraeumt, BEVOR seine
+  //      Ereignisse kommen -> startAnsageAktuell haelt ihn fest.
+  //   2. cancel() direkt vor speak() verschluckt auf Android Ereignisse oder den ganzen Satz
+  //      -> kein cancel() mehr; vor dem Start spricht ohnehin nichts.
+  //   3. Auf Ereignisse ist kein Verlass -> zusaetzlich wird speechSynthesis.speaking abgefragt;
+  //      was zuerst kommt, startet die Uhr. Die Notbremse in 74-startampel.js bleibt.
+  let startAnsageAktuell = null;
   function startAnsageSprechen(beginn) {
     if (!ansageAn.start) return false;
     if (playAnsageClip('start')) { if (beginn) beginn(); return true; }
     if (!('speechSynthesis' in window)) return false;
     try {
-      window.speechSynthesis.cancel();
-      announceCancels++;
       const u = new SpeechSynthesisUtterance(START_ANSAGE);
+      startAnsageAktuell = u;
       u.lang = 'en-US';
       u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
       const en = englischeStimme();
       if (en) u.voice = en;
       if (beginn) {
-        let einmal = false;
-        const los = () => { if (!einmal) { einmal = true; beginn(); } };
+        let einmal = false, abfrage = null;
+        const los = () => {
+          if (abfrage) { clearInterval(abfrage); abfrage = null; }
+          if (!einmal) { einmal = true; beginn(); }
+        };
         u.onstart = los;
         u.onerror = los;   // keine Stimme: die Ampel soll trotzdem laufen
+        abfrage = setInterval(() => {
+          try { if (window.speechSynthesis.speaking) los(); } catch (e) { los(); }
+        }, 100);
+        setTimeout(() => { if (abfrage) { clearInterval(abfrage); abfrage = null; } }, 15000);
       }
+      u.onend = () => { if (startAnsageAktuell === u) startAnsageAktuell = null; };
       window.speechSynthesis.speak(u);
       announceCalls++;
       return true;
@@ -86428,7 +86453,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       else if (gestartetUm - t0 < 550) f.push('Countdown nach ' + Math.round(gestartetUm - t0) + ' ms - wartet nicht auf die Ansage');
       // Wird die Stimme nie gestartet, geht es nach ANSAGE_MAX_MS trotzdem los (hier nicht gewartet,
       // nur geprueft, dass die Grenze existiert und vernuenftig ist).
-      if (!(ANSAGE_MAX_MS >= 5000 && ANSAGE_MAX_MS <= 15000)) f.push('ANSAGE_MAX_MS ' + ANSAGE_MAX_MS);
+      if (!(ANSAGE_MAX_MS >= 2000 && ANSAGE_MAX_MS <= 6000)) f.push('ANSAGE_MAX_MS ' + ANSAGE_MAX_MS);
       return { ok: !f.length, mass: f.length ? f.join(' | ')
         : 'Stimme nach 600 ms, Countdown nach ' + Math.round(gestartetUm - t0) + ' ms (erst mit der Ansage, Wartezeit 0)' };
     } finally {

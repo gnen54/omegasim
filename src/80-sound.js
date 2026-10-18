@@ -837,24 +837,41 @@
   // Sprachausgabe erst beim ersten speak() hoch, und das dauert Sekunden - der Satz kam
   // nach der Ampel. Deshalb wird sie beim Oeffnen des Startfensters vorgewaermt
   // (startAnsageVorwaermen) und die Ampel wartet auf den Beginn der Ansage.
+  //
+  // GEMELDET (am Tisch, Android-Chrome): "Gruen-Sequenz laeuft nicht, Rennabbruch geht nicht."
+  // Die Ampel wartete auf u.onstart, und das kam nicht. Drei bekannte Eigenheiten von Chrome:
+  //   1. Ein SpeechSynthesisUtterance ohne Verweis darauf wird weggeraeumt, BEVOR seine
+  //      Ereignisse kommen -> startAnsageAktuell haelt ihn fest.
+  //   2. cancel() direkt vor speak() verschluckt auf Android Ereignisse oder den ganzen Satz
+  //      -> kein cancel() mehr; vor dem Start spricht ohnehin nichts.
+  //   3. Auf Ereignisse ist kein Verlass -> zusaetzlich wird speechSynthesis.speaking abgefragt;
+  //      was zuerst kommt, startet die Uhr. Die Notbremse in 74-startampel.js bleibt.
+  let startAnsageAktuell = null;
   function startAnsageSprechen(beginn) {
     if (!ansageAn.start) return false;
     if (playAnsageClip('start')) { if (beginn) beginn(); return true; }
     if (!('speechSynthesis' in window)) return false;
     try {
-      window.speechSynthesis.cancel();
-      announceCancels++;
       const u = new SpeechSynthesisUtterance(START_ANSAGE);
+      startAnsageAktuell = u;
       u.lang = 'en-US';
       u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
       const en = englischeStimme();
       if (en) u.voice = en;
       if (beginn) {
-        let einmal = false;
-        const los = () => { if (!einmal) { einmal = true; beginn(); } };
+        let einmal = false, abfrage = null;
+        const los = () => {
+          if (abfrage) { clearInterval(abfrage); abfrage = null; }
+          if (!einmal) { einmal = true; beginn(); }
+        };
         u.onstart = los;
         u.onerror = los;   // keine Stimme: die Ampel soll trotzdem laufen
+        abfrage = setInterval(() => {
+          try { if (window.speechSynthesis.speaking) los(); } catch (e) { los(); }
+        }, 100);
+        setTimeout(() => { if (abfrage) { clearInterval(abfrage); abfrage = null; } }, 15000);
       }
+      u.onend = () => { if (startAnsageAktuell === u) startAnsageAktuell = null; };
       window.speechSynthesis.speak(u);
       announceCalls++;
       return true;

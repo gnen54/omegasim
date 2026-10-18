@@ -152,8 +152,8 @@
   // Sprachausgabe auf Android Sekunden, bis sie spricht, und die Ampel war dann schon durch.
   // Jetzt laeuft die Uhr erst ab dem ersten gesprochenen Wort (oder sofort, wenn es keine
   // Ansage gibt) - spaetestens aber nach ANSAGE_MAX_MS, damit eine haengende Stimme den
-  // Start nicht blockiert.
-  const ANSAGE_MAX_MS = 10000;
+  // Start nicht blockiert. 4 s statt vorher 10 s: am Tisch wirkten 10 s wie "Gruen kommt nicht".
+  const ANSAGE_MAX_MS = 4000;
   let startWarteNr = 0;
   function ampelStartVerzoegert(weiter) {
     if (startWarteTimer) return;
@@ -173,6 +173,9 @@
     // Platzhalter, damit das Warten ab jetzt zaehlt (kein zweites Fenster, Abbrechen geht).
     startWarteTimer = setTimeout(uhrStarten, ANSAGE_MAX_MS);
     $('race-status').textContent = t('Start in {n} s …').replace('{n}', String(Math.round(ms / 1000)));
+    // Schon im Warten abbrechbar (GEMELDET: "Rennabbruch per OmegaSim funktioniert nicht" -
+    // der Knopf war bis zum Countdown gesperrt). requestRaceStop() bricht dann das Warten ab.
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = false;
     updateRaceActButtons();
     if (!ampelStartKnopf(uhrStarten)) uhrStarten();
   }
@@ -182,6 +185,8 @@
     startWarteTimer = null;
     startWarteNr++;
     ampelSenden('ROT');
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+    if ($('race-start-btn')) $('race-start-btn').disabled = false;
     $('race-status').textContent = t('Start abgebrochen');
     showHudToast(t('Start abgebrochen'));
     updateRaceActButtons();
