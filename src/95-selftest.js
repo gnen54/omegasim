@@ -17401,7 +17401,7 @@
       else if (gestartetUm - t0 < 550) f.push('Countdown nach ' + Math.round(gestartetUm - t0) + ' ms - wartet nicht auf die Ansage');
       // Wird die Stimme nie gestartet, geht es nach ANSAGE_MAX_MS trotzdem los (hier nicht gewartet,
       // nur geprueft, dass die Grenze existiert und vernuenftig ist).
-      if (!(ANSAGE_MAX_MS >= 5000 && ANSAGE_MAX_MS <= 15000)) f.push('ANSAGE_MAX_MS ' + ANSAGE_MAX_MS);
+      if (!(ANSAGE_MAX_MS >= 2000 && ANSAGE_MAX_MS <= 6000)) f.push('ANSAGE_MAX_MS ' + ANSAGE_MAX_MS);
       return { ok: !f.length, mass: f.length ? f.join(' | ')
         : 'Stimme nach 600 ms, Countdown nach ' + Math.round(gestartetUm - t0) + ' ms (erst mit der Ansage, Wartezeit 0)' };
     } finally {

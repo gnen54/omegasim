@@ -2173,6 +2173,9 @@
   // The lap in progress is discarded rather than recorded — it was never completed, and
   // counting a partial lap would poison the fastest-lap column.
   function requestRaceStop() {
+    // In der Wartezeit nach dem Start (74-startampel.js) laeuft noch kein Rennen - der Knopf
+    // bricht dann das Warten ab, die Ampel geht auf Rot.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     if (raceState !== 'racing' && raceState !== 'countdown' && raceState !== 'finishing') return;
     if (raceCountdownTimer) { clearInterval(raceCountdownTimer); raceCountdownTimer = null; }
     setRaceLights(0);
