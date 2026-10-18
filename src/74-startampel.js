@@ -100,6 +100,9 @@
   // Zur Fehlersuche am Tisch: der zuletzt gesendete Befehl und der letzte Fehler stehen direkt
   // unter "Startampel verbinden" (Optionen -> AddOn).
   let ampelLetzter = '', ampelFehler = '';
+  // Erkennungszeichen der Fassung: so sieht man am Tablet sofort, ob die neue Version geladen ist
+  // (die Programmversion 1.0.36 aendert sich bei Testfassungen nicht).
+  const AMPEL_STAND = '18.10.-d';
   function ampelStatusZeigen(text) {
     const s = $('ampel-status');
     let zeile = text || (ampelVerbunden()
@@ -107,6 +110,7 @@
       : t('Nicht verbunden.'));
     if (!text && ampelLetzter) zeile += ' · ' + t('zuletzt') + ': ' + ampelLetzter;
     if (!text && ampelFehler) zeile += ' · ⚠ ' + ampelFehler;
+    if (!text) zeile += ' · (' + AMPEL_STAND + ')';
     if (s) s.textContent = zeile;
     const b = $('ampel-verbinden');
     if (b) b.textContent = ampelVerbunden() ? t('Trennen') : t('Verbinden');
@@ -229,6 +233,14 @@
       startWarteTimer = setTimeout(() => {
         startWarteTimer = null;
         weiter();
+        // Lief der Start nicht an (z. B. Time Attack ohne eingescannte Strecke, Knockout ohne
+        // NPC - dort erscheint ein Hinweis), darf die Ampel nicht ewig auf Gelb stehen.
+        if (raceState === 'idle' || raceState === 'finished') {
+          ampelSenden('ROT');
+          if ($('race-status').textContent.indexOf('…') >= 0) $('race-status').textContent = t('Start abgebrochen');
+          if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+          if ($('race-start-btn')) $('race-start-btn').disabled = false;
+        }
         updateRaceActButtons();
       }, ms);
     };
