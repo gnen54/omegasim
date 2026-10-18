@@ -9179,8 +9179,8 @@
           <span class="wip-tag">experimentell</span>
           <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim
           Start im Fenster &bdquo;Bringe die Autos in Position&ldquo; (die Ansage kommt von OmegaSim, siehe Ton); Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
-          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.
-          <span id="ampel-status">Nicht verbunden.</span></small></div>
+          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.</small>
+          <div id="ampel-status" class="muted" style="font-size:12px;margin-top:4px">Nicht verbunden.</div></div>
         <button type="button" id="ampel-verbinden">Verbinden</button></div>
       <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
           mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
@@ -44793,7 +44793,7 @@
   let ampelLetzter = '', ampelFehler = '';
   // Erkennungszeichen der Fassung: so sieht man am Tablet sofort, ob die neue Version geladen ist
   // (die Programmversion 1.0.36 aendert sich bei Testfassungen nicht).
-  const AMPEL_STAND = '18.10.-d';
+  const AMPEL_STAND = '18.10.-e';
   function ampelStatusZeigen(text) {
     const s = $('ampel-status');
     let zeile = text || (ampelVerbunden()
