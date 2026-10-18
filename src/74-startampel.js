@@ -39,14 +39,40 @@
   // Befehle laufen nacheinander: Bluetooth vertraegt keinen zweiten Schreibvorgang, solange der
   // erste noch offen ist, und die Reihenfolge (START vor GRUEN) muss am Pi ankommen, wie sie
   // hier gemeint war.
+  //
+  // GEMELDET: "START kommt am Pi an, GRUEN 1..5 und ROT nicht." Die Schlange hing: ein
+  // Schreiben MIT Antwort, dessen Bestaetigung nie kommt (Android-Bluetooth), haelt jeden
+  // weiteren Befehl fuer immer auf. Deshalb jetzt:
+  //  - OHNE Antwort schreiben, wenn die Ampel das anbietet (Pi und Pico tun es) - da gibt es
+  //    nichts, worauf man warten koennte;
+  //  - sonst mit Antwort, aber hoechstens AMPEL_SCHREIB_MS lang warten;
+  //  - ein fehlgeschlagener Befehl wird einmal wiederholt (z. B. "GATT operation already in
+  //    progress", solange der haengende noch offen ist);
+  //  - jeder Befehl steht im Protokoll, damit man am Tablet sieht, was hinausging.
+  const AMPEL_SCHREIB_MS = 1500;
+  function ampelSchreiben(kanal, daten) {
+    const p = kanal.properties || {};
+    if (p.writeWithoutResponse && typeof kanal.writeValueWithoutResponse === 'function') {
+      return kanal.writeValueWithoutResponse(daten);
+    }
+    const schreiben = typeof kanal.writeValueWithResponse === 'function'
+      ? kanal.writeValueWithResponse(daten) : kanal.writeValue(daten);
+    return Promise.race([schreiben, new Promise((_, nein) =>
+      setTimeout(() => nein(new Error('keine Antwort in ' + AMPEL_SCHREIB_MS + ' ms')), AMPEL_SCHREIB_MS))]);
+  }
   function ampelSenden(befehl) {
     if (befehl === 'ROT' || befehl === 'LOS' || befehl === 'FRUEHSTART') ampelVorstart = false;
     else if (befehl === 'START') ampelVorstart = true;
-    if (!ampelVerbunden()) return;
+    if (!ampelVerbunden()) {
+      if (ampelGeraet) log('Startampel: ' + befehl + ' nicht gesendet (nicht verbunden)', 'err');
+      return;
+    }
     const kanal = ampelKanal;
     const daten = new TextEncoder().encode(befehl + '\n');
     ampelSchlange = ampelSchlange
-      .then(() => kanal.writeValueWithResponse(daten))
+      .then(() => ampelSchreiben(kanal, daten))
+      .catch(() => new Promise((r) => setTimeout(r, 150)).then(() => ampelSchreiben(kanal, daten)))
+      .then(() => log('Startampel: ' + befehl, 'info'))
       .catch((e) => log('Startampel: ' + befehl + ' nicht gesendet (' + (e && e.message) + ')', 'err'));
   }
 
@@ -73,11 +99,32 @@
     if (b) b.textContent = ampelVerbunden() ? t('Trennen') : t('Verbinden');
   }
 
+  // Bricht die Verbindung ab (Funkloch, Pi kurz weg), verbindet OmegaSim von selbst neu - ohne
+  // Auswahlfenster, dasselbe Geraet - und schickt den aktuellen Stand. Fuenf Versuche.
+  let ampelVonHandGetrennt = false;
+  async function ampelWiederVerbinden(dev, versuch) {
+    if (ampelGeraet !== dev || ampelVonHandGetrennt || ampelVerbunden() || versuch > 5) return;
+    ampelStatusZeigen(t('Verbinde neu …'));
+    try {
+      const srv = await dev.gatt.connect();
+      const dienst = await srv.getPrimaryService(AMPEL_SERVICE);
+      ampelKanal = await dienst.getCharacteristic(AMPEL_BEFEHL);
+      log('Startampel wieder verbunden.', 'info');
+      ampelStatusZeigen();
+      ampelStandSenden();
+    } catch (e) {
+      ampelStatusZeigen();
+      setTimeout(() => ampelWiederVerbinden(dev, versuch + 1), 2000);
+    }
+  }
+
   async function ampelVerbinden() {
     if (ampelVerbunden()) {
+      ampelVonHandGetrennt = true;
       try { ampelGeraet.gatt.disconnect(); } catch (e) { /* schon weg */ }
       return;
     }
+    ampelVonHandGetrennt = false;
     if (!navigator.bluetooth) { alert(t('Dieser Browser kann kein Bluetooth.')); return; }
     try {
       ampelStatusZeigen(t('Suche …'));
@@ -92,8 +139,10 @@
       dev.addEventListener('gattserverdisconnected', () => {
         if (ampelGeraet !== dev) return;
         ampelKanal = null;
+        ampelSchlange = Promise.resolve();
         log('Startampel getrennt.', 'err');
         ampelStatusZeigen();
+        if (!ampelVonHandGetrennt) ampelWiederVerbinden(dev, 1);
       });
       log('Startampel verbunden.', 'info');
       ampelStatusZeigen();
