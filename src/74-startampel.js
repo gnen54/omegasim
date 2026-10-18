@@ -52,6 +52,9 @@
   const AMPEL_SCHREIB_MS = 1500;
   function ampelSchreiben(kanal, daten) {
     const p = kanal.properties || {};
+    // In der Android-App (05-app-bruecke.js) am schnellen Autoweg vorbei, der nur den jeweils
+    // neuesten Befehl schreibt.
+    if (p.writeWithoutResponse && typeof kanal._befehlSchreiben === 'function') return kanal._befehlSchreiben(daten);
     if (p.writeWithoutResponse && typeof kanal.writeValueWithoutResponse === 'function') {
       return kanal.writeValueWithoutResponse(daten);
     }
@@ -72,8 +75,12 @@
     ampelSchlange = ampelSchlange
       .then(() => ampelSchreiben(kanal, daten))
       .catch(() => new Promise((r) => setTimeout(r, 150)).then(() => ampelSchreiben(kanal, daten)))
-      .then(() => log('Startampel: ' + befehl, 'info'))
-      .catch((e) => log('Startampel: ' + befehl + ' nicht gesendet (' + (e && e.message) + ')', 'err'));
+      .then(() => { log('Startampel: ' + befehl, 'info'); ampelLetzter = befehl; ampelFehler = ''; ampelStatusZeigen(); })
+      .catch((e) => {
+        ampelFehler = befehl + ': ' + ((e && e.message) || e);
+        log('Startampel: ' + befehl + ' nicht gesendet (' + ((e && e.message) || e) + ')', 'err');
+        ampelStatusZeigen();
+      });
   }
 
   // Nach dem Verbinden den Stand der App nachziehen - die Ampel weiss sonst nicht, ob gerade
@@ -90,11 +97,17 @@
     }
   }
 
+  // Zur Fehlersuche am Tisch: der zuletzt gesendete Befehl und der letzte Fehler stehen direkt
+  // unter "Startampel verbinden" (Optionen -> AddOn).
+  let ampelLetzter = '', ampelFehler = '';
   function ampelStatusZeigen(text) {
     const s = $('ampel-status');
-    if (s) s.textContent = text || (ampelVerbunden()
+    let zeile = text || (ampelVerbunden()
       ? t('Verbunden: {n}').replace('{n}', (ampelGeraet && ampelGeraet.name) || 'Startampel')
       : t('Nicht verbunden.'));
+    if (!text && ampelLetzter) zeile += ' · ' + t('zuletzt') + ': ' + ampelLetzter;
+    if (!text && ampelFehler) zeile += ' · ⚠ ' + ampelFehler;
+    if (s) s.textContent = zeile;
     const b = $('ampel-verbinden');
     if (b) b.textContent = ampelVerbunden() ? t('Trennen') : t('Verbinden');
   }
