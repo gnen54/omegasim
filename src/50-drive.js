@@ -903,6 +903,11 @@
     { id: 'uebersicht', name: 'Rennen',
       waehlen: () => ovNochmal(),
       malen: () => ovScreenRender() },
+    // Onboard-Kamera (75-onboard.js): Livebild aus dem Auto. Blaetterbar nur, solange die
+    // Kamera an ist (cockpitScreenGilt); die Waehltaste startet und stoppt die Aufnahme.
+    { id: 'onboard', name: 'Onboard',
+      waehlen: () => onboardWaehlen(),
+      malen: () => onboardMalen() },
   ];
   let cockpitScreen = 0;
 
@@ -964,6 +969,8 @@
   // Zahlen stehen bleiben - schlimmer als ein Schirm, den es nicht gibt.
   function cockpitScreenGilt(s) {
     if (!s) return false;
+    // Den Onboard-Schirm gibt es nur mit Kamera. typeof, weil 75-onboard.js spaeter steht.
+    if (s.id === 'onboard') return typeof onboardAktiv === 'function' && onboardAktiv();
     // Seit dem Cockpit-Umbau ist die Beide-Ansicht der morph(t)e Standardschirm (main)
     // selbst und kein eigener Schirm mehr - es gibt keinen Schirm mehr mit einer Sperre.
     return true;
@@ -998,11 +1005,15 @@
   function cockpitPunkteMalen() {
     const host = $('race-screen-dots');
     if (!host) return;
-    if (host.children.length !== COCKPIT_SCREENS.length) {
-      host.innerHTML = COCKPIT_SCREENS.map(() => '<i></i>').join('');
+    // Nur die BLAETTERBAREN Schirme bekommen einen Punkt: der Onboard-Schirm ohne Kamera
+    // waere sonst ein Punkt, den man nie erreicht.
+    const sichtbar = [];
+    COCKPIT_SCREENS.forEach((s, i) => { if (cockpitScreenGilt(s) || i === cockpitScreen) sichtbar.push(i); });
+    if (host.children.length !== sichtbar.length) {
+      host.innerHTML = sichtbar.map(() => '<i></i>').join('');
     }
-    for (let i = 0; i < host.children.length; i++) {
-      host.children[i].classList.toggle('an', i === cockpitScreen);
+    for (let k = 0; k < host.children.length; k++) {
+      host.children[k].classList.toggle('an', sichtbar[k] === cockpitScreen);
     }
   }
 

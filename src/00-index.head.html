@@ -1858,6 +1858,31 @@
   #race-dash[data-screen="auto2"] #race-p2screen,
   #race-dash[data-screen="renneinstellungen"] #race-settingsscreen,
   #race-dash[data-screen="uebersicht"] #race-ovscreen { display: grid; }
+  /* ---- Onboard-Kamera (75-onboard.js) ----
+     Das Bild fuellt den Schirm ohne Abschneiden (contain): ein FPV-Empfaenger liefert 4:3,
+     und abgeschnittene Raender waeren genau die Kurve, die man sehen will. */
+  #race-dash[data-screen="onboard"] #race-onboardscreen { display: block; }
+  #race-onboardscreen { padding: 0; background: #000; color: #fff; }
+  #race-onboardscreen video { position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; background: #000; }
+  #race-onboardscreen.gedreht video { transform: rotate(180deg); }
+  #race-onboardscreen.gelb { box-shadow: inset 0 0 0 6px #ffd400; }
+  .onb-leer { position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; text-align: center; padding: 16px; color: #a3acbd;
+    font-size: clamp(13px, 1.8vw, 18px); }
+  .onb-leer[hidden] { display: none; }
+  .onb-hud { position: absolute; left: clamp(6px, 1.2vw, 14px); bottom: clamp(6px, 1.2vw, 14px);
+    display: flex; gap: clamp(6px, 1vw, 12px); pointer-events: none; }
+  .onb-hud span { display: flex; flex-direction: column; align-items: flex-start;
+    padding: 4px 10px; border-radius: 6px; background: rgba(0,0,0,.62); line-height: 1.05; }
+  .onb-hud small { font-size: clamp(9px, 1.1vw, 12px); opacity: .7; text-transform: uppercase;
+    letter-spacing: .06em; }
+  .onb-hud b { font-size: clamp(16px, 2.6vw, 30px); font-variant-numeric: tabular-nums; }
+  .onb-rec { position: absolute; right: clamp(6px, 1.2vw, 14px); bottom: clamp(6px, 1.2vw, 14px);
+    padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35);
+    background: rgba(0,0,0,.62); color: #fff; font-weight: 700;
+    font-size: clamp(12px, 1.5vw, 16px); font-variant-numeric: tabular-nums; }
+  .onb-rec.an { background: #d81b2c; border-color: #ff6b74; }
   /* ---- DER VERGLEICHSSCHIRM ------------------------------------------------------
      ZWEI SPALTEN NEBENEINANDER, auch auf dem Telefon. Untereinander waere es kein
      Vergleich mehr, sondern zweimal dieselbe Liste - und der ganze Zweck dieses Schirms
@@ -5170,6 +5195,19 @@
         <!-- NOCHMAL nach dem Rennen (Kreuz oder antippen): dasselbe Rennen, dieselben
              Einstellungen. Nur sichtbar, wenn ein Rennen beendet ist. -->
         <button type="button" id="ov-nochmal" class="ov-nochmal" hidden>✕ Nochmal</button>
+      </div>
+
+      <!-- ONBOARD-KAMERA (75-onboard.js): Livebild aus dem Auto, z. B. FPV-Mikrokamera mit
+           USB-Empfaenger. Darueber Runde, Zeit und km/h; der Knopf unten rechts nimmt auf. -->
+      <div class="gt3-schirm" id="race-onboardscreen">
+        <video id="onboard-video" autoplay muted playsinline></video>
+        <div class="onb-leer" id="onboard-leer">Keine Kamera. Optionen &rarr; AddOn &rarr; Onboard-Kamera.</div>
+        <div class="onb-hud">
+          <span><small>Runde</small><b id="onb-runde" data-i18n-skip>0</b></span>
+          <span><small>Zeit</small><b id="onb-zeit" data-i18n-skip>&ndash;</b></span>
+          <span><small>km/h</small><b id="onb-kmh" data-i18n-skip>0</b></span>
+        </div>
+        <button type="button" class="onb-rec" id="onboard-rec" data-i18n-skip>&#9679; Aufnahme</button>
       </div>
 
       <!-- ---- RENNEINSTELLUNGEN ALS EIGENER COCKPIT-SCHIRM --------------------------
@@ -9173,7 +9211,7 @@
     <button class="misc-back goto-tab" data-tab="options">&larr; Optionen</button>
     <div class="card" id="addon-card">
       <h2>AddOn &middot; Zusatz-Hardware</h2>
-      <p class="muted">Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm f&uuml;r Raspberry Pi und Pico liegen im Projekt unter tools/startampel.</p>
+      <p class="muted">Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm f&uuml;r Raspberry Pi und Pico liegen im Projekt unter tools/startampel, die Onboard-Kamera unter tools/onboard.</p>
       <h3>Startampel</h3>
       <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi / Pico)
           <span class="wip-tag">experimentell</span>
@@ -9197,6 +9235,20 @@
           <button type="button" data-step="1" aria-label="mehr">+</button>
           <span class="opt-val" id="race-start-warte-val">4 s</span>
         </div></div>
+      <h3>Onboard-Kamera</h3>
+      <div class="opt-row"><div class="opt-label">Onboard-Kamera
+          <span class="wip-tag">experimentell</span>
+          <small>Livebild einer Kamera im Auto, z.&nbsp;B. einer FPV-Mikrokamera mit USB-Empf&auml;nger (der meldet sich wie eine Webcam). Im Cockpit als eigener Schirm &bdquo;Onboard&ldquo;, mit Aufnahme als Video.</small>
+          <div id="onboard-status" class="muted" style="font-size:12px;margin-top:4px" data-i18n-skip>Aus.</div></div>
+        <button type="button" id="onboard-an">Einschalten</button></div>
+      <div class="opt-row"><div class="opt-label">Kamera<small>Die Namen stehen hier, sobald die Kamera einmal erlaubt wurde.</small></div>
+        <select id="onboard-quelle" data-preset-skip><option value="">Standard</option></select></div>
+      <div class="opt-row"><div class="opt-label">Bild um 180&deg; drehen<small>Wenn die Kamera kopf&uuml;ber im Auto sitzt.</small></div>
+        <label class="tgl"><input type="checkbox" id="onboard-drehen" data-preset-skip><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Beim Start Onboard-Bild zeigen<small>Mit dem Countdown schaltet das Cockpit auf den Schirm &bdquo;Onboard&ldquo;.</small></div>
+        <label class="tgl"><input type="checkbox" id="onboard-beim-start" checked data-preset-skip><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Rennen automatisch aufnehmen<small>Vom Countdown bis kurz nach dem Ziel, mit Runde, Zeit, km/h und Ampel im Bild. Ein abgebrochener Start wird nicht gespeichert.</small></div>
+        <label class="tgl"><input type="checkbox" id="onboard-auto-rec" data-preset-skip><span></span></label></div>
     </div>
   </section>
 
@@ -9234,7 +9286,7 @@
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="16" y="5" width="16" height="38" rx="4"/><circle cx="24" cy="14" r="3.5" fill="var(--bad)" stroke="var(--bad)"/><circle cx="24" cy="24" r="3.5"/><circle cx="24" cy="34" r="3.5" fill="var(--good)" stroke="var(--good)"/></svg>
           <b>AddOn</b>
-          <span>Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).</span>
+          <span>Zusatz-Hardware: Startampel am Tisch und Onboard-Kamera.</span>
         </button>
         <button class="misc-tile subpage-open" data-sub="opt-sound">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"

@@ -1352,6 +1352,13 @@
     },
     schirmStep(d) { cockpitScreenStep(d); return cockpitScreenIst().id; },
     schirmZu(id) { cockpitScreenZu(id); return cockpitScreenIst().id; },
+    // Onboard-Kamera (75-onboard.js): Zustand lesen und den Rennablauf nachstellen.
+    onboardLage() {
+      const z = onbZustand();
+      return { aktiv: onboardAktiv(), rec: !!z.rec, auto: !!(z.rec && z.rec.auto),
+               gefahren: !!(z.rec && z.rec.gefahren), einst: Object.assign({}, onbEinst()) };
+    },
+    onboardWache(zustand) { onbWache(zustand); return this.onboardLage(); },
     // Und der Weg, den das Steuerkreuz wirklich nimmt - nicht nur die Registry.
     schirmPad(dir) { return pitScreenPad(dir); },
     // ---- HAT SPIELER 2 DIESELBEN KNOEPFE WIE SPIELER 1? -----------------------------

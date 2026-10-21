@@ -2554,6 +2554,22 @@
              mass: teile.join(' | ') + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
   });
 
+  // ---- Onboard-Schirm nur mit Kamera ----
+  //
+  // Ohne Kamera darf "Onboard" weder blaetterbar sein noch einen Punkt bekommen: ein Punkt,
+  // den man nie erreicht, sieht aus wie ein kaputter Schirm. Mit Kamera umgekehrt.
+  stAdd('Onboard-Schirm: nur mit Kamera blaetterbar, ein Punkt je Schirm', () => {
+    if (!window.OMEGA_TEST || !OMEGA_TEST.onboardLage) return { skip: true, mass: 'Pruefhaken fehlt' };
+    const blaetter = OMEGA_TEST.schirmListeBlaetterbar();
+    const aktiv = OMEGA_TEST.onboardLage().aktiv;
+    const drin = blaetter.indexOf('onboard') >= 0;
+    cockpitPunkteMalen();
+    const punkte = document.querySelectorAll('#race-screen-dots i').length;
+    const ok = drin === aktiv && punkte === blaetter.length;
+    return { ok, mass: 'Kamera ' + (aktiv ? 'an' : 'aus') + ', Onboard ' + (drin ? 'blaetterbar' : 'nicht blaetterbar')
+                       + ', ' + punkte + ' Punkte fuer ' + blaetter.length + ' Schirme' };
+  });
+
   // ---- Der Boxenschirm deckt die Instrumente und nicht die Lichter ----
   //
   // Er liegt ueber den Kacheln, aber Schaltlichter, Flaggenband, Boxenband und die
