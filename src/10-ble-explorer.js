@@ -849,7 +849,7 @@
     "Akku kritisch ansagen": "Announce critical battery",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Once per car when the battery drops to 6 % – the last step before the car stops: “Abort session, box now!” Armed again only after charging.",
     "AddOn · Zusatz-Hardware": "Add-on · extra hardware",
-    "Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm für Raspberry Pi und Pico liegen im Projekt unter tools/startampel.": "These settings need your own hardware at the table. Build guide and program for Raspberry Pi and Pico are in the project under tools/startampel.",
+    "Diese Einstellungen brauchen eigene Hardware am Tisch (Startampel mit Raspberry Pi oder Pico, Onboard-Kamera).": "These settings need your own hardware at the table (start light with Raspberry Pi or Pico, onboard camera).",
     "Startampel": "Start light",
     "AddOn": "Add-on",
     "Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).": "Extra hardware: start light at the table (Raspberry Pi / Pico).",
@@ -3349,7 +3349,6 @@
     "Solange das Auto steht (0 km/h), zählt kein Stoß als Crash – du kannst es aufheben, ohne dass es simulierten Schaden nimmt.": "As long as the car is standing still (0 km/h), no crash is counted – you can lift it up without it taking simulated damage.",
     // Onboard-Kamera (75-onboard.js)
     "Zusatz-Hardware: Startampel am Tisch und Onboard-Kamera.": "Extra hardware: start light at the table and onboard camera.",
-    "Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm für Raspberry Pi und Pico liegen im Projekt unter tools/startampel, die Onboard-Kamera unter tools/onboard.": "These settings need your own hardware at the table. Build guide and program for Raspberry Pi and Pico are in the project under tools/startampel, the onboard camera under tools/onboard.",
     "Onboard-Kamera": "Onboard camera",
     "Livebild einer Kamera im Auto, z. B. einer FPV-Mikrokamera mit USB-Empfänger (der meldet sich wie eine Webcam). Im Cockpit als eigener Schirm „Onboard“, mit Aufnahme als Video.": "Live picture from a camera in the car, e.g. an FPV micro camera with a USB receiver (it shows up like a webcam). In the cockpit as its own “Onboard” screen, with recording as a video.",
     "Einschalten": "Turn on",
@@ -3566,7 +3565,7 @@
     "Akku kritisch ansagen": "Anunciar batería crítica",
     "Einmal je Auto, wenn der Akku auf 6 % fällt – die letzte Stufe vor dem Stehenbleiben: „Session abbrechen, Box anfahren!“ Erst nach dem Laden wieder scharf.": "Una vez por coche cuando la batería baja al 6 % – el último paso antes de que se pare: «¡Abandona la sesión, entra en boxes!» Se rearma solo tras cargar.",
     "AddOn · Zusatz-Hardware": "Complemento · hardware adicional",
-    "Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm für Raspberry Pi und Pico liegen im Projekt unter tools/startampel.": "Estos ajustes necesitan hardware propio en la mesa. La guía de montaje y el programa para Raspberry Pi y Pico están en el proyecto, en tools/startampel.",
+    "Diese Einstellungen brauchen eigene Hardware am Tisch (Startampel mit Raspberry Pi oder Pico, Onboard-Kamera).": "Estos ajustes necesitan hardware propio en la mesa (semáforo de salida con Raspberry Pi o Pico, cámara a bordo).",
     "Startampel": "Semáforo de salida",
     "AddOn": "Complemento",
     "Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).": "Hardware adicional: semáforo de salida en la mesa (Raspberry Pi / Pico).",
@@ -4311,7 +4310,6 @@
     "Vollständige Gestaltungsfreiheit für deine Carrera Hybrid Bahn": "Libertad creativa total para tu pista Carrera Hybrid",
     // Onboard-Kamera (75-onboard.js)
     "Zusatz-Hardware: Startampel am Tisch und Onboard-Kamera.": "Hardware adicional: semáforo de salida en la mesa y cámara a bordo.",
-    "Diese Einstellungen brauchen eigene Hardware am Tisch. Bauanleitung und Programm für Raspberry Pi und Pico liegen im Projekt unter tools/startampel, die Onboard-Kamera unter tools/onboard.": "Estos ajustes necesitan hardware propio en la mesa. Las instrucciones y el programa para Raspberry Pi y Pico están en el proyecto en tools/startampel, la cámara a bordo en tools/onboard.",
     "Onboard-Kamera": "Cámara a bordo",
     "Livebild einer Kamera im Auto, z. B. einer FPV-Mikrokamera mit USB-Empfänger (der meldet sich wie eine Webcam). Im Cockpit als eigener Schirm „Onboard“, mit Aufnahme als Video.": "Imagen en directo de una cámara en el coche, p. ej. una microcámara FPV con receptor USB (aparece como una webcam). En la cabina como pantalla propia «Onboard», con grabación en vídeo.",
     "Einschalten": "Encender",

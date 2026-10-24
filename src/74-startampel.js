@@ -14,7 +14,8 @@
   //
   // PROTOKOLL: Textzeilen mit "\n" auf eine schreibbare Characteristic eines EIGENEN Dienstes.
   // Nicht der Nordic-UART-Dienst der Autos: garageConnect() filtert auch nach diesem, und die
-  // Ampel stuende dann im Auto-Verbinden-Dialog. Der Gegenpart ist tools/startampel/startampel.py.
+  // Ampel stuende dann im Auto-Verbinden-Dialog. Der Gegenpart ist das Ampel-Programm
+  // auf Raspberry Pi bzw. Pico (separat, nicht Teil dieses Repositorys).
   //
   //   ROT | START | GRUEN <1-5> | LOS | FRUEHSTART | GELB | GELB_AUS
   //
