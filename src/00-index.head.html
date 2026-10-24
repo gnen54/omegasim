@@ -4732,6 +4732,7 @@
   <button class="tab-btn" data-tab="challenges">Challenges</button>
   <button class="tab-btn" data-tab="mp">WLAN Mehrspieler</button>
   <button class="tab-btn" data-tab="info" data-parent="options" hidden style="display:none">Info</button>
+  <button class="tab-btn" data-tab="addon" data-parent="options" hidden style="display:none">AddOn</button>
   <button class="tab-btn" data-tab="misc">Entwicklertools</button>
   <!-- Nicht in der Leiste, aber weiter als Tab-Knopf vorhanden: showTab() sucht genau
        diese Knoepfe, und die drei Kacheln unter "Sonstige" rufen showTab() auf. Ein
@@ -9495,6 +9496,41 @@
   </section>
 
   <!-- OPTIONEN TAB: player-facing settings (feel, sound, controller bindings) -->
+  <!-- ADDON: Einstellungen, die nur mit ZUSATZ-HARDWARE Sinn ergeben (BESTELLT: "die
+       Einstellungen bezueglich Startampel in ein separates Menue AddOn legen - so ist klar
+       ersichtlich, dass das nur mit Zusatz-Hardware genutzt werden kann"). Eigene tabpage wie
+       die Renneinstellungen, erreichbar ueber die Kachel "AddOn" in den Optionen. -->
+  <section class="tabpage" id="tab-addon">
+    <button class="misc-back goto-tab" data-tab="options">&larr; Optionen</button>
+    <div class="card" id="addon-card">
+      <h2>AddOn &middot; Zusatz-Hardware</h2>
+      <p class="muted">Diese Einstellungen brauchen eigene Hardware am Tisch (Startampel mit Raspberry Pi oder Pico).</p>
+      <h3>Startampel</h3>
+      <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi / Pico)
+          <span class="wip-tag">experimentell</span>
+          <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim
+          Start im Fenster &bdquo;Bringe die Autos in Position&ldquo; (die Ansage kommt von OmegaSim, siehe Ton); Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
+          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.</small>
+          <div id="ampel-status" class="muted" style="font-size:12px;margin-top:4px">Nicht verbunden.</div></div>
+        <button type="button" id="ampel-verbinden">Verbinden</button></div>
+      <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
+          mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
+          Fr&uuml;hstart h&auml;lt den Countdown an, Gelb blinkt am Tisch, und &bdquo;Rennen
+          starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
+          oben.</small></div>
+        <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Wartezeit nach dem Start<small>Nach dem Start im Fenster
+          &bdquo;Bringe die Autos in Position&ldquo; steht die Ampel so lange auf Gelb (mit der Startansage),
+          bis die gr&uuml;nen Lichter beginnen. Gilt f&uuml;r jeden Start, auch ohne Ampel. 0&nbsp;=&nbsp;sofort.</small></div>
+        <div class="opt-slider">
+          <button type="button" data-step="-1" aria-label="weniger">&minus;</button>
+          <input type="range" id="race-start-warte" min="0" max="10" step="1" value="4" data-preset-skip>
+          <button type="button" data-step="1" aria-label="mehr">+</button>
+          <span class="opt-val" id="race-start-warte-val">4 s</span>
+        </div></div>
+    </div>
+  </section>
+
   <section class="tabpage" id="tab-options">
     <div class="ch-sperre-hinweis" id="ch-sperre" hidden>W&auml;hrend einer Challenge sind die Einstellungen gesperrt.</div>
     <div class="card subpage-home" id="sub-home-options">
@@ -9523,6 +9559,13 @@
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6v36"/><path d="M10 8h24l-5 7 5 7H10" fill="var(--bad)" stroke="var(--bad)" stroke-linejoin="round"/></svg>
           <b>Renneinstellungen</b>
           <span>Renntyp, Dauer, Wetter, Pflichtstopps, Rennen starten.</span>
+        </button>
+        <!-- ADDON (#tab-addon): Zusatz-Hardware wie die Startampel am Tisch. -->
+        <button class="misc-tile goto-tab" data-tab="addon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="16" y="5" width="16" height="38" rx="4"/><circle cx="24" cy="14" r="3.5" fill="var(--bad)" stroke="var(--bad)"/><circle cx="24" cy="24" r="3.5"/><circle cx="24" cy="34" r="3.5" fill="var(--good)" stroke="var(--good)"/></svg>
+          <b>AddOn</b>
+          <span>Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).</span>
         </button>
         <button class="misc-tile subpage-open" data-sub="opt-sound">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
@@ -10948,6 +10991,8 @@
         <label class="tgl"><input type="checkbox" id="setting-announce-rain" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Boxenstopp ansagen<small>Wenn der Stopp &uuml;ber den doppelten Start-Ausdruck ausgel&ouml;st wird: &bdquo;Boxenstopp eingeleitet&ldquo;. Nicht beim Knopf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-pit" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Startansage<small>Beim Start im Fenster &bdquo;Bringe die Autos in Position&ldquo;: &bdquo;Gentlemen, start your engines&ldquo; (immer englisch).</small></div>
+        <label class="tgl"><input type="checkbox" id="setting-announce-start" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Akku ansagen<small>Einmal, wenn der Akku unter 25&nbsp;% f&auml;llt. Erst nach dem Laden wieder scharf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-battery"><span></span></label></div>
     </div>

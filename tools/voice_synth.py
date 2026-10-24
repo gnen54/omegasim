@@ -52,6 +52,9 @@ PHRASES = {
     'rainstart': {'de': 'Es regnet', 'en': 'Rain has started'},
     'rainstop': {'de': 'Der Regen hört auf', 'en': 'The rain is stopping'},
     'battery': {'de': 'Akku fast leer', 'en': 'Battery low'},
+    # Startansage, startAnsageSprechen() in src/80-sound.js - in beiden Sprachen englisch
+    # (feststehender Ruf). Fuer 'de' am besten auch mit der englischen Stimme rendern.
+    'start': {'de': 'Gentlemen, start your engines', 'en': 'Gentlemen, start your engines'},
 }
 
 # Dieselben zwei Stimmen, die GetInstalledVoices() auf diesem Rechner meldet. Ein anderer

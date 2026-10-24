@@ -522,10 +522,13 @@
     fruehstartTimer = setInterval(() => {
       if (raceState !== 'countdown') return;
       FRUEH_SPIELER.forEach((w) => {
+        if (raceState !== 'countdown') return;   // die Startampel kann den Start abgebrochen haben
         if (w >= 2 && !(zweiSpieler && zusatzPlatz(w) && zusatzPlatz(w).car)) return;
         if (!fruehstart[w].frueh && fruehstartTempo(w) > FRUEHSTART_KMH) {
           fruehstart[w].frueh = true;
           showHudToast(w >= 2 ? t('Frühstart Spieler {n}!').replace('{n}', w) : t('Frühstart!'));
+          // Startampel (74-startampel.js): bricht den Start ab, wenn sie verbunden ist und soll.
+          ampelFruehstart();
         }
       });
     }, 100);
@@ -1720,6 +1723,8 @@
     host.appendChild(img);
   }
   function raceGridAnzeigen(weiter) {
+    // Waehrend der Wartezeit nach dem Start (74-startampel.js) kein zweites Startfenster.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) return;
     raceGridWeiter = typeof weiter === 'function' ? weiter : null;
     const gs = $('race-gridscreen');
     if (!gs) { if (raceGridWeiter) raceGridWeiter(); return; }
@@ -1752,6 +1757,8 @@
     gs.hidden = false;
     gridFokusIdx = -1;
     raceGridFokus(0);
+    // Sprachausgabe fuer "Gentlemen, start your engines" schon jetzt aufwecken (80-sound.js).
+    if (typeof startAnsageVorwaermen === 'function') startAnsageVorwaermen();
   }
   // v0.10.5 BESTELLT: "Rennstartmenue: mach Abbrechen und Start anwaehlbar, dann mit X
   // bestaetigen." Steuerkreuz links/rechts (oder hoch/runter) waehlt, X drueckt den gewaehlten
@@ -1778,7 +1785,9 @@
     if (typeof aufstellenStoppen === 'function') aufstellenStoppen(false);
     syncRaceGridOrder();
     const w = raceGridWeiter; raceGridWeiter = null;
-    if (w) w();
+    // Der eigentliche Start (74-startampel.js): Startampel auf Gelb und "Gentlemen, start
+    // your engines" sofort, der Countdown (w) erst nach der eingestellten Wartezeit.
+    if (w) ampelStartVerzoegert(w); else ampelStartKnopf();
   }
   // BESTELLT: "X auf dem Controller soll auf dem Autos-in-Position-Schirm funktionieren".
   // flagTasteTick() fragt das ab, bevor es den normalen Cockpit-Weg (Boxenstopp/Gelb) nimmt.
@@ -1799,6 +1808,7 @@
       });
     }
     raceGridWeiter = null;
+    ampelStartAbgebrochen();   // Startampel: zurueck auf Rot
     // Hing die Challenge gerade in der Ampel-Phase (Autos-in-Position war ihr Start),
     // bricht Abbrechen sie ab - sonst bliebe sie auf Stillstand warten.
     if (typeof challengeAbbrechen === 'function' && typeof challengeLaeuft === 'function'
@@ -2132,6 +2142,7 @@
       finishSeitenZaehlerZuruecksetzen();
     }
     raceState = 'countdown';
+    ampelCountdown(!!gruenBei);
     fruehstartBeginnen();
     $('race-start-btn').disabled = true;
     // Abbrechen muss schon im Countdown gehen: requestRaceStop() raeumt den Zaehler mit
@@ -2156,6 +2167,7 @@
       if (stufe > 0 && warte < -400 && k + 1 < plan.length) { schritt(k + 1); return; }
       if (stufe > 0) {
         setRaceLights(stufe);
+        startampelLicht(stufe);   // Startampel am Tisch: so viele gruene Spalten (74-startampel.js)
         ampelTon(440 + (stufe - 1) * 60, 0.18, 'square', 0.18);
         schritt(k + 1);
         return;
@@ -2187,6 +2199,7 @@
     // and no laps count until the field crosses the line.
     raceFormationLap = raceFlying;
     raceGreenAt = raceFlying ? null : Date.now();
+    ampelLos();   // Startampel: alles aus
     fruehstartGruen();
     rammReset();
     // FRISCH ZAEHLEN. Ohne das traegt ein zweites Rennen die Ueberfahrten des ersten mit
@@ -2266,6 +2279,9 @@
   // The lap in progress is discarded rather than recorded — it was never completed, and
   // counting a partial lap would poison the fastest-lap column.
   function requestRaceStop() {
+    // In der Wartezeit nach dem Start (74-startampel.js) laeuft noch kein Rennen - der Knopf
+    // bricht dann das Warten ab, die Ampel geht auf Rot.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     if (raceState !== 'racing' && raceState !== 'countdown' && raceState !== 'finishing') return;
     if (raceCountdownTimer) { clearInterval(raceCountdownTimer); raceCountdownTimer = null; }
     setRaceLights(0);
@@ -2322,6 +2338,7 @@
     // setFlag('green') - das zeigt "GRUEN" und schickt das Safety Car heim; es steht hier
     // ohnehin gleich. Ein laufender Neustart-Countdown prueft flagState und verfaellt.
     gelbBeenden();
+    ampelRennende();   // Startampel: wieder Rot
     // Das Safety Car steht beim Rennende - es hat in keinem Ergebnis etwas zu suchen.
     garage.forEach((c) => {
       if ((c.role === 'safetycar' || c.role === 'reinig') && c.ghost && c.ghost.running) {
@@ -2623,6 +2640,8 @@
   // and RB/R1. There used to be a second, near-identical abort path inlined here, which is
   // how the two could drift apart.
   function toggleRace() {
+    // In der Wartezeit nach dem Start bricht der Knopf das Warten ab (Ampel wieder Rot).
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     // Wartet eine Challenge noch auf Stillstand, bricht die Rennen-Taste sie ab, statt die Ampel
     // ohne Pruefung zu starten.
     if (typeof challengeToggle === 'function' && challengeToggle()) { updateRaceActButtons(); return; }
@@ -2823,10 +2842,11 @@
       // Waehrend des Countdowns zeigt der Knopf, dass er laeuft. Vorher stand dort schon
       // "Rennen abbrechen", ohne dass sichtbar war, dass ueberhaupt etwas laeuft - ein Druck
       // in dieser Zeit brach still ab, und das sah aus wie "der Knopf tut nichts".
-      a.textContent = raceState === 'countdown'
-        ? 'Countdown … abbrechen'
+      const wartet = typeof ampelStartWartet === 'function' && ampelStartWartet();
+      a.textContent = wartet ? 'Start … abbrechen'
+        : raceState === 'countdown' ? 'Countdown … abbrechen'
         : (live ? 'Rennen abbrechen' : 'Rennen starten');
-      a.classList.toggle('warn', live);
+      a.classList.toggle('warn', live || wartet);
     }
     const p = $('race-act-pit');
     if (p) {

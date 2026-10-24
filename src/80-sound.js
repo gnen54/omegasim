@@ -697,7 +697,8 @@
   // Akku: BESTELLT "Akku-Ansage < 25 %" - eine eigene Schwelle, nicht die 10 % oben.
   const AKKU_SCHWELLE = 0.25;
   const AKKU_HYSTERESE = 0.32;
-  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false };
+  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
+                     start: true };
   const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false };
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
@@ -867,6 +868,87 @@
     return raus;
   }
 
+  // ---- STARTANSAGE: "Gentlemen, start your engines" ---------------------------------
+  //
+  // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch - und NUR beim
+  // Start-Knopf im Fenster "Bringe die Autos in Position", wenn nichts laeuft
+  // (ampelStartKnopf() in 74-startampel.js).
+  // Mit und ohne angeschlossene Ampel.
+  //
+  // IMMER ENGLISCH, auch in der deutschen Oberflaeche: der Satz ist ein feststehender Ruf
+  // (Indianapolis), und eine deutsche Stimme spricht ihn falsch aus. Reihenfolge wie bei den
+  // anderen Meldungen: eigene Aufnahme ('start', sobald tools/voice_synth.py sie rendert),
+  // sonst die englische Live-Stimme.
+  const START_ANSAGE = 'Gentlemen, start your engines';
+  // `beginn` (optional) wird gerufen, sobald die Ansage WIRKLICH zu hoeren ist: bei der
+  // Aufnahme sofort, bei der Live-Stimme erst bei u.onstart. Daran haengt die Wartezeit bis
+  // zum ersten Licht (74-startampel.js).
+  //
+  // GEMELDET: "Nach dem ersten Start wird die Ansage erst nach Ablauf der Startsequenz
+  // gesagt, ab dem zweiten Start stimmt die Reihenfolge." Chrome auf Android faehrt die
+  // Sprachausgabe erst beim ersten speak() hoch, und das dauert Sekunden - der Satz kam
+  // nach der Ampel. Deshalb wird sie beim Oeffnen des Startfensters vorgewaermt
+  // (startAnsageVorwaermen) und die Ampel wartet auf den Beginn der Ansage.
+  //
+  // GEMELDET (am Tisch, Android-Chrome): "Gruen-Sequenz laeuft nicht, Rennabbruch geht nicht."
+  // Die Ampel wartete auf u.onstart, und das kam nicht. Drei bekannte Eigenheiten von Chrome:
+  //   1. Ein SpeechSynthesisUtterance ohne Verweis darauf wird weggeraeumt, BEVOR seine
+  //      Ereignisse kommen -> startAnsageAktuell haelt ihn fest.
+  //   2. cancel() direkt vor speak() verschluckt auf Android Ereignisse oder den ganzen Satz
+  //      -> kein cancel() mehr; vor dem Start spricht ohnehin nichts.
+  //   3. Auf Ereignisse ist kein Verlass -> zusaetzlich wird speechSynthesis.speaking abgefragt;
+  //      was zuerst kommt, startet die Uhr. Die Notbremse in 74-startampel.js bleibt.
+  let startAnsageAktuell = null;
+  function startAnsageSprechen(beginn) {
+    if (!ansageAn.start) return false;
+    if (playAnsageClip('start')) { if (beginn) beginn(); return true; }
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      const u = new SpeechSynthesisUtterance(START_ANSAGE);
+      startAnsageAktuell = u;
+      u.lang = 'en-US';
+      u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
+      const en = englischeStimme();
+      if (en) u.voice = en;
+      if (beginn) {
+        let einmal = false, abfrage = null;
+        const los = () => {
+          if (abfrage) { clearInterval(abfrage); abfrage = null; }
+          if (!einmal) { einmal = true; beginn(); }
+        };
+        u.onstart = los;
+        u.onerror = los;   // keine Stimme: die Ampel soll trotzdem laufen
+        abfrage = setInterval(() => {
+          try { if (window.speechSynthesis.speaking) los(); } catch (e) { los(); }
+        }, 100);
+        setTimeout(() => { if (abfrage) { clearInterval(abfrage); abfrage = null; } }, 15000);
+      }
+      u.onend = () => { if (startAnsageAktuell === u) startAnsageAktuell = null; };
+      window.speechSynthesis.speak(u);
+      announceCalls++;
+      return true;
+    } catch (e) { return false; }
+  }
+  function englischeStimme() {
+    const stimmen = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    return stimmen.find((v) => /^en[-_]US/i.test(v.lang)) || stimmen.find((v) => /^en/i.test(v.lang)) || null;
+  }
+  // Einmal je Seite: ein stummer Satz, damit die Sprachausgabe laeuft, bevor sie gebraucht
+  // wird. Muss aus einer Nutzergeste kommen (Tippen auf "Rennen starten") - Chrome laesst
+  // speak() ohne Geste nicht zu. Die Stimmenliste wird dabei gleich mitgeladen.
+  let startAnsageWarm = false;
+  function startAnsageVorwaermen() {
+    if (startAnsageWarm || !ansageAn.start || !('speechSynthesis' in window)) return;
+    startAnsageWarm = true;
+    try {
+      if (window.speechSynthesis.getVoices) window.speechSynthesis.getVoices();
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* ohne Vorwaermen geht es auch, nur beim ersten Mal spaeter */ }
+  }
+
   function speakLap(ms, istBest) {
     if (!ansageAn.lap || !rennstandVorRundenzeit()) return;
     // Ohne Sprachausgabe (App-WebView): die Zahlen-Clips.
@@ -883,7 +965,8 @@
   const ANSAGE_KAESTCHEN = { 'setting-announce': 'lap', 'setting-announce-damage': 'damage',
                              'setting-announce-fuel': 'fuel', 'setting-announce-tyre': 'tyre',
                              'setting-announce-rain': 'rain', 'setting-announce-pit': 'pit',
-                             'setting-announce-battery': 'battery' };
+                             'setting-announce-battery': 'battery',
+                             'setting-announce-start': 'start' };
   Object.keys(ANSAGE_KAESTCHEN).forEach((id) => {
     const el = $(id);
     if (!el) return;

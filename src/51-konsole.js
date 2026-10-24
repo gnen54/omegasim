@@ -34,7 +34,7 @@
   const K_EBENE1 = ['fahren', 'challenges', 'mp', 'options', 'misc'];
   const K_NAME = {
     home: 'Titel', fahren: 'Fahren', garage: 'Garage', race: 'Cockpit',
-    options: 'Optionen', control: 'Renneinstellungen', track: 'Strecke', mp: 'WLAN Mehrspieler',
+    options: 'Optionen', control: 'Renneinstellungen', addon: 'AddOn', track: 'Strecke', mp: 'WLAN Mehrspieler',
     info: 'Info', challenges: 'Challenges', misc: 'Entwickler', doc: 'Doku', school: 'Programmierschule',
     dev: 'BLE-Werkbank', selftest: 'Selbsttest', probe: 'Code-Sonde', numtrain: 'Zahlensysteme',
     record: 'Aufnahme-Modus',
@@ -42,7 +42,7 @@
   // Zu welchem Reiter der Ebene 1 eine tiefe Seite gehoert: der Reiter bleibt hervorgehoben,
   // und Kreis fuehrt dorthin, wenn der Stapel leer ist.
   const K_ELTERN = {
-    garage: 'fahren', info: 'options', control: 'fahren', track: 'fahren',
+    garage: 'fahren', info: 'options', control: 'fahren', track: 'fahren', addon: 'options',
     doc: 'misc', school: 'misc', dev: 'misc', selftest: 'misc', probe: 'misc',
     numtrain: 'misc', record: 'misc',
   };

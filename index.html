@@ -4732,6 +4732,7 @@
   <button class="tab-btn" data-tab="challenges">Challenges</button>
   <button class="tab-btn" data-tab="mp">WLAN Mehrspieler</button>
   <button class="tab-btn" data-tab="info" data-parent="options" hidden style="display:none">Info</button>
+  <button class="tab-btn" data-tab="addon" data-parent="options" hidden style="display:none">AddOn</button>
   <button class="tab-btn" data-tab="misc">Entwicklertools</button>
   <!-- Nicht in der Leiste, aber weiter als Tab-Knopf vorhanden: showTab() sucht genau
        diese Knoepfe, und die drei Kacheln unter "Sonstige" rufen showTab() auf. Ein
@@ -9495,6 +9496,41 @@
   </section>
 
   <!-- OPTIONEN TAB: player-facing settings (feel, sound, controller bindings) -->
+  <!-- ADDON: Einstellungen, die nur mit ZUSATZ-HARDWARE Sinn ergeben (BESTELLT: "die
+       Einstellungen bezueglich Startampel in ein separates Menue AddOn legen - so ist klar
+       ersichtlich, dass das nur mit Zusatz-Hardware genutzt werden kann"). Eigene tabpage wie
+       die Renneinstellungen, erreichbar ueber die Kachel "AddOn" in den Optionen. -->
+  <section class="tabpage" id="tab-addon">
+    <button class="misc-back goto-tab" data-tab="options">&larr; Optionen</button>
+    <div class="card" id="addon-card">
+      <h2>AddOn &middot; Zusatz-Hardware</h2>
+      <p class="muted">Diese Einstellungen brauchen eigene Hardware am Tisch (Startampel mit Raspberry Pi oder Pico).</p>
+      <h3>Startampel</h3>
+      <div class="opt-row"><div class="opt-label">Startampel (Raspberry Pi / Pico)
+          <span class="wip-tag">experimentell</span>
+          <small>Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim
+          Start im Fenster &bdquo;Bringe die Autos in Position&ldquo; (die Ansage kommt von OmegaSim, siehe Ton); Gr&uuml;n Spalte f&uuml;r Spalte im Takt der Startt&ouml;ne;
+          bei Gr&uuml;n alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.</small>
+          <div id="ampel-status" class="muted" style="font-size:12px;margin-top:4px">Nicht verbunden.</div></div>
+        <button type="button" id="ampel-verbinden">Verbinden</button></div>
+      <div class="opt-row"><div class="opt-label">Startampel: Fr&uuml;hstart bricht den Start ab<small>Nur
+          mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein
+          Fr&uuml;hstart h&auml;lt den Countdown an, Gelb blinkt am Tisch, und &bdquo;Rennen
+          starten&ldquo; beginnt die Abfolge neu. Aus: die Ampel l&auml;uft weiter, Strafe wie
+          oben.</small></div>
+        <label class="tgl"><input type="checkbox" id="race-ampel-neustart" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Wartezeit nach dem Start<small>Nach dem Start im Fenster
+          &bdquo;Bringe die Autos in Position&ldquo; steht die Ampel so lange auf Gelb (mit der Startansage),
+          bis die gr&uuml;nen Lichter beginnen. Gilt f&uuml;r jeden Start, auch ohne Ampel. 0&nbsp;=&nbsp;sofort.</small></div>
+        <div class="opt-slider">
+          <button type="button" data-step="-1" aria-label="weniger">&minus;</button>
+          <input type="range" id="race-start-warte" min="0" max="10" step="1" value="4" data-preset-skip>
+          <button type="button" data-step="1" aria-label="mehr">+</button>
+          <span class="opt-val" id="race-start-warte-val">4 s</span>
+        </div></div>
+    </div>
+  </section>
+
   <section class="tabpage" id="tab-options">
     <div class="ch-sperre-hinweis" id="ch-sperre" hidden>W&auml;hrend einer Challenge sind die Einstellungen gesperrt.</div>
     <div class="card subpage-home" id="sub-home-options">
@@ -9523,6 +9559,13 @@
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6v36"/><path d="M10 8h24l-5 7 5 7H10" fill="var(--bad)" stroke="var(--bad)" stroke-linejoin="round"/></svg>
           <b>Renneinstellungen</b>
           <span>Renntyp, Dauer, Wetter, Pflichtstopps, Rennen starten.</span>
+        </button>
+        <!-- ADDON (#tab-addon): Zusatz-Hardware wie die Startampel am Tisch. -->
+        <button class="misc-tile goto-tab" data-tab="addon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="16" y="5" width="16" height="38" rx="4"/><circle cx="24" cy="14" r="3.5" fill="var(--bad)" stroke="var(--bad)"/><circle cx="24" cy="24" r="3.5"/><circle cx="24" cy="34" r="3.5" fill="var(--good)" stroke="var(--good)"/></svg>
+          <b>AddOn</b>
+          <span>Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).</span>
         </button>
         <button class="misc-tile subpage-open" data-sub="opt-sound">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"
@@ -10948,6 +10991,8 @@
         <label class="tgl"><input type="checkbox" id="setting-announce-rain" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Boxenstopp ansagen<small>Wenn der Stopp &uuml;ber den doppelten Start-Ausdruck ausgel&ouml;st wird: &bdquo;Boxenstopp eingeleitet&ldquo;. Nicht beim Knopf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-pit" checked><span></span></label></div>
+      <div class="opt-row"><div class="opt-label">Startansage<small>Beim Start im Fenster &bdquo;Bringe die Autos in Position&ldquo;: &bdquo;Gentlemen, start your engines&ldquo; (immer englisch).</small></div>
+        <label class="tgl"><input type="checkbox" id="setting-announce-start" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Akku ansagen<small>Einmal, wenn der Akku unter 25&nbsp;% f&auml;llt. Erst nach dem Laden wieder scharf.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-announce-battery"><span></span></label></div>
     </div>
@@ -13091,6 +13136,14 @@
                                                characteristic: z.characteristic, value: zuHex(daten), timeout: 300 }));
     }
     writeValue(daten) { return this.writeValueWithResponse(daten); }
+    // FUER EINZELNE BEFEHLE (Startampel, 74-startampel.js): ohne Antwort, aber NICHT ueber
+    // OmegaBle - dort gilt "neuester gewinnt", und von "START", "GRUEN 1" kurz hintereinander
+    // kaeme nur der letzte an. Ohne Pause der Autos: es ist eine andere Verbindung.
+    _befehlSchreiben(daten) {
+      const z = this._ziel;
+      return ruf('writeWithoutResponse', { deviceId: z.deviceId, service: z.service,
+                                           characteristic: z.characteristic, value: zuHex(daten), timeout: 1000 });
+    }
     async readValue() {
       const r = await mitOmegaPause(() => ruf('read', this._ziel));
       this.value = ausHex(r && r.value);
@@ -14299,6 +14352,26 @@
     "NPC Knockout: Bahnmodus „Auf der Bahn“": "NPC Knockout: track mode “On the track”",
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Disable yellow flag",
+    "AddOn · Zusatz-Hardware": "Add-on · extra hardware",
+    "Diese Einstellungen brauchen eigene Hardware am Tisch (Startampel mit Raspberry Pi oder Pico).": "These settings need your own hardware at the table (start light with Raspberry Pi or Pico).",
+    "AddOn": "Add-on",
+    "Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).": "Extra hardware: start light at the table (Raspberry Pi / Pico).",
+    "Wartezeit nach dem Start": "Delay after start",
+    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. Gilt für jeden Start, auch ohne Ampel. 0 = sofort.": "After Start in the “Bring the cars into position” window, the light stays yellow this long (with the start announcement) before the green lights begin. Applies to every start, even without a light. 0 = immediately.",
+    "Start in {n} s …": "Start in {n} s …",
+    "Start abgebrochen": "Start aborted",
+    "Start … abbrechen": "Start … cancel",
+    "Startansage": "Start announcement",
+    "Beim Start im Fenster „Bringe die Autos in Position“: „Gentlemen, start your engines“ (immer englisch).": "On Start in the “Bring the cars into position” window: “Gentlemen, start your engines”.",
+    "Startampel (Raspberry Pi / Pico)": "Start light (Raspberry Pi / Pico)",
+    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim Start im Fenster „Bringe die Autos in Position“ (die Ansage kommt von OmegaSim, siehe Ton); Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "A real start light at the table: red while nothing is released; yellow on Start in the “Bring the cars into position” window (OmegaSim makes the announcement, see Sound); green column by column with the start beeps; everything off at green; yellow under a yellow flag; red again after the race.",
+    "Startampel: Frühstart bricht den Start ab": "Start light: a jump start aborts the start",
+    "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Only with a connected start light, not in Wi-Fi multiplayer and not in challenges: a jump start stops the countdown, yellow flashes at the table, and “Start race” begins the sequence again. Off: the lights carry on, penalty as above.",
+    "Verbunden: {n}": "Connected: {n}",
+    "Nicht verbunden.": "Not connected.",
+    "Dieser Browser kann kein Bluetooth.": "This browser has no Bluetooth.",
+    "Frühstart – bitte neu starten": "Jump start – please restart",
+    "Frühstart – Start abgebrochen": "Jump start – start aborted",
     "An: Der Knopf „Gelbe Flagge“ und das Halten der Boxentaste rufen kein Gelb mehr aus.": "On: neither the “Yellow flag” button nor holding the pit key calls a yellow any more.",
     "Gelbe Flagge ist deaktiviert": "Yellow flag is disabled",
     "Statistiken": "Statistics",
@@ -15446,6 +15519,7 @@
     "keine WLAN-Adresse": "no Wi-Fi address",
     "Info-Screen im Browser:": "Info screen in the browser:",
     "Suche …": "Searching …",
+    "Verbinde neu …": "Reconnecting …",
     "Kein Host gefunden. Gleiches WLAN? Manche Router trennen Geräte voneinander.": "No host found. Same Wi-Fi? Some routers isolate devices from each other.",
     "Restzeit": "Time left",
     "offen": "open",
@@ -17315,6 +17389,26 @@
     "NPC Knockout: Bahnmodus „Auf der Bahn“": "NPC Knockout: modo de pista «En pista»",
     "NPC Knockout": "NPC Knockout",
     "Gelbe Flagge deaktivieren": "Desactivar bandera amarilla",
+    "AddOn · Zusatz-Hardware": "Complemento · hardware adicional",
+    "Diese Einstellungen brauchen eigene Hardware am Tisch (Startampel mit Raspberry Pi oder Pico).": "Estos ajustes necesitan hardware propio en la mesa (semáforo de salida con Raspberry Pi o Pico).",
+    "AddOn": "Complemento",
+    "Zusatz-Hardware: Startampel am Tisch (Raspberry Pi / Pico).": "Hardware adicional: semáforo de salida en la mesa (Raspberry Pi / Pico).",
+    "Wartezeit nach dem Start": "Espera tras la salida",
+    "Nach dem Start im Fenster „Bringe die Autos in Position“ steht die Ampel so lange auf Gelb (mit der Startansage), bis die grünen Lichter beginnen. Gilt für jeden Start, auch ohne Ampel. 0 = sofort.": "Tras pulsar Iniciar en «Coloca los coches en posición», el semáforo se queda en amarillo este tiempo (con el anuncio de salida) antes de que empiecen las luces verdes. Vale para cada salida, también sin semáforo. 0 = inmediato.",
+    "Start in {n} s …": "Salida en {n} s …",
+    "Start abgebrochen": "Salida cancelada",
+    "Start … abbrechen": "Salida … cancelar",
+    "Startansage": "Anuncio de salida",
+    "Beim Start im Fenster „Bringe die Autos in Position“: „Gentlemen, start your engines“ (immer englisch).": "Al pulsar Iniciar en la ventana «Coloca los coches en posición»: «Gentlemen, start your engines» (siempre en inglés).",
+    "Startampel (Raspberry Pi / Pico)": "Semáforo de salida (Raspberry Pi / Pico)",
+    "Echte Startampel am Tisch: Rot, solange nichts freigegeben ist; Gelb beim Start im Fenster „Bringe die Autos in Position“ (die Ansage kommt von OmegaSim, siehe Ton); Grün Spalte für Spalte im Takt der Starttöne; bei Grün alles aus; Gelb bei Gelber Flagge; nach dem Rennen wieder Rot.": "Un semáforo de salida real en la mesa: rojo mientras nada está liberado; amarillo al pulsar Iniciar en «Coloca los coches en posición» (el anuncio lo hace OmegaSim, ver Sonido); verde columna a columna al ritmo de los pitidos; todo apagado con el verde; amarillo con bandera amarilla; rojo de nuevo tras la carrera.",
+    "Startampel: Frühstart bricht den Start ab": "Semáforo: una salida en falso cancela la salida",
+    "Nur mit verbundener Startampel, nicht im WLAN-Mehrspieler und nicht in Challenges: ein Frühstart hält den Countdown an, Gelb blinkt am Tisch, und „Rennen starten“ beginnt die Abfolge neu. Aus: die Ampel läuft weiter, Strafe wie oben.": "Solo con el semáforo conectado, no en multijugador por WiFi ni en desafíos: una salida en falso detiene la cuenta atrás, el amarillo parpadea en la mesa y «Iniciar carrera» reinicia la secuencia. Desactivado: el semáforo continúa, con la penalización de arriba.",
+    "Verbunden: {n}": "Conectado: {n}",
+    "Nicht verbunden.": "No conectado.",
+    "Dieser Browser kann kein Bluetooth.": "Este navegador no tiene Bluetooth.",
+    "Frühstart – bitte neu starten": "Salida en falso – reinicia, por favor",
+    "Frühstart – Start abgebrochen": "Salida en falso – salida cancelada",
     "Gelbe Flagge ist deaktiviert": "La bandera amarilla está desactivada",
     "Statistiken": "Estadísticas",
     "Kilometer, Sitzungen, Fahrzeit, Rennen, Siege, Medaillen und das Ranking deiner Autos.": "Kilómetros, sesiones, tiempo de conducción, carreras, victorias, medallas y la clasificación de tus coches.",
@@ -18034,6 +18128,7 @@
     "keine WLAN-Adresse": "sin dirección WiFi",
     "Info-Screen im Browser:": "Pantalla de información en el navegador:",
     "Suche …": "Buscando …",
+    "Verbinde neu …": "Reconectando …",
     "Kein Host gefunden. Gleiches WLAN? Manche Router trennen Geräte voneinander.": "No se encontró ningún host. ¿Mismo WiFi? Algunos routers aíslan los dispositivos entre sí.",
     "Restzeit": "Tiempo restante",
     "offen": "abierto",
@@ -27371,7 +27466,7 @@
   const K_EBENE1 = ['fahren', 'challenges', 'mp', 'options', 'misc'];
   const K_NAME = {
     home: 'Titel', fahren: 'Fahren', garage: 'Garage', race: 'Cockpit',
-    options: 'Optionen', control: 'Renneinstellungen', track: 'Strecke', mp: 'WLAN Mehrspieler',
+    options: 'Optionen', control: 'Renneinstellungen', addon: 'AddOn', track: 'Strecke', mp: 'WLAN Mehrspieler',
     info: 'Info', challenges: 'Challenges', misc: 'Entwickler', doc: 'Doku', school: 'Programmierschule',
     dev: 'BLE-Werkbank', selftest: 'Selbsttest', probe: 'Code-Sonde', numtrain: 'Zahlensysteme',
     record: 'Aufnahme-Modus',
@@ -27379,7 +27474,7 @@
   // Zu welchem Reiter der Ebene 1 eine tiefe Seite gehoert: der Reiter bleibt hervorgehoben,
   // und Kreis fuehrt dorthin, wenn der Stapel leer ist.
   const K_ELTERN = {
-    garage: 'fahren', info: 'options', control: 'fahren', track: 'fahren',
+    garage: 'fahren', info: 'options', control: 'fahren', track: 'fahren', addon: 'options',
     doc: 'misc', school: 'misc', dev: 'misc', selftest: 'misc', probe: 'misc',
     numtrain: 'misc', record: 'misc',
   };
@@ -37277,10 +37372,13 @@
     fruehstartTimer = setInterval(() => {
       if (raceState !== 'countdown') return;
       FRUEH_SPIELER.forEach((w) => {
+        if (raceState !== 'countdown') return;   // die Startampel kann den Start abgebrochen haben
         if (w >= 2 && !(zweiSpieler && zusatzPlatz(w) && zusatzPlatz(w).car)) return;
         if (!fruehstart[w].frueh && fruehstartTempo(w) > FRUEHSTART_KMH) {
           fruehstart[w].frueh = true;
           showHudToast(w >= 2 ? t('Frühstart Spieler {n}!').replace('{n}', w) : t('Frühstart!'));
+          // Startampel (74-startampel.js): bricht den Start ab, wenn sie verbunden ist und soll.
+          ampelFruehstart();
         }
       });
     }, 100);
@@ -38475,6 +38573,8 @@
     host.appendChild(img);
   }
   function raceGridAnzeigen(weiter) {
+    // Waehrend der Wartezeit nach dem Start (74-startampel.js) kein zweites Startfenster.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) return;
     raceGridWeiter = typeof weiter === 'function' ? weiter : null;
     const gs = $('race-gridscreen');
     if (!gs) { if (raceGridWeiter) raceGridWeiter(); return; }
@@ -38507,6 +38607,8 @@
     gs.hidden = false;
     gridFokusIdx = -1;
     raceGridFokus(0);
+    // Sprachausgabe fuer "Gentlemen, start your engines" schon jetzt aufwecken (80-sound.js).
+    if (typeof startAnsageVorwaermen === 'function') startAnsageVorwaermen();
   }
   // v0.10.5 BESTELLT: "Rennstartmenue: mach Abbrechen und Start anwaehlbar, dann mit X
   // bestaetigen." Steuerkreuz links/rechts (oder hoch/runter) waehlt, X drueckt den gewaehlten
@@ -38533,7 +38635,9 @@
     if (typeof aufstellenStoppen === 'function') aufstellenStoppen(false);
     syncRaceGridOrder();
     const w = raceGridWeiter; raceGridWeiter = null;
-    if (w) w();
+    // Der eigentliche Start (74-startampel.js): Startampel auf Gelb und "Gentlemen, start
+    // your engines" sofort, der Countdown (w) erst nach der eingestellten Wartezeit.
+    if (w) ampelStartVerzoegert(w); else ampelStartKnopf();
   }
   // BESTELLT: "X auf dem Controller soll auf dem Autos-in-Position-Schirm funktionieren".
   // flagTasteTick() fragt das ab, bevor es den normalen Cockpit-Weg (Boxenstopp/Gelb) nimmt.
@@ -38554,6 +38658,7 @@
       });
     }
     raceGridWeiter = null;
+    ampelStartAbgebrochen();   // Startampel: zurueck auf Rot
     // Hing die Challenge gerade in der Ampel-Phase (Autos-in-Position war ihr Start),
     // bricht Abbrechen sie ab - sonst bliebe sie auf Stillstand warten.
     if (typeof challengeAbbrechen === 'function' && typeof challengeLaeuft === 'function'
@@ -38887,6 +38992,7 @@
       finishSeitenZaehlerZuruecksetzen();
     }
     raceState = 'countdown';
+    ampelCountdown(!!gruenBei);
     fruehstartBeginnen();
     $('race-start-btn').disabled = true;
     // Abbrechen muss schon im Countdown gehen: requestRaceStop() raeumt den Zaehler mit
@@ -38911,6 +39017,7 @@
       if (stufe > 0 && warte < -400 && k + 1 < plan.length) { schritt(k + 1); return; }
       if (stufe > 0) {
         setRaceLights(stufe);
+        startampelLicht(stufe);   // Startampel am Tisch: so viele gruene Spalten (74-startampel.js)
         ampelTon(440 + (stufe - 1) * 60, 0.18, 'square', 0.18);
         schritt(k + 1);
         return;
@@ -38942,6 +39049,7 @@
     // and no laps count until the field crosses the line.
     raceFormationLap = raceFlying;
     raceGreenAt = raceFlying ? null : Date.now();
+    ampelLos();   // Startampel: alles aus
     fruehstartGruen();
     rammReset();
     // FRISCH ZAEHLEN. Ohne das traegt ein zweites Rennen die Ueberfahrten des ersten mit
@@ -39021,6 +39129,9 @@
   // The lap in progress is discarded rather than recorded — it was never completed, and
   // counting a partial lap would poison the fastest-lap column.
   function requestRaceStop() {
+    // In der Wartezeit nach dem Start (74-startampel.js) laeuft noch kein Rennen - der Knopf
+    // bricht dann das Warten ab, die Ampel geht auf Rot.
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     if (raceState !== 'racing' && raceState !== 'countdown' && raceState !== 'finishing') return;
     if (raceCountdownTimer) { clearInterval(raceCountdownTimer); raceCountdownTimer = null; }
     setRaceLights(0);
@@ -39077,6 +39188,7 @@
     // setFlag('green') - das zeigt "GRUEN" und schickt das Safety Car heim; es steht hier
     // ohnehin gleich. Ein laufender Neustart-Countdown prueft flagState und verfaellt.
     gelbBeenden();
+    ampelRennende();   // Startampel: wieder Rot
     // Das Safety Car steht beim Rennende - es hat in keinem Ergebnis etwas zu suchen.
     garage.forEach((c) => {
       if ((c.role === 'safetycar' || c.role === 'reinig') && c.ghost && c.ghost.running) {
@@ -39378,6 +39490,8 @@
   // and RB/R1. There used to be a second, near-identical abort path inlined here, which is
   // how the two could drift apart.
   function toggleRace() {
+    // In der Wartezeit nach dem Start bricht der Knopf das Warten ab (Ampel wieder Rot).
+    if (typeof ampelStartWartet === 'function' && ampelStartWartet()) { ampelStartWarteAbbrechen(); return; }
     // Wartet eine Challenge noch auf Stillstand, bricht die Rennen-Taste sie ab, statt die Ampel
     // ohne Pruefung zu starten.
     if (typeof challengeToggle === 'function' && challengeToggle()) { updateRaceActButtons(); return; }
@@ -39578,10 +39692,11 @@
       // Waehrend des Countdowns zeigt der Knopf, dass er laeuft. Vorher stand dort schon
       // "Rennen abbrechen", ohne dass sichtbar war, dass ueberhaupt etwas laeuft - ein Druck
       // in dieser Zeit brach still ab, und das sah aus wie "der Knopf tut nichts".
-      a.textContent = raceState === 'countdown'
-        ? 'Countdown … abbrechen'
+      const wartet = typeof ampelStartWartet === 'function' && ampelStartWartet();
+      a.textContent = wartet ? 'Start … abbrechen'
+        : raceState === 'countdown' ? 'Countdown … abbrechen'
         : (live ? 'Rennen abbrechen' : 'Rennen starten');
-      a.classList.toggle('warn', live);
+      a.classList.toggle('warn', live || wartet);
     }
     const p = $('race-act-pit');
     if (p) {
@@ -47775,6 +47890,319 @@
     else return;
     e.preventDefault(); e.stopPropagation();
   }, true);
+  // ============================== STARTAMPEL (Raspberry Pi, Bluetooth LE) ==============================
+  //
+  // BESTELLT: eine echte Startampel am Tisch, angesteuert von OmegaSim per Bluetooth. Drei
+  // LED-Reihen: oben Rot, in der Mitte Gelb, unten Gruen mit fuenf Spalten.
+  //
+  //   gesperrt (kein Training/Rennen freigegeben)   Rot
+  //   Start im Fenster "Autos in Position"          Rot aus, Gelb an; OmegaSim sagt
+  //                                                 "Gentlemen, start your engines"
+  //   Starttoene des Countdowns                     Gruen, Spalte fuer Spalte dazu
+  //   Gruen / Los                                   alles aus
+  //   Fruehstart im Countdown                       Gruen aus, Gelb blinkt bis zum Neustart
+  //   Gelbe Flagge im Rennen                        Gelb, bis sie aufgehoben ist
+  //   Rennende oder Abbruch                         wieder Rot
+  //
+  // PROTOKOLL: Textzeilen mit "\n" auf eine schreibbare Characteristic eines EIGENEN Dienstes.
+  // Nicht der Nordic-UART-Dienst der Autos: garageConnect() filtert auch nach diesem, und die
+  // Ampel stuende dann im Auto-Verbinden-Dialog. Der Gegenpart ist das Ampel-Programm
+  // auf Raspberry Pi bzw. Pico (separat, nicht Teil dieses Repositorys).
+  //
+  //   ROT | START | GRUEN <1-5> | LOS | FRUEHSTART | GELB | GELB_AUS
+  //
+  // FUENF TOENE, FUENF SPALTEN: der Countdown hat fuenf Toene im Sekundentakt (ampelZeitplan()
+  // in 70-race.js), je Ton leuchtet eine gruene Spalte mehr - wie die Bruecke im Cockpit.
+  const AMPEL_SERVICE = 'b5a30001-0e9a-4b7c-8d2f-a3f1c0de5a11';
+  const AMPEL_BEFEHL = 'b5a30002-0e9a-4b7c-8d2f-a3f1c0de5a11';
+  let ampelGeraet = null, ampelKanal = null;
+  let ampelSchlange = Promise.resolve();
+  // Ob die Ampel gerade im Vorstart steht (Gelb). START kommt beim Oeffnen des Startfensters;
+  // startRaceCountdown() schickt es nur nach, wenn es dort nicht kam (Challenge, Mehrspieler).
+  let ampelVorstart = false;
+  // Countdown mit fester Gruenzeit (WLAN-Mehrspieler, Challenge-Fenster): dort laeuft die Ampel
+  // auf allen Geraeten gleichzeitig, ein Abbruch hier wuerde nur dieses Geraet anhalten.
+  let ampelZeitgesteuert = false;
+
+  function ampelVerbunden() {
+    return !!(ampelKanal && ampelGeraet && ampelGeraet.gatt && ampelGeraet.gatt.connected);
+  }
+  function ampelNeustartAn() { const el = $('race-ampel-neustart'); return el ? !!el.checked : true; }
+
+  // Befehle laufen nacheinander: Bluetooth vertraegt keinen zweiten Schreibvorgang, solange der
+  // erste noch offen ist, und die Reihenfolge (START vor GRUEN) muss am Pi ankommen, wie sie
+  // hier gemeint war.
+  //
+  // GEMELDET: "START kommt am Pi an, GRUEN 1..5 und ROT nicht." Die Schlange hing: ein
+  // Schreiben MIT Antwort, dessen Bestaetigung nie kommt (Android-Bluetooth), haelt jeden
+  // weiteren Befehl fuer immer auf. Deshalb jetzt:
+  //  - OHNE Antwort schreiben, wenn die Ampel das anbietet (Pi und Pico tun es) - da gibt es
+  //    nichts, worauf man warten koennte;
+  //  - sonst mit Antwort, aber hoechstens AMPEL_SCHREIB_MS lang warten;
+  //  - ein fehlgeschlagener Befehl wird einmal wiederholt (z. B. "GATT operation already in
+  //    progress", solange der haengende noch offen ist);
+  //  - jeder Befehl steht im Protokoll, damit man am Tablet sieht, was hinausging.
+  const AMPEL_SCHREIB_MS = 1500;
+  function ampelSchreiben(kanal, daten) {
+    const p = kanal.properties || {};
+    // In der Android-App (05-app-bruecke.js) am schnellen Autoweg vorbei, der nur den jeweils
+    // neuesten Befehl schreibt.
+    if (p.writeWithoutResponse && typeof kanal._befehlSchreiben === 'function') return kanal._befehlSchreiben(daten);
+    if (p.writeWithoutResponse && typeof kanal.writeValueWithoutResponse === 'function') {
+      return kanal.writeValueWithoutResponse(daten);
+    }
+    const schreiben = typeof kanal.writeValueWithResponse === 'function'
+      ? kanal.writeValueWithResponse(daten) : kanal.writeValue(daten);
+    return Promise.race([schreiben, new Promise((_, nein) =>
+      setTimeout(() => nein(new Error('keine Antwort in ' + AMPEL_SCHREIB_MS + ' ms')), AMPEL_SCHREIB_MS))]);
+  }
+  function ampelSenden(befehl) {
+    if (befehl === 'ROT' || befehl === 'LOS' || befehl === 'FRUEHSTART') ampelVorstart = false;
+    else if (befehl === 'START') ampelVorstart = true;
+    if (!ampelVerbunden()) {
+      if (ampelGeraet) log('Startampel: ' + befehl + ' nicht gesendet (nicht verbunden)', 'err');
+      return;
+    }
+    const kanal = ampelKanal;
+    const daten = new TextEncoder().encode(befehl + '\n');
+    ampelSchlange = ampelSchlange
+      .then(() => ampelSchreiben(kanal, daten))
+      .catch(() => new Promise((r) => setTimeout(r, 150)).then(() => ampelSchreiben(kanal, daten)))
+      .then(() => { log('Startampel: ' + befehl, 'info'); ampelLetzter = befehl; ampelFehler = ''; ampelStatusZeigen(); })
+      .catch((e) => {
+        ampelFehler = befehl + ': ' + ((e && e.message) || e);
+        log('Startampel: ' + befehl + ' nicht gesendet (' + ((e && e.message) || e) + ')', 'err');
+        ampelStatusZeigen();
+      });
+  }
+
+  // Nach dem Verbinden den Stand der App nachziehen - die Ampel weiss sonst nicht, ob gerade
+  // ein Rennen laeuft.
+  function ampelStandSenden() {
+    const live = raceState === 'racing' || raceState === 'finishing';
+    if (live) {
+      ampelSenden('LOS');
+      if (typeof flagState !== 'undefined' && flagState !== 'green') ampelSenden('GELB');
+    } else if (raceState === 'countdown' || (typeof raceGridOffen === 'function' && raceGridOffen())) {
+      ampelSenden('START');
+    } else {
+      ampelSenden('ROT');
+    }
+  }
+
+  // Zur Fehlersuche am Tisch: der zuletzt gesendete Befehl und der letzte Fehler stehen direkt
+  // unter "Startampel verbinden" (Optionen -> AddOn).
+  let ampelLetzter = '', ampelFehler = '';
+  // Erkennungszeichen der Fassung: so sieht man am Tablet sofort, ob die neue Version geladen ist
+  // (die Programmversion 1.0.36 aendert sich bei Testfassungen nicht).
+  const AMPEL_STAND = '23.10.-a';
+  function ampelStatusZeigen(text) {
+    const s = $('ampel-status');
+    let zeile = text || (ampelVerbunden()
+      ? t('Verbunden: {n}').replace('{n}', (ampelGeraet && ampelGeraet.name) || 'Startampel')
+      : t('Nicht verbunden.'));
+    if (!text && ampelLetzter) zeile += ' · ' + t('zuletzt') + ': ' + ampelLetzter;
+    if (!text && ampelFehler) zeile += ' · ⚠ ' + ampelFehler;
+    if (!text) zeile += ' · (' + AMPEL_STAND + ')';
+    if (s) s.textContent = zeile;
+    const b = $('ampel-verbinden');
+    if (b) b.textContent = ampelVerbunden() ? t('Trennen') : t('Verbinden');
+  }
+
+  // Bricht die Verbindung ab (Funkloch, Pi kurz weg), verbindet OmegaSim von selbst neu - ohne
+  // Auswahlfenster, dasselbe Geraet - und schickt den aktuellen Stand. Fuenf Versuche.
+  let ampelVonHandGetrennt = false;
+  async function ampelWiederVerbinden(dev, versuch) {
+    if (ampelGeraet !== dev || ampelVonHandGetrennt || ampelVerbunden() || versuch > 5) return;
+    ampelStatusZeigen(t('Verbinde neu …'));
+    try {
+      const srv = await dev.gatt.connect();
+      const dienst = await srv.getPrimaryService(AMPEL_SERVICE);
+      ampelKanal = await dienst.getCharacteristic(AMPEL_BEFEHL);
+      log('Startampel wieder verbunden.', 'info');
+      ampelStatusZeigen();
+      ampelStandSenden();
+    } catch (e) {
+      ampelStatusZeigen();
+      setTimeout(() => ampelWiederVerbinden(dev, versuch + 1), 2000);
+    }
+  }
+
+  async function ampelVerbinden() {
+    if (ampelVerbunden()) {
+      ampelVonHandGetrennt = true;
+      try { ampelGeraet.gatt.disconnect(); } catch (e) { /* schon weg */ }
+      return;
+    }
+    ampelVonHandGetrennt = false;
+    if (!navigator.bluetooth) { alert(t('Dieser Browser kann kein Bluetooth.')); return; }
+    try {
+      ampelStatusZeigen(t('Suche …'));
+      const dev = await navigator.bluetooth.requestDevice({
+        filters: [{ services: [AMPEL_SERVICE] }],
+        optionalServices: [AMPEL_SERVICE],
+      });
+      const srv = await dev.gatt.connect();
+      const dienst = await srv.getPrimaryService(AMPEL_SERVICE);
+      ampelKanal = await dienst.getCharacteristic(AMPEL_BEFEHL);
+      ampelGeraet = dev;
+      dev.addEventListener('gattserverdisconnected', () => {
+        if (ampelGeraet !== dev) return;
+        ampelKanal = null;
+        ampelSchlange = Promise.resolve();
+        log('Startampel getrennt.', 'err');
+        ampelStatusZeigen();
+        if (!ampelVonHandGetrennt) ampelWiederVerbinden(dev, 1);
+      });
+      log('Startampel verbunden.', 'info');
+      ampelStatusZeigen();
+      ampelStandSenden();
+    } catch (err) {
+      ampelKanal = null;
+      ampelStatusZeigen();
+      if (err && err.name === 'NotFoundError') log('Keine Startampel gewaehlt.', 'info');
+      else log('Startampel: Verbinden fehlgeschlagen: ' + (err && err.message), 'err');
+    }
+  }
+  if ($('ampel-verbinden')) $('ampel-verbinden').addEventListener('click', ampelVerbinden);
+
+  // ---- Die Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
+  // Startfenster abgebrochen: Rot (bleibt Rot, falls schon Rot).
+  function ampelStartAbgebrochen() { ampelSenden('ROT'); }
+  // Der Countdown beginnt. Kam der Start nicht ueber den Knopf im Startfenster (Mehrspieler-
+  // Countdown), fehlt START noch - dann Gelb ohne Ansage.
+  function ampelCountdown(zeitgesteuert) {
+    ampelZeitgesteuert = !!zeitgesteuert;
+    if (!ampelVorstart) ampelSenden('START');
+  }
+  // DER EIGENTLICHE START: der Start-Knopf im Fenster "Bringe die Autos in Position"
+  // (raceGridStart() in 70-race.js - Tippen und Controller-Taste X laufen beide dort durch).
+  //
+  // BESTELLT: "Nur im Menue 'Bringe die Autos in Position' dieser Start-Button soll den
+  // eigentlichen Start ausloesen." Erst hier geht die Ampel auf Gelb, und erst hier sagt
+  // OmegaSim "Gentlemen, start your engines" (80-sound.js) - nicht schon beim Oeffnen des
+  // Fensters ("Rennen starten", Cockpit-Knopf, Challenge nach Stillstand), nicht beim
+  // Mehrspieler-Countdown. Und nur, wenn nichts laeuft. Auch ohne verbundene Ampel.
+  function ampelStartKnopf(beginn) {
+    if (raceState !== 'idle' && raceState !== 'finished') return false;
+    ampelSenden('START');
+    return typeof startAnsageSprechen === 'function' && startAnsageSprechen(beginn);
+  }
+  // ---- WARTEZEIT zwischen Start und erstem gruenen Licht ----
+  //
+  // BESTELLT: "Wir brauchen ein Delay (3-5 Sekunden) nach Betaetigen des Start-Buttons bis
+  // zum Beginn der Sequenz der gruenen LEDs." Nach dem Start im Fenster steht die Ampel auf
+  // Gelb, die Ansage laeuft, und erst nach dieser Zeit beginnt der Countdown (der erste Ton =
+  // die ersten gruenen Spalten). Einstellbar unter Optionen -> AddOn, ab Werk 4 s, 0 = aus.
+  //
+  // Waehrend des Wartens laeuft noch nichts (raceState bleibt idle): ein zweites Startfenster
+  // wird nicht geoeffnet, und der Start-Knopf im Cockpit bricht das Warten ab (Ampel Rot).
+  const START_WARTE_STORE = 'omegasim-start-warte-s', START_WARTE_VORGABE = 4;
+  let startWarteTimer = null;
+  function startWarteMs() {
+    const el = $('race-start-warte');
+    const v = el ? parseFloat(el.value) : START_WARTE_VORGABE;
+    return (Number.isFinite(v) ? Math.max(0, Math.min(10, v)) : START_WARTE_VORGABE) * 1000;
+  }
+  function ampelStartWartet() { return !!startWarteTimer; }
+  // Aus raceGridStart() (70-race.js): Gelb und Ansage sofort, der Countdown (weiter) danach.
+  //
+  // DIE WARTEZEIT BEGINNT MIT DER ANSAGE, nicht mit dem Knopf: beim ersten Start braucht die
+  // Sprachausgabe auf Android Sekunden, bis sie spricht, und die Ampel war dann schon durch.
+  // Jetzt laeuft die Uhr erst ab dem ersten gesprochenen Wort (oder sofort, wenn es keine
+  // Ansage gibt) - spaetestens aber nach ANSAGE_MAX_MS, damit eine haengende Stimme den
+  // Start nicht blockiert. 4 s statt vorher 10 s: am Tisch wirkten 10 s wie "Gruen kommt nicht".
+  const ANSAGE_MAX_MS = 4000;
+  let startWarteNr = 0;
+  function ampelStartVerzoegert(weiter) {
+    if (startWarteTimer) return;
+    const nr = ++startWarteNr;
+    const ms = startWarteMs();
+    let laeuft = false;
+    const uhrStarten = () => {
+      if (laeuft || nr !== startWarteNr || !startWarteTimer) return;   // schon gestartet/abgebrochen
+      laeuft = true;
+      clearTimeout(startWarteTimer);
+      startWarteTimer = setTimeout(() => {
+        startWarteTimer = null;
+        weiter();
+        // Lief der Start nicht an (z. B. Time Attack ohne eingescannte Strecke, Knockout ohne
+        // NPC - dort erscheint ein Hinweis), darf die Ampel nicht ewig auf Gelb stehen.
+        if (raceState === 'idle' || raceState === 'finished') {
+          ampelSenden('ROT');
+          if ($('race-status').textContent.indexOf('…') >= 0) $('race-status').textContent = t('Start abgebrochen');
+          if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+          if ($('race-start-btn')) $('race-start-btn').disabled = false;
+        }
+        updateRaceActButtons();
+      }, ms);
+    };
+    // Platzhalter, damit das Warten ab jetzt zaehlt (kein zweites Fenster, Abbrechen geht).
+    startWarteTimer = setTimeout(uhrStarten, ANSAGE_MAX_MS);
+    $('race-status').textContent = t('Start in {n} s …').replace('{n}', String(Math.round(ms / 1000)));
+    // Schon im Warten abbrechbar (GEMELDET: "Rennabbruch per OmegaSim funktioniert nicht" -
+    // der Knopf war bis zum Countdown gesperrt). requestRaceStop() bricht dann das Warten ab.
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = false;
+    updateRaceActButtons();
+    if (!ampelStartKnopf(uhrStarten)) uhrStarten();
+  }
+  function ampelStartWarteAbbrechen() {
+    if (!startWarteTimer) return;
+    clearTimeout(startWarteTimer);
+    startWarteTimer = null;
+    startWarteNr++;
+    ampelSenden('ROT');
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+    if ($('race-start-btn')) $('race-start-btn').disabled = false;
+    $('race-status').textContent = t('Start abgebrochen');
+    showHudToast(t('Start abgebrochen'));
+    updateRaceActButtons();
+  }
+  if ($('race-start-warte')) {
+    const el = $('race-start-warte');
+    const zeigen = () => { if ($('race-start-warte-val')) $('race-start-warte-val').textContent = Math.round(startWarteMs() / 1000) + ' s'; };
+    try { const w = localStorage.getItem(START_WARTE_STORE); if (w !== null && w !== '') el.value = w; } catch (e) { /* privat */ }
+    el.addEventListener('input', () => {
+      zeigen();
+      try { localStorage.setItem(START_WARTE_STORE, el.value); } catch (e) { /* privat */ }
+    });
+    zeigen();
+  }
+
+  // Ein Ampelton: licht = Zahl der leuchtenden Spalten, 1..5 (70-race.js).
+  function startampelLicht(licht) {
+    ampelSenden('GRUEN ' + Math.max(1, Math.min(5, licht)));
+  }
+  function ampelLos() { ampelSenden('LOS'); }
+  function ampelRennende() { ampelSenden('ROT'); }
+  function ampelGelb(an) { ampelSenden(an ? 'GELB' : 'GELB_AUS'); }
+
+  // FRUEHSTART. Ohne Startampel bleibt alles, wie es war: die Ampel laeuft weiter, Strafe nach
+  // den Renneinstellungen. MIT Startampel und eingeschaltetem Schalter wird der Start
+  // abgebrochen - Gelb blinkt am Tisch, und "Rennen starten" beginnt die Abfolge neu.
+  // Nicht im Mehrspieler und nicht in einer Challenge: dort haengt Gruen an einer Zeit, die
+  // andere Geraete oder die Challenge vorgeben.
+  // Rueckgabe true: der Start ist abgebrochen.
+  function ampelFruehstart() {
+    if (!ampelVerbunden() || !ampelNeustartAn() || ampelZeitgesteuert) return false;
+    if (typeof challengeLaeuft === 'function' && challengeLaeuft()) return false;
+    if (raceState !== 'countdown') return false;
+    ampelSenden('FRUEHSTART');
+    if (raceCountdownTimer) { clearTimeout(raceCountdownTimer); raceCountdownTimer = null; }
+    ampelPlan = null; ampelSchritt = null;
+    setRaceLights(0);
+    fruehstartReset();
+    raceState = 'idle';
+    $('race-start-btn').disabled = false;
+    $('race-stop-btn').disabled = true;
+    $('race-status').textContent = t('Frühstart – bitte neu starten');
+    showHudToast(t('Frühstart – Start abgebrochen'));
+    log('Fruehstart: Start abgebrochen, die Startampel blinkt gelb. Rennen neu starten.', 'err');
+    updateRaceActButtons();
+    return true;
+  }
+
+  ampelStatusZeigen();
   // =========================================================================
   // Der Ton
   // =========================================================================
@@ -48474,7 +48902,8 @@
   // Akku: BESTELLT "Akku-Ansage < 25 %" - eine eigene Schwelle, nicht die 10 % oben.
   const AKKU_SCHWELLE = 0.25;
   const AKKU_HYSTERESE = 0.32;
-  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false };
+  const ansageAn = { lap: true, damage: false, fuel: false, tyre: false, rain: false, pit: true, battery: false,
+                     start: true };
   const ansageLatch = { damage: false, fuel: false, tyre: false, rain: null, battery: false };
   // JE Auto ein Latch fuer die Akku-Meldung: jedes Auto meldet unter 25 % einmal, erst nach
   // der Erholung wieder scharf. Ein gemeinsames Latch wuerde nur das ERSTE Auto melden.
@@ -48644,6 +49073,87 @@
     return raus;
   }
 
+  // ---- STARTANSAGE: "Gentlemen, start your engines" ---------------------------------
+  //
+  // BESTELLT: die Ansage kommt von OmegaSim, nicht von der Startampel am Tisch - und NUR beim
+  // Start-Knopf im Fenster "Bringe die Autos in Position", wenn nichts laeuft
+  // (ampelStartKnopf() in 74-startampel.js).
+  // Mit und ohne angeschlossene Ampel.
+  //
+  // IMMER ENGLISCH, auch in der deutschen Oberflaeche: der Satz ist ein feststehender Ruf
+  // (Indianapolis), und eine deutsche Stimme spricht ihn falsch aus. Reihenfolge wie bei den
+  // anderen Meldungen: eigene Aufnahme ('start', sobald tools/voice_synth.py sie rendert),
+  // sonst die englische Live-Stimme.
+  const START_ANSAGE = 'Gentlemen, start your engines';
+  // `beginn` (optional) wird gerufen, sobald die Ansage WIRKLICH zu hoeren ist: bei der
+  // Aufnahme sofort, bei der Live-Stimme erst bei u.onstart. Daran haengt die Wartezeit bis
+  // zum ersten Licht (74-startampel.js).
+  //
+  // GEMELDET: "Nach dem ersten Start wird die Ansage erst nach Ablauf der Startsequenz
+  // gesagt, ab dem zweiten Start stimmt die Reihenfolge." Chrome auf Android faehrt die
+  // Sprachausgabe erst beim ersten speak() hoch, und das dauert Sekunden - der Satz kam
+  // nach der Ampel. Deshalb wird sie beim Oeffnen des Startfensters vorgewaermt
+  // (startAnsageVorwaermen) und die Ampel wartet auf den Beginn der Ansage.
+  //
+  // GEMELDET (am Tisch, Android-Chrome): "Gruen-Sequenz laeuft nicht, Rennabbruch geht nicht."
+  // Die Ampel wartete auf u.onstart, und das kam nicht. Drei bekannte Eigenheiten von Chrome:
+  //   1. Ein SpeechSynthesisUtterance ohne Verweis darauf wird weggeraeumt, BEVOR seine
+  //      Ereignisse kommen -> startAnsageAktuell haelt ihn fest.
+  //   2. cancel() direkt vor speak() verschluckt auf Android Ereignisse oder den ganzen Satz
+  //      -> kein cancel() mehr; vor dem Start spricht ohnehin nichts.
+  //   3. Auf Ereignisse ist kein Verlass -> zusaetzlich wird speechSynthesis.speaking abgefragt;
+  //      was zuerst kommt, startet die Uhr. Die Notbremse in 74-startampel.js bleibt.
+  let startAnsageAktuell = null;
+  function startAnsageSprechen(beginn) {
+    if (!ansageAn.start) return false;
+    if (playAnsageClip('start')) { if (beginn) beginn(); return true; }
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      const u = new SpeechSynthesisUtterance(START_ANSAGE);
+      startAnsageAktuell = u;
+      u.lang = 'en-US';
+      u.rate = 0.95;   // ein Ruf, keine Funkmeldung - etwas getragener als die anderen
+      const en = englischeStimme();
+      if (en) u.voice = en;
+      if (beginn) {
+        let einmal = false, abfrage = null;
+        const los = () => {
+          if (abfrage) { clearInterval(abfrage); abfrage = null; }
+          if (!einmal) { einmal = true; beginn(); }
+        };
+        u.onstart = los;
+        u.onerror = los;   // keine Stimme: die Ampel soll trotzdem laufen
+        abfrage = setInterval(() => {
+          try { if (window.speechSynthesis.speaking) los(); } catch (e) { los(); }
+        }, 100);
+        setTimeout(() => { if (abfrage) { clearInterval(abfrage); abfrage = null; } }, 15000);
+      }
+      u.onend = () => { if (startAnsageAktuell === u) startAnsageAktuell = null; };
+      window.speechSynthesis.speak(u);
+      announceCalls++;
+      return true;
+    } catch (e) { return false; }
+  }
+  function englischeStimme() {
+    const stimmen = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    return stimmen.find((v) => /^en[-_]US/i.test(v.lang)) || stimmen.find((v) => /^en/i.test(v.lang)) || null;
+  }
+  // Einmal je Seite: ein stummer Satz, damit die Sprachausgabe laeuft, bevor sie gebraucht
+  // wird. Muss aus einer Nutzergeste kommen (Tippen auf "Rennen starten") - Chrome laesst
+  // speak() ohne Geste nicht zu. Die Stimmenliste wird dabei gleich mitgeladen.
+  let startAnsageWarm = false;
+  function startAnsageVorwaermen() {
+    if (startAnsageWarm || !ansageAn.start || !('speechSynthesis' in window)) return;
+    startAnsageWarm = true;
+    try {
+      if (window.speechSynthesis.getVoices) window.speechSynthesis.getVoices();
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* ohne Vorwaermen geht es auch, nur beim ersten Mal spaeter */ }
+  }
+
   function speakLap(ms, istBest) {
     if (!ansageAn.lap || !rennstandVorRundenzeit()) return;
     // Ohne Sprachausgabe (App-WebView): die Zahlen-Clips.
@@ -48660,7 +49170,8 @@
   const ANSAGE_KAESTCHEN = { 'setting-announce': 'lap', 'setting-announce-damage': 'damage',
                              'setting-announce-fuel': 'fuel', 'setting-announce-tyre': 'tyre',
                              'setting-announce-rain': 'rain', 'setting-announce-pit': 'pit',
-                             'setting-announce-battery': 'battery' };
+                             'setting-announce-battery': 'battery',
+                             'setting-announce-start': 'start' };
   Object.keys(ANSAGE_KAESTCHEN).forEach((id) => {
     const el = $(id);
     if (!el) return;
@@ -58087,11 +58598,13 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
           + 'die Ampel.', 'err');
       showHudToast('GELBE FLAGGE');
       setRaceLights(0);
+      ampelGelb(true);   // Startampel: Gelb an
     } else if (next === 'green') {
       limitYellow = 1;
       safetyCarHeim();
       applySpeedLimit();
       log('Gr\u00fcn. Volle Kontrolle.', 'info');
+      ampelGelb(false);   // Startampel: Gelb aus
       showHudToast('GR\u00dcN');
     }
     updateFlagUi();
@@ -92959,6 +93472,215 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       if (fruehstartZuschlag(1, 0) !== 0) f.push('Schalter aus: trotzdem Zuschlag');
     } finally { $('race-fruehstart-zeit').checked = merk; fruehstartReset(); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'einmal +5 s auf Runde 1, je Spieler, Schalter wirkt' };
+  });
+
+  stAdd('Startampel: Befehle fuer Start, Toene, Gruen, Gelb, Fruehstart und Ende', async () => {
+    const f = [];
+    const gesendet = [];
+    const merk = { k: ampelKanal, g: ampelGeraet, rs: raceState, vs: ampelVorstart,
+                   zg: ampelZeitgesteuert, neu: $('race-ampel-neustart').checked,
+                   timer: raceCountdownTimer, start: $('race-start-btn').disabled,
+                   stop: $('race-stop-btn').disabled, status: $('race-status').textContent };
+    try {
+      ampelGeraet = { name: 'Test', gatt: { connected: true } };
+      ampelKanal = { writeValueWithResponse(d) {
+        gesendet.push(new TextDecoder().decode(d).trim()); return Promise.resolve(); } };
+      ampelVorstart = false; ampelZeitgesteuert = false;
+      // Ohne Startfenster: der Countdown schickt START nach.
+      raceState = 'countdown';
+      ampelCountdown(false);
+      startampelLicht(1); startampelLicht(2); startampelLicht(3); startampelLicht(4); startampelLicht(5);
+      ampelLos();
+      ampelGelb(true); ampelGelb(false);
+      ampelRennende();
+      // Mit Startfenster: START nur einmal.
+      raceState = 'idle'; ampelStartKnopf(); raceState = 'countdown'; ampelCountdown(false);
+      // Fruehstart, Schalter an: Start abgebrochen.
+      $('race-ampel-neustart').checked = true;
+      raceState = 'countdown';
+      if (!ampelFruehstart()) f.push('Fruehstart hat nicht abgebrochen');
+      if (raceState !== 'idle') f.push('nach Fruehstart nicht idle');
+      // Mehrspieler (feste Gruenzeit): kein Abbruch, nichts gesendet.
+      raceState = 'countdown'; ampelZeitgesteuert = true;
+      if (ampelFruehstart()) f.push('Mehrspieler-Countdown abgebrochen');
+      ampelZeitgesteuert = false;
+      // Schalter aus: kein Abbruch.
+      $('race-ampel-neustart').checked = false;
+      if (ampelFruehstart()) f.push('Schalter aus: trotzdem abgebrochen');
+      await ampelSchlange;
+      const soll = ['START', 'GRUEN 1', 'GRUEN 2', 'GRUEN 3', 'GRUEN 4', 'GRUEN 5', 'LOS', 'GELB', 'GELB_AUS', 'ROT',
+                    'START', 'FRUEHSTART'];
+      if (gesendet.join('|') !== soll.join('|')) f.push('gesendet: ' + gesendet.join(', '));
+    } finally {
+      ampelKanal = merk.k; ampelGeraet = merk.g; raceState = merk.rs; ampelVorstart = merk.vs;
+      ampelZeitgesteuert = merk.zg; $('race-ampel-neustart').checked = merk.neu;
+      raceCountdownTimer = merk.timer; $('race-start-btn').disabled = merk.start;
+      $('race-stop-btn').disabled = merk.stop; $('race-status').textContent = merk.status;
+      fruehstartReset();
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'START, GRUEN 1-5, LOS, GELB, GELB_AUS, ROT; Fruehstart bricht nur mit Schalter und ohne Mehrspieler ab' };
+  });
+
+  stAdd('Startansage und Gelb: nur der Start-Knopf in "Bringe die Autos in Position"', async () => {
+    const f = [];
+    const gesagt = [], befehle = [];
+    const echt = window.speechSynthesis;
+    const echtBuffers = Object.assign({}, voiceBuffers);
+    const gs = $('race-gridscreen');
+    const merk = { vs: ampelVorstart, k: ampelKanal, g: ampelGeraet, rs: raceState,
+                   an: $('setting-announce-start').checked, gs: gs ? gs.hidden : true, w: raceGridWeiter,
+                   warte: $('race-start-warte').value };
+    $('race-start-warte').value = '0';   // Wartezeit hat ihren eigenen Test
+    const el = $('setting-announce-start');
+    // START wird ueber eine Schlange gesendet (asynchron); sofort sichtbar ist ampelVorstart,
+    // das ampelSenden('START') im selben Aufruf setzt.
+    const fall = async (name, sollAnsage, sollStart, tun) => {
+      const a0 = gesagt.length; ampelVorstart = false; tun();
+      const a = gesagt.length - a0, b = ampelVorstart ? 1 : 0;
+      if (a !== sollAnsage) f.push(name + ': Ansage ' + a + ' statt ' + sollAnsage);
+      if (b !== sollStart) f.push(name + ': START ' + b + ' statt ' + sollStart);
+      // Wartezeit 0 laeuft ueber Zeitgeber; in der vollen Suite ist die Seite beschaeftigt,
+      // deshalb bis zu 2 s warten, bis das Warten vorbei ist (nicht fest 30 ms).
+      for (let i = 0; i < 100 && ampelStartWartet(); i++) await new Promise((r) => setTimeout(r, 20));
+    };
+    try {
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true,
+        value: { cancel() {}, getVoices() { return []; }, speak(u) {
+          if (u.volume === 0) return;   // stummes Vorwaermen zaehlt nicht
+          gesagt.push(u.lang + ':' + u.text); if (u.onstart) setTimeout(u.onstart, 0); } } });
+      ampelGeraet = { name: 'Test', gatt: { connected: true } };
+      ampelKanal = { writeValueWithResponse(d) { befehle.push(new TextDecoder().decode(d).trim()); return Promise.resolve(); } };
+      el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true }));
+      raceState = 'idle';
+      // Fenster oeffnen ("Rennen starten", Cockpit, Challenge): noch nichts.
+      await fall('Fenster oeffnen', 0, 0, () => raceGridAnzeigen(() => {}));
+      // Start im Fenster: Gelb und Ansage. raceGridWeiter ist eine Attrappe - kein echtes Rennen.
+      await fall('Start im Fenster', 1, 1, () => raceGridStart());
+      raceState = 'finished';
+      await fall('Start im Fenster nach Rennende', 1, 1, () => { raceGridWeiter = () => {}; raceGridStart(); });
+      for (const rs of ['countdown', 'racing', 'finishing']) {
+        raceState = rs;
+        await fall('Start waehrend ' + rs, 0, 0, () => ampelStartKnopf());
+      }
+      raceState = 'idle'; ampelSenden('ROT');
+      await fall('Mehrspieler-Countdown', 0, 1, () => ampelCountdown(true));
+      ampelSenden('ROT');
+      el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true }));
+      await fall('Ansage ausgeschaltet', 0, 1, () => ampelStartKnopf());
+      if (gesagt.some((x) => x !== 'en-US:Gentlemen, start your engines')) f.push('Text/Sprache: ' + gesagt.join(' ; '));
+    } finally {
+      if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
+      else delete window.speechSynthesis;
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.assign(voiceBuffers, echtBuffers);
+      ampelVorstart = merk.vs; ampelKanal = merk.k; ampelGeraet = merk.g; raceState = merk.rs;
+      if (gs) gs.hidden = merk.gs;
+      raceGridWeiter = merk.w;
+      $('race-start-warte').value = merk.warte;
+      el.checked = merk.an; el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    return ampelSchlange.then(() => {
+      if (befehle.filter((x) => x === 'START').length !== 4) f.push('an die Ampel gesendet: ' + befehle.join(', '));
+      return { ok: !f.length, mass: f.length ? f.join(' | ')
+        : 'Fenster oeffnen: nichts; Start im Fenster: Gelb + Ansage; laufend: nichts; Mehrspieler: Gelb ohne Ansage' };
+    });
+  });
+
+  stAdd('Startampel: Wartezeit nach dem Start bis zum ersten gruenen Licht', async () => {
+    const f = [];
+    const gs = $('race-gridscreen');
+    const el = $('race-start-warte');
+    const merk = { warte: el.value, rs: raceState, gs: gs ? gs.hidden : true, w: raceGridWeiter,
+                   an: $('setting-announce-start').checked, vs: ampelVorstart };
+    const ansage = $('setting-announce-start');
+    let gestartet = 0;
+    const weiter = () => { gestartet++; };
+    try {
+      ansage.checked = false; ansage.dispatchEvent(new Event('change', { bubbles: true }));
+      raceState = 'idle';
+      el.value = '1';
+      // Start: Gelb sofort, Countdown erst nach 1 s.
+      raceGridAnzeigen(weiter); raceGridStart();
+      if (!ampelVorstart) f.push('kein Gelb beim Start');
+      if (gestartet !== 0) f.push('Countdown sofort statt nach 1 s');
+      if (!ampelStartWartet()) f.push('wartet nicht');
+      // Waehrend des Wartens: kein zweites Startfenster.
+      raceGridAnzeigen(weiter);
+      if (gs && !gs.hidden) f.push('zweites Startfenster im Warten');
+      await new Promise((r) => setTimeout(r, 1150));
+      if (gestartet !== 1) f.push('nach 1 s ' + gestartet + 'x gestartet statt 1x');
+      if (ampelStartWartet()) f.push('wartet nach Ablauf noch');
+      // Abbrechen im Warten: Rot, kein Countdown.
+      raceState = 'idle';
+      raceGridAnzeigen(weiter); raceGridStart();
+      toggleRace();
+      if (ampelStartWartet()) f.push('Abbrechen beendet das Warten nicht');
+      if (ampelVorstart) f.push('nach Abbrechen nicht Rot');
+      await new Promise((r) => setTimeout(r, 1150));
+      if (gestartet !== 1) f.push('nach Abbrechen trotzdem gestartet');
+      // 0 = sofort.
+      el.value = '0';
+      raceGridAnzeigen(weiter); raceGridStart();
+      await new Promise((r) => setTimeout(r, 30));
+      if (gestartet !== 2) f.push('Wartezeit 0: nicht sofort');
+    } finally {
+      if (ampelStartWartet()) ampelStartWarteAbbrechen();
+      el.value = merk.warte; raceState = merk.rs; raceGridWeiter = merk.w; ampelVorstart = merk.vs;
+      if (gs) gs.hidden = merk.gs;
+      ansage.checked = merk.an; ansage.dispatchEvent(new Event('change', { bubbles: true }));
+      updateRaceActButtons();
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ')
+      : 'Gelb sofort, Countdown nach der Wartezeit, kein zweites Fenster, Abbrechen = Rot, 0 = sofort' };
+  });
+
+  stAdd('Startansage: Wartezeit beginnt erst, wenn die Ansage spricht (Android-Erststart)', async () => {
+    // GEMELDET: beim ersten Start kam die Ansage erst nach der Ampel - die Sprachausgabe auf
+    // Android braucht beim ersten Mal Sekunden. Nachgestellt: die Stimme beginnt 600 ms nach
+    // speak(). Selbst mit Wartezeit 0 darf der Countdown nicht vor der Stimme beginnen.
+    const f = [];
+    const echt = window.speechSynthesis;
+    const echtBuffers = Object.assign({}, voiceBuffers);
+    const gs = $('race-gridscreen');
+    const el = $('race-start-warte'), an = $('setting-announce-start');
+    const merk = { warte: el.value, rs: raceState, gs: gs ? gs.hidden : true, w: raceGridWeiter,
+                   an: an.checked, vs: ampelVorstart };
+    let gesprochenUm = 0, gestartetUm = 0;
+    try {
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.defineProperty(window, 'speechSynthesis', { configurable: true,
+        value: { cancel() {}, getVoices() { return []; }, speak(u) {
+          if (u.volume === 0) return;
+          setTimeout(() => { gesprochenUm = performance.now(); if (u.onstart) u.onstart(); }, 600); } } });
+      an.checked = true; an.dispatchEvent(new Event('change', { bubbles: true }));
+      el.value = '0';
+      raceState = 'idle';
+      const t0 = performance.now();
+      raceGridAnzeigen(() => { gestartetUm = performance.now(); });
+      raceGridStart();
+      await new Promise((r) => setTimeout(r, 1000));
+      if (!gesprochenUm) f.push('Ansage nicht gesprochen');
+      if (!gestartetUm) f.push('Countdown nicht gestartet');
+      else if (gestartetUm < gesprochenUm) f.push('Countdown vor der Ansage');
+      else if (gestartetUm - t0 < 550) f.push('Countdown nach ' + Math.round(gestartetUm - t0) + ' ms - wartet nicht auf die Ansage');
+      // Wird die Stimme nie gestartet, geht es nach ANSAGE_MAX_MS trotzdem los (hier nicht gewartet,
+      // nur geprueft, dass die Grenze existiert und vernuenftig ist).
+      if (!(ANSAGE_MAX_MS >= 2000 && ANSAGE_MAX_MS <= 6000)) f.push('ANSAGE_MAX_MS ' + ANSAGE_MAX_MS);
+      return { ok: !f.length, mass: f.length ? f.join(' | ')
+        : 'Stimme nach 600 ms, Countdown nach ' + Math.round(gestartetUm - t0) + ' ms (erst mit der Ansage, Wartezeit 0)' };
+    } finally {
+      if (ampelStartWartet()) ampelStartWarteAbbrechen();
+      if (echt) Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: echt });
+      else delete window.speechSynthesis;
+      Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
+      Object.assign(voiceBuffers, echtBuffers);
+      el.value = merk.warte; raceState = merk.rs; raceGridWeiter = merk.w; ampelVorstart = merk.vs;
+      if (gs) gs.hidden = merk.gs;
+      an.checked = merk.an; an.dispatchEvent(new Event('change', { bubbles: true }));
+      updateRaceActButtons();
+    }
   });
 
   stAdd('Menue im Rennen: erst fragen, Rennen laeuft weiter', () => {
