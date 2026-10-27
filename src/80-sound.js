@@ -142,6 +142,11 @@
     'sd_toro',
     // v1.1.9 BESTELLT: der Vulture V5R aus Speed Dreams (virtuelle Fahrt), sein eigener V8 (GPL-2+).
     'sd_v5r',
+    // v1.1.45 BESTELLT: die Lynx 220 (Jaguar XJ220), ihr eigener V6-Turbo (Free Art).
+    'sd_lynx',
+    // v1.1.45 BESTELLT: Ford GT40 Mk1 (FMC GT4, V8) und Porsche 911 GT3 (Boxer 96, Boxer-6).
+    'sd_fmc',
+    'sd_boxer',
     // ---- ZWEI AUFNAHMEN DES NUTZERS, aus photos/newaudio --------------------------
     // BESTELLT: eigene Aufnahmen; Drehzahlen aus der Video-Anzeige (siehe loops.json).
     // DIESELBE REIHENFOLGE wie im Menue (am Ende der Liste).
@@ -172,8 +177,8 @@
                          // Siehe motorDrehzahl() - es ist die Skala, auf der Anzeige und
                          // Ton gemeinsam laufen.
                          band: {},
-                         nodes: null, over: null, car: null,
-                         master: null, ready: false, loading: false };
+                          nodes: null, over: null, car: null,
+                          master: null, ready: false, loading: false };
 
   // ====================================================================================
   // DIE DREHZAHL DES GEWAEHLTEN MOTORS
@@ -258,8 +263,12 @@
       // schon nach IHM, nicht erst nach allen 27 - der Rest laedt im selben Durchlauf
       // weiter, nur eben im Hintergrund, waehrend das gewaehlte Auto schon spielt.
       const vorrang = $('sound-profile') ? $('sound-profile').value : null;
-      const reihenfolge = vorrang && manifest[vorrang]
-        ? [vorrang, ...Object.keys(manifest).filter(c => c !== vorrang)]
+      // Auch den Motor der virtuellen Fahrt frueh laden: sonst spielt dort der Ersatzton,
+      // bis der (zuletzt eingetragene) Vulture V5.R / Lynx 220 endlich an der Reihe ist.
+      const vfMotor = (typeof vfMotorZiel === 'function') ? vfMotorZiel() : null;
+      const prio = [vorrang, vfMotor, 'sd_v5r', 'sd_lynx', 'sd_fmc', 'sd_boxer'].filter((c, i, a) => c && manifest[c] && a.indexOf(c) === i);
+      const reihenfolge = prio.length
+        ? [...prio, ...Object.keys(manifest).filter((c) => !prio.includes(c))]
         : Object.keys(manifest);
       for (const car of reihenfolge) {
         sampleEngine.buffers[car] = {};
@@ -362,6 +371,9 @@
       // aelteres audio/ hat den Eintrag nicht.
       if (fx.offroad) fxBuffers.offroad = await grab(fx.offroad.file);
       fxBuffers.pit = await grab(fx.pit.file);
+      // v1.1.42: der Schrauber je Radpaar (Pixabay-Aufnahme, tools/pit_wrench_pixabay.py). Duldsam: fehlt er,
+      // laeuft die alte, gerechnete Schleife.
+      if (fx.pit_paar) fxBuffers.pitPaar = await grab(fx.pit_paar.file);
       // Both are loops: they run for as long as their job does. Missing files are tolerated
       // (grab returns null) and the sound is simply absent rather than the load failing.
       if (fx.pit_fuel) fxBuffers.pitFuel = await grab(fx.pit_fuel.file);
@@ -956,8 +968,15 @@
   // `spieler` kommt aus der Physikinstanz (siehe schaltTon() in 40-physics.js). Er
   // entscheidet nur ueber die Stereoseite: ein Schaltvorgang, den man nicht ausgeloest hat,
   // soll von der anderen Seite kommen, sonst haelt man ihn fuer den eigenen.
+  // v1.2.24 BESTELLT (Variante C aus drei Hoerproben): tiefer Schlag plus Auspuffknall statt des
+  // hellen "Klack" (tools/shift_tief.py). Mit "Schaltklang: alt" die bisherigen Dateien.
+  function schaltPuffer(direction) {
+    const s = fxBuffers.shift, alt = typeof schaltKlangAlt !== 'undefined' && schaltKlangAlt;
+    if (!alt && (direction >= 0 ? s.upTief : s.downTief)) return direction >= 0 ? s.upTief : s.downTief;
+    return direction >= 0 ? s.up : s.down;
+  }
   function playShiftSound(direction, spieler) {
-    const buf = direction >= 0 ? fxBuffers.shift.up : fxBuffers.shift.down;
+    const buf = schaltPuffer(direction);
     const seite = (typeof zweiSpieler !== 'undefined' && zweiSpieler)
       ? (spieler >= 2 ? spielerPan(spieler) : -PAN_ZWEI) : 0;
     // v1.1.3: am Regler "Knaller & Schalten" (knallVolume) und mit dem Schaltschlag darunter.
@@ -1029,7 +1048,19 @@
   // schnelle Kurve nicht. Ein Selbsttest haelt fest, dass die Schwelle ERREICHBAR bleibt -
   // das Fehlen genau dieser Pruefung war der eigentliche Fehler.
   const TYRE_SQUEAL_START = 0.6;
+  // v1.1.42 BESTELLT: "leichtes Rumbling beim Reifenquietschen". Dieselbe Menge wie der Ton, aber auch ohne
+  // Ton (Vibrationsart 'quietschen', Kachel Vibration): leicht und im schwachen Motor, alle 250 ms erneuert.
+  let quietschRuettelnAt = 0;
+  function quietschRuetteln(nutzung) {
+    const menge = Math.max(0, Math.min(1, (Math.max(0, Math.min(1.2, nutzung)) - TYRE_SQUEAL_START) / (1 - TYRE_SQUEAL_START)));
+    if (menge <= 0.05 || typeof padRumble !== 'function') return false;
+    const jetzt = performance.now();
+    if (jetzt - quietschRuettelnAt < 250) return false;
+    quietschRuettelnAt = jetzt;
+    return padRumble(0, 0.12 + 0.28 * menge, 280, 'quietschen', 1);
+  }
   function setTyreSqueal(nutzung) {
+    quietschRuetteln(nutzung);
     if (!fxBuffers.tyre || !audioCtx || !soundEnabled) return;
     // Unterhalb der Schwelle auf null abbilden, statt die Schwelle im Nenner zu vergessen:
     // sonst faengt es bei 0 an und ist bei 0,85 schon laut.
@@ -1200,9 +1231,16 @@
   // The visual side of the weather. Tied to the WEATHER, not to the volume: muting the
   // ambience must not also stop the rain from being visible, or a silent storm becomes an
   // invisible one.
+  // v1.1.45: nur bei spuerbarer Aenderung schreiben (jede Aenderung von --rain-lvl am <html> rechnet die ganze Seite
+  // neu - vorher alle 80 ms), und die Nass-Klasse mit Hysterese, damit sie an der Schwelle nicht flattert.
+  let regenSichtbarWert = -1;
   function setRainVisuals(lvl) {
     const v = typeof lvl === 'number' ? lvl : (lvl ? 1 : 0);
-    document.body.classList.toggle('race-wet', v > 0.02);
+    const nass = document.body.classList.contains('race-wet');
+    if (!nass && v > 0.03) document.body.classList.add('race-wet');
+    else if (nass && v < 0.01) document.body.classList.remove('race-wet');
+    if (Math.abs(v - regenSichtbarWert) < 0.02 && !(v === 0 && regenSichtbarWert !== 0) && !(v === 1 && regenSichtbarWert !== 1)) return;
+    regenSichtbarWert = v;
     // Die Staerke geht als CSS-Variable hinaus, und das Stylesheet entscheidet, was daraus
     // wird: erst wenige Tropfen, dann viele. Die Alternative waere, hier Tropfen zu zaehlen
     // und einzeln zu erzeugen - dann stuende die Gestaltung im Programm.
@@ -1214,6 +1252,7 @@
   function triggerLightning() {
     const dash = $('race-dash');
     if (!dash) return;
+    if ($('setting-blitz') && !$('setting-blitz').checked) return;
     const flash = (ms) => {
       dash.classList.add('race-flash');
       setTimeout(() => dash.classList.remove('race-flash'), ms);
@@ -1584,9 +1623,32 @@
     const load = Math.max(0, Math.min(1, eng.state.engineLoad || 0));
     const leise = load <= 0.01 && (eng.state.virtualSpeed || 0) <= 0.01
                   && Math.abs(eng.state.speedKmh || 0) < 0.05;
+    // v1.2.5 (WIP) BESTELLT: "NPC-Motorsound-Ueberarbeitungsvorschlag: aktuell nur niedrig und hoch, keine Gaenge, kein
+    // Auspuffblubbern." Die Gaenge kommen aus dem Motormodell (frueheres Zurueckschalten, ghostMaxMotor in
+    // 90-ghosts.js - Physik, nicht vom Tonschalter abhaengig). Hier: Knaller auch, wenn der NPC anbremst (sein Gas ist
+    // ratenbegrenzt, ein Lastabfall von 0,15 je Takt kam nie vor), und die Knaller etwas lauter.
+    const neu = !npcKlangAlt;
     updateSampleEngineIn(st, motorDrehzahl(eng.state, st.car), load, leise, eng, 1);
     if (!st.knallMerk) st.knallMerk = {};
-    fremdKnallTick(st.knallMerk, eng.state, load, st.pan || audioCtx.destination, 0.45 * GHOST_LEISE);
+    const faktor = (neu ? 0.8 : 0.45) * GHOST_LEISE;
+    fremdKnallTick(st.knallMerk, eng.state, load, st.pan || audioCtx.destination, faktor);
+    if (neu) {
+      // Bremsflanke: der NPC geht vom Gas in die Bremse - ein Schub kurzer Knaller wie beim Lupfen.
+      const bremse = car.ghost.lastBrake || 0;
+      const vorher = st.bremsMerk || 0;
+      st.bremsMerk = bremse;
+      if (extrasOn && bremse > 0.25 && vorher <= 0.05 && (eng.state.rpmFrac || 0) > 0.35) {
+        const ziel = st.pan || audioCtx.destination;
+        const n = 1 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < n; i++) xKnallAn(ziel, 0.12 * knallVolume * faktor, Math.random() * 0.2);
+      }
+    }
+  }
+  let npcKlangAlt = false;
+  if ($('setting-npc-klang-alt')) {
+    const el = $('setting-npc-klang-alt');
+    npcKlangAlt = el.checked;
+    el.addEventListener('change', () => { npcKlangAlt = el.checked; });
   }
   // Die Liste des NPC-Motors: dieselben Gruppen wie #sound-profile, nur Motoren mit Schleifen.
   function ghostMotorListeFuellen() {
@@ -1708,9 +1770,25 @@
   // `dop` der Dopplerfaktor. Auto 2 bekommt 1: dopplerFactor() haengt an der Runde des
   // Fahrerautos, und ein Doppler, der zur falschen Runde gehoert, ist schlechter als
   // keiner.
+  // ---- SCHALTKLANG (v1.2.5, WIP) ----------------------------------------------------------
+  // BESTELLT: "Der Schaltton ist bei der Mustang-GT3-Aufnahme gut, aber ueberall sonst soll er auch so gut sein. Bitte
+  // Vorschlag fuer globalen Schaltton." Beim Schalten steht die Last 120 ms auf 0, und bisher blendete der Klang dann
+  // aufs Schubband (over) ueber - beim Mustang ist das dieselbe Aufnahme, nur dunkler, und klingt wie eine echte
+  // Zuendunterbrechung; bei den uebrigen ist es ein anderer Klang, oft sogar am 2x-Anschlag der Abspielrate (Piepsen).
+  // Neu fuer ALLE Motoren: waehrend des Schaltens bleibt die Mischung stehen (kein Wechsel aufs Schubband), der Pegel
+  // bricht kurz ein (die Unterbrechung), und die Tonhoehe gleitet ueber die Schaltzeit statt zu springen. Dazu nie ein
+  // Schubband nahe dem 2x-Anschlag. Schalter "Schaltklang: alt" stellt das alte Verhalten wieder her.
+  let schaltKlangAlt = false;
+  if ($('setting-schaltklang-alt')) {
+    const el = $('setting-schaltklang-alt');
+    schaltKlangAlt = el.checked;
+    el.addEventListener('change', () => { schaltKlangAlt = el.checked; });
+  }
+  const SCHALT_EINBRUCH = 0.4;     // Pegel waehrend der Unterbrechung
   function updateSampleEngineIn(store, rpm, load, silent, motor, dop) {
     const nodes = store.nodes;
     if (!nodes) return;
+    const schaltet = !schaltKlangAlt && !!(motor && motor.state && motor.state.isShifting);
     const scale = sampleEngine.rpmScale[store.car] || 1;
     // The crossfade has to see the same scaled rpm as the playback rate does, otherwise the
     // band boundaries and the pitch disagree and you hear the wrong loop at the wrong speed.
@@ -1721,18 +1799,32 @@
     // pedal is fully down, and a crossfade that only completes at load = 0 spends most of
     // its travel doing nothing audible.
     const over = store.over;
-    const powerMix = over ? Math.min(1, Math.max(0, (load - 0.06) / 0.30)) : 1;
+    let powerMix = over ? Math.min(1, Math.max(0, (load - 0.06) / 0.30)) : 1;
+    if (!schaltKlangAlt && over) {
+      // Nie das Schubband nahe seinem 2x-Anschlag: dort piepst es. Ab 1,7x geht der Anteil an die Lastschleifen.
+      const roh = rpm * scale / over.baseRpm * dop;
+      if (roh > 1.7) powerMix = Math.max(powerMix, Math.min(1, (roh - 1.7) / 0.3));
+    }
+    // Waehrend des Schaltens die Mischung von vorher halten.
+    if (schaltet) {
+      if (store.schaltMix === undefined) store.schaltMix = store.letzterMix !== undefined ? store.letzterMix : powerMix;
+      powerMix = store.schaltMix;
+    } else {
+      store.schaltMix = undefined;
+      store.letzterMix = powerMix;
+    }
+    const tonZeit = schaltet ? Math.max(0.04, ((motor.config && motor.config.shiftMs) || 120) / 3000) : 0.04;
     nodes.forEach((n, i) => {
       // A loop generated at baseRpm played back at rpm/baseRpm IS that engine speed.
       // Clamped because resampling much beyond an octave stops sounding like an engine —
       // past that the neighbouring loop has taken over anyway.
       const rate = Math.max(0.5, Math.min(2.0, rpm * scale / n.baseRpm * dop));
-      n.src.playbackRate.setTargetAtTime(rate, t, 0.04);
+      n.src.playbackRate.setTargetAtTime(rate, t, tonZeit);
       n.gain.gain.setTargetAtTime(w[i] * powerMix, t, 0.05);
     });
     if (over) {
       const rate = Math.max(0.5, Math.min(2.0, rpm * scale / over.baseRpm * dop));
-      over.src.playbackRate.setTargetAtTime(rate, t, 0.04);
+      over.src.playbackRate.setTargetAtTime(rate, t, tonZeit);
       over.gain.gain.setTargetAtTime(1 - powerMix, t, 0.05);
     }
     // With a real overrun loop the master no longer has to fake off-throttle by turning
@@ -1742,7 +1834,9 @@
     // v0.9.61 (D8): eine Stimme darf leiser sein als die Fahrerauto-Stimme (Ghosts: 0.6).
     if (store.laut) vol *= store.laut;
     if (motor.state.onLimiter) vol *= 0.8 + 0.2 * Math.sign(Math.sin(Date.now() / 18));
-    store.master.gain.setTargetAtTime(silent ? 0 : vol, t, 0.05);
+    // v1.2.5: die Zuendunterbrechung - kurz und hart hinein, weich wieder heraus.
+    if (schaltet) vol *= SCHALT_EINBRUCH;
+    store.master.gain.setTargetAtTime(silent ? 0 : vol, t, schaltet ? 0.015 : 0.05);
   }
 
   // ---- Der Takt der zweiten Stimme ---------------------------------------------------
@@ -2363,6 +2457,7 @@
   // 90 ms, leise). Lautstaerke am Regler "Knaller & Schalten".
   const SCHALT_SCHLAG = { metallHz: 1600, metallMs: 18, stossVon: 95, stossBis: 45, stossMs: 70,
     laut: 0.16, blipVon: 180, blipBis: 320, blipMs: 90, blipLaut: 0.05 };
+  const SCHALT_METALL_NEU = 0.15;
   function xSchaltSchlag(richtung, pan, kv) {
     if (!audioCtx || !extrasOn || !soundEnabled || !(kv > 0)) return null;
     const S = SCHALT_SCHLAG, t = audioCtx.currentTime + 0.005;
@@ -2375,7 +2470,8 @@
     const bp = audioCtx.createBiquadFilter();
     bp.type = 'bandpass'; bp.Q.value = 2.2; bp.frequency.value = runter ? S.metallHz * 0.75 : S.metallHz;
     const g = audioCtx.createGain();
-    const lautM = S.laut * kv * (runter ? 0.8 : 1);
+    // v1.2.24: der Metallteil ist die helle Haelfte des "Klack" - im neuen Schaltklang nur noch ein Hauch.
+    const lautM = S.laut * kv * (runter ? 0.8 : 1) * (schaltKlangAlt ? 1 : SCHALT_METALL_NEU);
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(lautM, t + 0.002);
     g.gain.exponentialRampToValueAtTime(0.0006, t + S.metallMs / 1000);
@@ -2553,7 +2649,8 @@
     const flanke = st.isShifting && !xs.schaltAn;
     // v1.1.3: auch beim Runterschalten (Gang kleiner als beim letzten Takt) ein Knall, leiser.
     const runter = flanke && xs.letzterGang !== undefined && (st.currentGear || 0) < xs.letzterGang;
-    const schaltKnall = (flanke && load > 0.45) ? (0.13 + 0.1 * knallStark) * knallVolume
+    // v1.2.24: im neuen Schaltklang knallt das Runterschalten so tief wie das Hochschalten unter Last.
+    const schaltKnall = (flanke && (load > 0.45 || (runter && !schaltKlangAlt))) ? (0.13 + 0.1 * knallStark) * knallVolume
       : runter ? (0.07 + 0.06 * knallStark) * knallVolume : 0;
     xs.schaltAn = !!st.isShifting;
     xs.letzterGang = st.currentGear || 0;
