@@ -1802,7 +1802,8 @@
       const merk = {};
       const kaesten = { lap: 'setting-announce', damage: 'setting-announce-damage',
                         fuel: 'setting-announce-fuel', tyre: 'setting-announce-tyre',
-                        rain: 'setting-announce-rain', battery: 'setting-announce-battery' };
+                        rain: 'setting-announce-rain', battery: 'setting-announce-battery',
+                        batterycrit: 'setting-announce-battery-crit' };
       // Die Kaestchen setzen und hinterher zuruecklegen: der Test darf die Einstellung
       // des Nutzers nicht behalten.
       try {
@@ -1824,12 +1825,14 @@
         // und der naechste Test in der Datei erbte ein bereits 'rain: true' geflanktes
         // Latch - eine Meldung fiel, die zur eigenen Zustandsfolge gar nicht gehoerte.
         const merkLatch = Object.assign({}, ansageLatch);
-        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false });
+        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
         // Das Akku-Latch ist JE AUTO (batteryLatchSet in 80-sound.js) und genauso geteilt -
         // dieselbe Vorsicht wie oben: eine vorangegangene Probe darf kein Auto-Latch
         // hinterlassen.
         const merkBatt = new Set(batteryLatchSet);
         batteryLatchSet.clear();
+        const merkKrit = new Set(batteryKritLatchSet);
+        batteryKritLatchSet.clear();
         // BESTELLT: die Aufnahme hat jetzt IMMER Vorrang vor der Live-Stimme (ansage()),
         // nicht nur ohne speechSynthesis. Diese Probe will aber ausdruecklich den
         // Live-Pfad beobachten (ueber die Attrappe unten) - ist der Browser, in dem der
@@ -1855,6 +1858,8 @@
           Object.assign(ansageLatch, merkLatch);
           batteryLatchSet.clear();
           merkBatt.forEach((c) => batteryLatchSet.add(c));
+          batteryKritLatchSet.clear();
+          merkKrit.forEach((c) => batteryKritLatchSet.add(c));
           Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
           Object.assign(voiceBuffers, echtBuffers);
         }
@@ -1878,7 +1883,8 @@
     ansagenFunkProbe(schritte) {
       const kaesten = { lap: 'setting-announce', damage: 'setting-announce-damage',
                         fuel: 'setting-announce-fuel', tyre: 'setting-announce-tyre',
-                        rain: 'setting-announce-rain', battery: 'setting-announce-battery' };
+                        rain: 'setting-announce-rain', battery: 'setting-announce-battery',
+                        batterycrit: 'setting-announce-battery-crit' };
       const merk = {};
       try {
         Object.keys(kaesten).forEach((art) => {
@@ -1902,9 +1908,11 @@
         // Zustand, eine vorangegangene Probe kann eine Flanke hinterlassen haben, die
         // zu DIESER Zustandsfolge nicht gehoert.
         const merkLatch = Object.assign({}, ansageLatch);
-        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false });
+        Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
         const merkBatt = new Set(batteryLatchSet);
         batteryLatchSet.clear();
+        const merkKrit = new Set(batteryKritLatchSet);
+        batteryKritLatchSet.clear();
         try {
           delete window.speechSynthesis;
           const folge = schritte.map((w) => ({ w, fiel: ansagenPruefen(w) }));
@@ -1920,6 +1928,8 @@
           Object.assign(ansageLatch, merkLatch);
           batteryLatchSet.clear();
           merkBatt.forEach((c) => batteryLatchSet.add(c));
+          batteryKritLatchSet.clear();
+          merkKrit.forEach((c) => batteryKritLatchSet.add(c));
         }
       } finally {
         Object.keys(merk).forEach((art) => {
@@ -1948,7 +1958,7 @@
       playFx = (puffer) => { abgespielt.push(puffer && puffer.markiert); return true; };
       const gesagt = [];
       const merkLatch = Object.assign({}, ansageLatch);
-      Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false });
+      Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
       try {
         Object.defineProperty(window, 'speechSynthesis', {
           configurable: true,
