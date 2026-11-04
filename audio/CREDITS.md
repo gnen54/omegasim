@@ -531,3 +531,33 @@ oben). Die bisherigen `shift_up.ogg` / `shift_down.ogg` bleiben für den Schalte
 
 Aus einer eigenen Aufnahme des Autors (Video eines Ford Mustang GT3, nicht Teil des Repos,
 `photos/` ist ausgeschlossen) geschnitten. Lizenz wie OmegaSim (MIT).
+
+## Tutorial-Stimme (v1.3.15, erweitert v1.3.31)
+
+29 Sprachclips (`tutorial_*_de.ogg`, nur Deutsch; seit v1.3.31 auch Rolle, Bahn/Boden, Licht, Regen, Regenreifen, zweiter Stopp), Manifest mit Datei, Dauer und Wortlaut:
+`audio/tutorial.json`. Erzeugung: `tools/voice_tutorial.py` (Piper, danach ffmpeg: Stille
+abschneiden, Hochpass 70 Hz, Lautheit auf -16 LUFS, Ogg Vorbis). Kein Funkfilter.
+Piper bekommt je Clip einen eigenen Sprechtext mit Lautschreibung fuer englische Woerter
+(Einfuehrung statt Tutorial, Aepp, Ahkehd, Omega-ssimm, Mass-taeng, Kontroller, Mannschaft),
+der Schirm zeigt die normale Schreibung. Seit der Nachbesserung zu 1.3.24 laeuft Piper mit
+UTF-8-Eingabe; vorher wurden die Umlaute unter Windows als Zeichensalat gesprochen.
+
+* **Software:** piper-tts 1.8.0 (https://github.com/OHF-voice/piper1-gpl, GPL-3.0). Die Lizenz
+  des Programms erstreckt sich nicht auf die damit erzeugten Aufnahmen.
+* **Stimme:** `de_DE-kerstin-low` von https://huggingface.co/rhasspy/piper-voices (Modell MIT),
+  Datensatz "Kerstin", CC0. Das Modell ist nicht im Repository, nur die erzeugten Clips.
+
+Englisch und Spanisch haben keine eigenen Aufnahmen: dort zeigt die App den uebersetzten Text
+und spricht ihn, wenn vorhanden, mit der Sprachausgabe des Geraets (speechSynthesis).
+Die Nennung "Ford Mustang" bezeichnet nur den gewaehlten Motorklang; keine Beteiligung oder
+Unterstuetzung des Herstellers.
+
+## Erweiterte Rennereignis-Ansagen
+
+`rennereignis_*.ogg` werden lokal mit `tools/voice_rennereignisse.py` erzeugt:
+Piper und die bereits fuer `voice_zahlen.py` verwendeten Modelle
+`de_DE-thorsten-medium` / `en_US-ljspeech-medium`. Herkunft und Modellkarten
+wie im bestehenden Abschnitt zu den Zahlenclips. Funkfilter ohne Knacken
+aus `voice_zahlen.py`; keine Nutzerstimme und kein Onlinedienst.
+116 neue Satz-/Zahlbausteine; die bestehenden Zahlen- und Fahrzeugclips
+bleiben unveraendert. Die erzeugten Sprachdateien gehoeren in den PR.
