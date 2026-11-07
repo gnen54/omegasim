@@ -1,0 +1,135 @@
+{
+ "name": "VW Käfer (Gnen54)",
+ "kennung": "kaefer",
+ "quelle": "Eigene Konstruktion von Gnen54 (OmegaSim CAD), Karosserie für das Carrera-HYBRID-Porsche-Chassis 1:50, ×50 auf Originalgröße",
+ "lizenz": "CC BY 4.0 (Gnen54, OmegaSim CAD)",
+ "koordinaten": "m; +x links, +y oben, +z vorn",
+ "ecken": 18811,
+ "indizes": 112290,
+ "indexAb": 601952,
+ "schritt": 32,
+ "teile": [
+  {
+   "name": "Karosserie oben",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "kaefer_schwarz.png",
+   "ecke0": 0,
+   "ecken": 5986,
+   "index0": 0,
+   "indizes": 36000
+  },
+  {
+   "name": "Karosserie unten",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "kaefer_schwarz.png",
+   "ecke0": 5986,
+   "ecken": 5998,
+   "index0": 36000,
+   "indizes": 36000
+  },
+  {
+   "name": "Streifen oben",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "kaefer_gelb.png",
+   "ecke0": 11984,
+   "ecken": 1260,
+   "index0": 72000,
+   "indizes": 7500
+  },
+  {
+   "name": "Streifen unten",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "kaefer_gelb.png",
+   "ecke0": 13244,
+   "ecken": 1246,
+   "index0": 79500,
+   "indizes": 7500
+  },
+  {
+   "name": "Unterboden",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "kaefer_unterboden.png",
+   "ecke0": 14490,
+   "ecken": 2694,
+   "index0": 87000,
+   "indizes": 16320
+  },
+  {
+   "name": "Rad",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "kaefer_rad.png",
+   "ecke0": 17184,
+   "ecken": 1627,
+   "index0": 103320,
+   "indizes": 8970
+  }
+ ],
+ "schatten": "shadow.png",
+ "lichter": {
+  "brems": [],
+  "rueck": [],
+  "front": []
+ },
+ "physik": {
+  "masse": 870.0,
+  "schwerpunktHoehe": 0.5,
+  "radstand": 2.511,
+  "a": 1.5066,
+  "b": 1.0044,
+  "vorderachse": 1.3413,
+  "hinterachse": -1.1698,
+  "laenge": 4.028,
+  "breite": 1.876,
+  "hoehe": 1.453,
+  "massenVerteilung": 0.8,
+  "lenkGrad": 30.0,
+  "bremsVorn": 0.6,
+  "cx": 0.48,
+  "stirnflaeche": 1.8,
+  "auftriebVorn": 0.3,
+  "auftriebHinten": 0.3,
+  "fluegelVorn": 0.0,
+  "fluegelHinten": 0.0,
+  "leerlauf": 900.0,
+  "begrenzer": 4500.0,
+  "reifen": {
+   "vorn": {
+    "radius": 0.3075,
+    "breite": 0.27,
+    "spur": 1.5,
+    "bodenfreiheit": 0.1,
+    "mu": 1.1
+   },
+   "hinten": {
+    "radius": 0.3503,
+    "breite": 0.378,
+    "spur": 1.45,
+    "bodenfreiheit": 0.1,
+    "mu": 1.1
+   }
+  },
+  "feder": {
+   "vorn": {
+    "k": 30000.0,
+    "druck": 3000.0,
+    "zug": 6000.0,
+    "weg": 0.12,
+    "stab": 0.0
+   },
+   "hinten": {
+    "k": 32000.0,
+    "druck": 3200.0,
+    "zug": 6400.0,
+    "weg": 0.12,
+    "stab": 0.0
+   }
+  },
+  "gefedert": 783.0
+ }
+}
