@@ -10,7 +10,7 @@
  "schritt": 32,
  "teile": [
   {
-   "name": "Karosserie oben",
+   "name": "Front",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "kaefer_schwarz.png",
@@ -20,17 +20,17 @@
    "indizes": 36000
   },
   {
-   "name": "Karosserie unten",
+   "name": "Heck",
    "rolle": "karosserie",
    "gruppe": "auto",
-   "tex": "kaefer_schwarz.png",
+   "tex": "kaefer_gelb.png",
    "ecke0": 5986,
    "ecken": 5998,
    "index0": 36000,
    "indizes": 36000
   },
   {
-   "name": "Streifen oben",
+   "name": "Streifen vorn",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "kaefer_gelb.png",
@@ -40,10 +40,10 @@
    "indizes": 7500
   },
   {
-   "name": "Streifen unten",
+   "name": "Streifen hinten",
    "rolle": "karosserie",
    "gruppe": "auto",
-   "tex": "kaefer_gelb.png",
+   "tex": "kaefer_schwarz.png",
    "ecke0": 13244,
    "ecken": 1246,
    "index0": 79500,
