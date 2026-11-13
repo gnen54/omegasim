@@ -4,9 +4,9 @@
  "quelle": "Eigene Konstruktion von Gnen54 (OmegaSim CAD), Karosserie für das Carrera-HYBRID-Porsche-Chassis 1:50, ×50 auf Originalgröße; getunt: 1303 RS mit Porsche-Boxster-Motor (2,5 l Boxer-6), Fahrdaten geschätzt",
  "lizenz": "CC BY 4.0 (Gnen54, OmegaSim CAD)",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 50717,
- "indizes": 182382,
- "indexAb": 1622944,
+ "ecken": 56875,
+ "indizes": 219282,
+ "indexAb": 1820000,
  "schritt": 32,
  "teile": [
   {
@@ -128,6 +128,16 @@
    "ecken": 5542,
    "index0": 167382,
    "indizes": 15000
+  },
+  {
+   "name": "Scheinwerfer",
+   "rolle": "scheinwerfer",
+   "gruppe": "auto",
+   "tex": "kaefer_reflektor.png",
+   "ecke0": 50717,
+   "ecken": 6158,
+   "index0": 182382,
+   "indizes": 36900
   }
  ],
  "schatten": "shadow.png",
