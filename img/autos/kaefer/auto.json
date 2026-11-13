@@ -1,7 +1,7 @@
 {
- "name": "VW Käfer (Gnen54)",
+ "name": "VW Käfer 1303 RS mit Boxster-Motor (Gnen54)",
  "kennung": "kaefer",
- "quelle": "Eigene Konstruktion von Gnen54 (OmegaSim CAD), Karosserie für das Carrera-HYBRID-Porsche-Chassis 1:50, ×50 auf Originalgröße",
+ "quelle": "Eigene Konstruktion von Gnen54 (OmegaSim CAD), Karosserie für das Carrera-HYBRID-Porsche-Chassis 1:50, ×50 auf Originalgröße; getunt: 1303 RS mit Porsche-Boxster-Motor (2,5 l Boxer-6), Fahrdaten geschätzt",
  "lizenz": "CC BY 4.0 (Gnen54, OmegaSim CAD)",
  "koordinaten": "m; +x links, +y oben, +z vorn",
  "ecken": 50717,
@@ -176,11 +176,11 @@
   ]
  },
  "physik": {
-  "masse": 870.0,
-  "schwerpunktHoehe": 0.5,
+  "masse": 950.0,
+  "schwerpunktHoehe": 0.44,
   "radstand": 2.515,
-  "a": 1.509,
-  "b": 1.006,
+  "a": 1.5593,
+  "b": 0.9557,
   "vorderachse": 1.3415,
   "hinterachse": -1.1735,
   "laenge": 4.014,
@@ -188,47 +188,47 @@
   "hoehe": 1.482,
   "massenVerteilung": 0.8,
   "lenkGrad": 30.0,
-  "bremsVorn": 0.6,
-  "cx": 0.48,
+  "bremsVorn": 0.62,
+  "cx": 0.46,
   "stirnflaeche": 1.8,
   "auftriebVorn": 0.3,
   "auftriebHinten": 0.3,
   "fluegelVorn": 0.0,
   "fluegelHinten": 0.0,
-  "leerlauf": 900.0,
-  "begrenzer": 4500.0,
+  "leerlauf": 850.0,
+  "begrenzer": 6900.0,
   "reifen": {
    "vorn": {
     "radius": 0.34,
     "breite": 0.335,
     "spur": 1.435,
     "bodenfreiheit": 0.1,
-    "mu": 1.1
+    "mu": 1.2
    },
    "hinten": {
     "radius": 0.35,
     "breite": 0.395,
     "spur": 1.435,
     "bodenfreiheit": 0.1,
-    "mu": 1.1
+    "mu": 1.2
    }
   },
   "feder": {
    "vorn": {
-    "k": 30000.0,
-    "druck": 3000.0,
-    "zug": 6000.0,
-    "weg": 0.12,
-    "stab": 0.0
+    "k": 42000.0,
+    "druck": 4200.0,
+    "zug": 8400.0,
+    "weg": 0.09,
+    "stab": 6000.0
    },
    "hinten": {
-    "k": 32000.0,
-    "druck": 3200.0,
-    "zug": 6400.0,
-    "weg": 0.12,
-    "stab": 0.0
+    "k": 48000.0,
+    "druck": 4800.0,
+    "zug": 9600.0,
+    "weg": 0.09,
+    "stab": 4000.0
    }
   },
-  "gefedert": 783.0
+  "gefedert": 860.0
  }
 }
