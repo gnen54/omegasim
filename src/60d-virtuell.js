@@ -156,6 +156,11 @@
     { id: 'fischgraet', name: 'Fischgrät', art: 'fischgraet', breiteCm: 7, laengeCm: 35, spalten: 16, zeilen: 2,
       ton: [[190, 143, 94], [176, 128, 82], [201, 157, 106], [163, 118, 74], [184, 136, 86]], maser: [122, 82, 48],
       kontrast: 0.42, ringCm: 0.8, poren: 1.0, ast: 0.08, glanz: 0.28 },
+    // BESTELLT (Gnen54, 14.11.2026): ein neutraler Boden ohne Dielen, "nicht komplett eintoenig, so
+    // ein bisschen wie marmoriert", nicht schwarz (die Fahrbahn ist schwarz). Eine nahtlos kachelbare
+    // Flaeche 120 x 60 cm (Atlas 2048 x 1024), ohne Fugen und ohne Spiegeln/Toenen je Stueck.
+    { id: 'stein', name: 'Stein grau marmoriert', art: 'flaeche', breiteCm: 60, laengeCm: 120, spalten: 1, zeilen: 1,
+      ton: [[124, 124, 127]], hell: [152, 152, 155], ader: [82, 82, 87], glanz: 0.34 },
   ];
   const VF_ATLAS_B = 2048, VF_ATLAS_H = 1024;   // Bodenatlas (8 MB, mit Mipmaps 10,7 MB)
   const VF_BAHN_TEX = 1024, VF_BAHN_SPALTE = 256;  // Fahrbahn: 4 Teile nebeneinander (3 gebraucht, 1 Start/Ziel)
@@ -214,6 +219,43 @@
   // Ringe fast gerade), Fasern je Spalte, Poren als kurze dunkle Striche, Flecken, selten ein Ast.
   // Ringsum eine dunkle Fuge (1-2 px) mit heller Fase daneben: im Atlas, damit sie mit den Mipmaps
   // weich wird statt in der Ferne zu flimmern. Alpha = Glanz (0 in der Fuge).
+  // Marmorierter Stein, NAHTLOS kachelbar: periodisches Wertrauschen (Gitter modulo Zellenzahl) in
+  // mehreren Oktaven, darauf Adern als |sin| mit ganzzahliger Frequenz je Kachel (auch periodisch),
+  // verzerrt vom Rauschen. Zeilen y0..y1 (in Schritten, damit die Garage im Leerlauf rechnen kann).
+  function vfSteinRauschen(u, v, n, m, s) {
+    const x = u * n, y = v * m, i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j;
+    const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+    const g = (a, b) => vfHash(((a % n) + n) % n + s, ((b % m) + m) % m + 7 * s);
+    const a0 = g(i, j), a1 = g(i + 1, j), b0 = g(i, j + 1), b1 = g(i + 1, j + 1);
+    return (a0 + (a1 - a0) * sx + (b0 - a0 + (b1 - b0 - a1 + a0) * sx) * sy) * 2 - 1;
+  }
+  function vfSteinTurb(u, v) {
+    let t = 0, a = 0.5;
+    for (let o = 0, n = 4, m = 2; o < 5; o++, n *= 2, m *= 2, a *= 0.5) t += a * vfSteinRauschen(u, v, n, m, 101 * (o + 1));
+    return t;
+  }
+  function vfSteinZeilen(d, AW, AH, y0, y1, P) {
+    const [t0, t1, t2] = P.ton[0], [h0, h1, h2] = P.hell, [a0, a1, a2] = P.ader;
+    for (let y = y0; y < y1; y++) {
+      const v = y / AH;
+      for (let x = 0; x < AW; x++) {
+        const u = x / AW, tb = vfSteinTurb(u, v);
+        // Grobe Wolken (hell/dunkel) und zwei Adernscharen (Frequenzen ganzzahlig je Kachel).
+        const wolke = 0.5 + 0.6 * vfSteinRauschen(u, v, 3, 2, 909) + 0.35 * tb;
+        const a1s = Math.abs(Math.sin(Math.PI * (3 * u + 2 * v) + 5.5 * tb));
+        const a2s = Math.abs(Math.sin(Math.PI * (5 * u - 3 * v) + 7.0 * vfSteinTurb(v, u)));
+        const ader = Math.pow(1 - a1s, 10) * 0.6 + Math.pow(1 - a2s, 14) * 0.35;
+        const hw = Math.max(0, Math.min(1, wolke));
+        let r = t0 + (h0 - t0) * hw, g = t1 + (h1 - t1) * hw, b = t2 + (h2 - t2) * hw;
+        const k = Math.min(1, ader);
+        r += (a0 - r) * k; g += (a1 - g) * k; b += (a2 - b) * k;
+        const korn = 1 + (vfHash(x, y) - 0.5) * 0.05;
+        const i = (y * AW + x) * 4;
+        d[i] = r * korn; d[i + 1] = g * korn; d[i + 2] = b * korn;
+        d[i + 3] = P.glanz * (0.85 + 0.3 * hw) * 255;
+      }
+    }
+  }
   function vfHolzStueck(d, AW, x0, y0, w, h, P, rnd) {
     const ton = P.ton[Math.floor(rnd() * P.ton.length)], j = 1 + (rnd() - 0.5) * 0.08;
     const t0 = ton[0] * j, t1 = ton[1] * j, t2 = ton[2] * j, m0 = P.maser[0], m1 = P.maser[1], m2 = P.maser[2];
@@ -290,9 +332,13 @@
   }
   function* vfBodenBau(P) {
     const AW = VF_ATLAS_B, AH = VF_ATLAS_H, d = new Uint8ClampedArray(AW * AH * 4);
-    const rnd = vfZufall(P.id === 'eiche' ? 1911 : P.id === 'grau' ? 2701 : 3307);
+    const rnd = vfZufall(P.id === 'eiche' ? 1911 : P.id === 'grau' ? 2701 : P.id === 'stein' ? 4409 : 3307);
     const w = AW / P.spalten, h = AH / P.zeilen, stuecke = [];
-    for (let r = 0; r < P.zeilen; r++) {
+    if (P.art === 'flaeche') {
+      for (let y = 0; y < AH; y += 64) { vfSteinZeilen(d, AW, AH, y, Math.min(AH, y + 64), P); yield; }
+      stuecke.push([0, 0, 1, 1]);
+    }
+    for (let r = 0; P.art !== 'flaeche' && r < P.zeilen; r++) {
       for (let s = 0; s < P.spalten; s++) {
         vfHolzStueck(d, AW, s * w, r * h, w, h, P, rnd);
         stuecke.push([(s * w + 0.5) / AW, (r * h + 0.5) / AH, ((s + 1) * w - 0.5) / AW, ((r + 1) * h - 0.5) / AH]);
@@ -680,7 +726,15 @@
     const B = art.breiteCm * cm, L = art.laengeCm * cm, rnd = vfZufall(9001 + pts.length);
     const reihen = [];
     let stuecke = 0;
-    if (art.art === 'fischgraet') {
+    if (art.art === 'flaeche') {
+      // Nahtlose Kacheln im Raster, gleiche Lage und Farbe (sonst saehe man die Kanten).
+      const c = [VF_BODEN_HELL, VF_BODEN_HELL, VF_BODEN_HELL];
+      for (let z = z0; z < z1; z += B) {
+        for (let x = x0; x < x1; x += L) {
+          vfViereck(a, [x, y, z, 0, 0], [x + L, y, z, 1, 0], [x + L, y, z + B, 1, 1], [x, y, z + B, 0, 1], c); stuecke++;
+        }
+      }
+    } else if (art.art === 'fischgraet') {
       const r = Math.SQRT1_2, d1 = [r, r], d2 = [-r, r];
       const W = (A, Bb) => [A * d1[0] + Bb * d2[0], A * d1[1] + Bb * d2[1]];
       // Rahmen-Koordinaten der Bodenecken: A = (x + z) r, B = (z - x) r
