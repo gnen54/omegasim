@@ -4,9 +4,9 @@
  "quelle": "Eigenbau von Gnen54 auf Basis der Modiplay-MP1-Karosserie, 1:50 für das Carrera-HYBRID-Porsche-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 97754,
- "indizes": 251589,
- "indexAb": 3128128,
+ "ecken": 104059,
+ "indizes": 256014,
+ "indexAb": 3329888,
  "schritt": 32,
  "teile": [
   {
@@ -25,18 +25,18 @@
    "gruppe": "auto",
    "tex": "spider_schwarz.png",
    "ecke0": 27913,
-   "ecken": 14646,
+   "ecken": 20951,
    "index0": 68832,
-   "indizes": 37224
+   "indizes": 41649
   },
   {
    "name": "Chassis",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "spider_schwarz.png",
-   "ecke0": 42559,
+   "ecke0": 48864,
    "ecken": 4634,
-   "index0": 106056,
+   "index0": 110481,
    "indizes": 13338
   },
   {
@@ -44,9 +44,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "spider_schwarz.png",
-   "ecke0": 47193,
+   "ecke0": 53498,
    "ecken": 4368,
-   "index0": 119394,
+   "index0": 123819,
    "indizes": 20520
   },
   {
@@ -54,9 +54,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "spider_schwarz.png",
-   "ecke0": 51561,
+   "ecke0": 57866,
    "ecken": 14041,
-   "index0": 139914,
+   "index0": 144339,
    "indizes": 42663
   },
   {
@@ -64,9 +64,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "spider_cockpit.png",
-   "ecke0": 65602,
+   "ecke0": 71907,
    "ecken": 13325,
-   "index0": 182577,
+   "index0": 187002,
    "indizes": 30000
   },
   {
@@ -74,9 +74,9 @@
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "spider_reflektor.png",
-   "ecke0": 78927,
+   "ecke0": 85232,
    "ecken": 4718,
-   "index0": 212577,
+   "index0": 217002,
    "indizes": 9120
   },
   {
@@ -84,9 +84,9 @@
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "spider_scheinwerfer.png",
-   "ecke0": 83645,
+   "ecke0": 89950,
    "ecken": 954,
-   "index0": 221697,
+   "index0": 226122,
    "indizes": 1680
   },
   {
@@ -94,9 +94,9 @@
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "spider_ruecklicht.png",
-   "ecke0": 84599,
+   "ecke0": 90904,
    "ecken": 1003,
-   "index0": 223377,
+   "index0": 227802,
    "indizes": 4776
   },
   {
@@ -104,9 +104,9 @@
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "spider_ruecklichtglas.png",
-   "ecke0": 85602,
+   "ecke0": 91907,
    "ecken": 1014,
-   "index0": 228153,
+   "index0": 232578,
    "indizes": 4776
   },
   {
@@ -114,9 +114,9 @@
    "rolle": "rad",
    "gruppe": "rad",
    "tex": "spider_reifen.png",
-   "ecke0": 86616,
+   "ecke0": 92921,
    "ecken": 4600,
-   "index0": 232929,
+   "index0": 237354,
    "indizes": 7500
   },
   {
@@ -124,9 +124,9 @@
    "rolle": "rad",
    "gruppe": "rad",
    "tex": "spider_felge.png",
-   "ecke0": 91216,
+   "ecke0": 97521,
    "ecken": 6538,
-   "index0": 240429,
+   "index0": 244854,
    "indizes": 11160
   }
  ],
