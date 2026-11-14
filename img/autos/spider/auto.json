@@ -175,6 +175,10 @@
    ]
   ]
  },
+ "haube": {
+  "vor": 0.75,
+  "hoch": 1.12
+ },
  "physik": {
   "masse": 900.0,
   "schwerpunktHoehe": 0.28,
