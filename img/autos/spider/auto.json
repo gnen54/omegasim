@@ -4,9 +4,9 @@
  "quelle": "Eigenbau von Gnen54 auf Basis der Modiplay-MP1-Karosserie, 1:50 für das Carrera-HYBRID-Porsche-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 104068,
- "indizes": 269589,
- "indexAb": 3330176,
+ "ecken": 97754,
+ "indizes": 251589,
+ "indexAb": 3128128,
  "schritt": 32,
  "teile": [
   {
@@ -70,23 +70,13 @@
    "indizes": 30000
   },
   {
-   "name": "Scheinwerfergehäuse",
-   "rolle": "karosserie",
-   "gruppe": "auto",
-   "tex": "spider_schwarz.png",
-   "ecke0": 78927,
-   "ecken": 6314,
-   "index0": 212577,
-   "indizes": 18000
-  },
-  {
    "name": "Scheinwerfer",
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "spider_reflektor.png",
-   "ecke0": 85241,
+   "ecke0": 78927,
    "ecken": 4718,
-   "index0": 230577,
+   "index0": 212577,
    "indizes": 9120
   },
   {
@@ -94,9 +84,9 @@
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "spider_scheinwerfer.png",
-   "ecke0": 89959,
+   "ecke0": 83645,
    "ecken": 954,
-   "index0": 239697,
+   "index0": 221697,
    "indizes": 1680
   },
   {
@@ -104,9 +94,9 @@
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "spider_ruecklicht.png",
-   "ecke0": 90913,
+   "ecke0": 84599,
    "ecken": 1003,
-   "index0": 241377,
+   "index0": 223377,
    "indizes": 4776
   },
   {
@@ -114,9 +104,9 @@
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "spider_ruecklichtglas.png",
-   "ecke0": 91916,
+   "ecke0": 85602,
    "ecken": 1014,
-   "index0": 246153,
+   "index0": 228153,
    "indizes": 4776
   },
   {
@@ -124,9 +114,9 @@
    "rolle": "rad",
    "gruppe": "rad",
    "tex": "spider_reifen.png",
-   "ecke0": 92930,
+   "ecke0": 86616,
    "ecken": 4600,
-   "index0": 250929,
+   "index0": 232929,
    "indizes": 7500
   },
   {
@@ -134,9 +124,9 @@
    "rolle": "rad",
    "gruppe": "rad",
    "tex": "spider_felge.png",
-   "ecke0": 97530,
+   "ecke0": 91216,
    "ecken": 6538,
-   "index0": 258429,
+   "index0": 240429,
    "indizes": 11160
   }
  ],
