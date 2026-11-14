@@ -3,5 +3,5 @@ Die Freigabe von Sturmkind für eine öffentliche Verwendung der Karosserieform 
 dieses Modell ist nur für die Testversion gedacht, nicht für einen öffentlichen Pull-Request.
 Eigene Teile (Anbauteile, Chassis, Farben, Fahrzeugdaten): Gnen54, CC BY 4.0.
 Umgewandelt für die virtuelle Fahrt: ×50 auf Originalgröße, reduziert. Chassis vom VW Käfer (Carrera-HYBRID-Chassis).
-Variante: ModiplayBodyMod-2, ShorttailKomplett, Frontspoiler, Seitenschweller, Lufthutzen, Diffusor (Lage geschätzt).
+Variante: ModiplayBodyMod-2, ShorttailKomplett, Frontspoiler, Seitenschweller, Lufthutzen, Diffusor (nach Bild eingepasst).
 Fahrverhalten nach Lister Storm LMP (geschätzt), Motorklang listerstorm.
