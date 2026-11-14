@@ -43816,17 +43816,31 @@
   // ---- Starten und Beenden ------------------------------------------------------------------
   // opts.tiles: diese Strecke statt der des Editors (die Studie faehrt Homington), opts.studie: die
   // Fahrt gehoert der Studie (beim Beenden nicht in die Garage). true = gestartet.
+  // Hinweis beim Start: der HUD-Toast liegt im Cockpit und ist in der Garage unsichtbar (Gnen54,
+  // 14.11.: "in der Android App ... kein Hinweis, keine Reaktion"). Dort ein eigener Hinweis unten.
+  function vfStartHinweis(msg) {
+    showHudToast(msg);
+    const el = $('hud-toast');
+    if (el && el.offsetParent) return;
+    const d = document.createElement('div');
+    d.setAttribute('role', 'status');
+    d.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99999;max-width:90vw;'
+      + 'background:#b8860b;color:#100c02;padding:10px 16px;border-radius:6px;font-weight:600;text-align:center';
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 4000);
+  }
   function virtuellStarten(opts) {
     opts = opts || {};
     if (VF.aktiv) return false;
     vfHandlingCache = null;   // einmal frisch lesen (z. B. in einem anderen Tab geaendert)
-    if (!physicsEnabled) { showHudToast(t('Virtuell braucht ein Fahrgefühl mit Physik (nicht RC)')); return false; }
+    if (!physicsEnabled) { vfStartHinweis(t('Virtuell braucht ein Fahrgefühl mit Physik (nicht RC)')); return false; }
     // Editor-Strecke und gemerkte Rollen gehoeren dem Fahrer: die Ersatzstrecke (Balkonia) und die Rolle
     // des virtuellen Autos werden beim Beenden wieder zurueckgenommen.
     VF.tilesVorher = currentTrackTiles;
     try { VF.editorVorher = localStorage.getItem(EDITOR_STRECKE_STORE); } catch (e) { VF.editorVorher = undefined; }
     const tiles = opts.tiles && opts.tiles.length >= 3 ? opts.tiles : vfTilesWaehlen();
-    if (!tiles) { showHudToast(t('Erst eine Strecke bauen')); return false; }
+    if (!tiles) { vfStartHinweis(t('Erst eine Strecke bauen')); return false; }
     VF.studie = !!opts.studie;
     const schicht = document.createElement('div');
     schicht.className = 'vf-schicht';
