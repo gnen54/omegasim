@@ -1,0 +1,244 @@
+{
+ "name": "Spider NG1 (Gnen54)",
+ "kennung": "spider",
+ "quelle": "Eigenbau von Gnen54 auf Basis der Modiplay-MP1-Karosserie, 1:50 für das Carrera-HYBRID-Porsche-Chassis, ×50 auf Originalgröße",
+ "lizenz": "siehe LIZENZ.txt",
+ "koordinaten": "m; +x links, +y oben, +z vorn",
+ "ecken": 104068,
+ "indizes": 269589,
+ "indexAb": 3330176,
+ "schritt": 32,
+ "teile": [
+  {
+   "name": "Karosserie",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_gelb.png",
+   "ecke0": 0,
+   "ecken": 27913,
+   "index0": 0,
+   "indizes": 68832
+  },
+  {
+   "name": "Heck",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_schwarz.png",
+   "ecke0": 27913,
+   "ecken": 14646,
+   "index0": 68832,
+   "indizes": 37224
+  },
+  {
+   "name": "Chassis",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_schwarz.png",
+   "ecke0": 42559,
+   "ecken": 4634,
+   "index0": 106056,
+   "indizes": 13338
+  },
+  {
+   "name": "Frontspoiler",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_schwarz.png",
+   "ecke0": 47193,
+   "ecken": 4368,
+   "index0": 119394,
+   "indizes": 20520
+  },
+  {
+   "name": "Anbauteile",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_schwarz.png",
+   "ecke0": 51561,
+   "ecken": 14041,
+   "index0": 139914,
+   "indizes": 42663
+  },
+  {
+   "name": "Cockpit",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_cockpit.png",
+   "ecke0": 65602,
+   "ecken": 13325,
+   "index0": 182577,
+   "indizes": 30000
+  },
+  {
+   "name": "Scheinwerfergehäuse",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "spider_schwarz.png",
+   "ecke0": 78927,
+   "ecken": 6314,
+   "index0": 212577,
+   "indizes": 18000
+  },
+  {
+   "name": "Scheinwerfer",
+   "rolle": "scheinwerfer",
+   "gruppe": "auto",
+   "tex": "spider_reflektor.png",
+   "ecke0": 85241,
+   "ecken": 4718,
+   "index0": 230577,
+   "indizes": 9120
+  },
+  {
+   "name": "Scheinwerferglas",
+   "rolle": "scheinwerferglas",
+   "gruppe": "auto",
+   "tex": "spider_scheinwerfer.png",
+   "ecke0": 89959,
+   "ecken": 954,
+   "index0": 239697,
+   "indizes": 1680
+  },
+  {
+   "name": "Rücklichter",
+   "rolle": "ruecklicht",
+   "gruppe": "auto",
+   "tex": "spider_ruecklicht.png",
+   "ecke0": 90913,
+   "ecken": 1003,
+   "index0": 241377,
+   "indizes": 4776
+  },
+  {
+   "name": "Rücklichtglas",
+   "rolle": "scheinwerferglas",
+   "gruppe": "auto",
+   "tex": "spider_ruecklichtglas.png",
+   "ecke0": 91916,
+   "ecken": 1014,
+   "index0": 246153,
+   "indizes": 4776
+  },
+  {
+   "name": "Reifen",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "spider_reifen.png",
+   "ecke0": 92930,
+   "ecken": 4600,
+   "index0": 250929,
+   "indizes": 7500
+  },
+  {
+   "name": "Felge",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "spider_felge.png",
+   "ecke0": 97530,
+   "ecken": 6538,
+   "index0": 258429,
+   "indizes": 11160
+  }
+ ],
+ "schatten": "shadow.png",
+ "lichter": {
+  "front": [
+   [
+    0.658,
+    0.513,
+    1.73,
+    0.14
+   ],
+   [
+    -0.658,
+    0.513,
+    1.73,
+    0.14
+   ]
+  ],
+  "rueck": [
+   [
+    0.7,
+    0.588,
+    -2.33,
+    0.12
+   ],
+   [
+    -0.7,
+    0.588,
+    -2.33,
+    0.12
+   ]
+  ],
+  "brems": [
+   [
+    0.7,
+    0.588,
+    -2.33,
+    0.12
+   ],
+   [
+    -0.7,
+    0.588,
+    -2.33,
+    0.12
+   ]
+  ]
+ },
+ "physik": {
+  "masse": 1050.0,
+  "schwerpunktHoehe": 0.4,
+  "radstand": 2.515,
+  "a": 1.4587,
+  "b": 1.0563,
+  "vorderachse": 1.0375,
+  "hinterachse": -1.4775,
+  "laenge": 4.694,
+  "breite": 2.239,
+  "hoehe": 1.186,
+  "massenVerteilung": 0.8,
+  "lenkGrad": 28.0,
+  "bremsVorn": 0.6,
+  "cx": 0.38,
+  "stirnflaeche": 1.7,
+  "auftriebVorn": 0.0,
+  "auftriebHinten": 0.0,
+  "fluegelVorn": 0.4,
+  "fluegelHinten": 0.6,
+  "leerlauf": 900.0,
+  "begrenzer": 7500.0,
+  "reifen": {
+   "vorn": {
+    "radius": 0.325,
+    "breite": 0.28,
+    "spur": 1.62,
+    "bodenfreiheit": 0.1,
+    "mu": 1.3
+   },
+   "hinten": {
+    "radius": 0.35000000000000003,
+    "breite": 0.405,
+    "spur": 1.525,
+    "bodenfreiheit": 0.1,
+    "mu": 1.3
+   }
+  },
+  "feder": {
+   "vorn": {
+    "k": 55000.0,
+    "druck": 5500.0,
+    "zug": 11000.0,
+    "weg": 0.08,
+    "stab": 8000.0
+   },
+   "hinten": {
+    "k": 60000.0,
+    "druck": 6000.0,
+    "zug": 12000.0,
+    "weg": 0.08,
+    "stab": 6000.0
+   }
+  },
+  "gefedert": 950.0
+ }
+}
