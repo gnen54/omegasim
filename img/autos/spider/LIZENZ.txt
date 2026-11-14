@@ -1,4 +1,6 @@
 Spider NG1 – Aufbau von Gnen54 (OmegaSim CAD) auf Basis der Modiplay-MP1-Karosserie (Sturmkind).
+Grundform: MODIplay MP-1 Spider (Sturmkind/MODIplay Racing), 3D-Daten für HYBRID überarbeitet von
+Thomas Strobel (FREAKPALACE Customs); von Sturmkind kostenlos an die Community herausgegeben.
 Die Freigabe von Sturmkind für eine öffentliche Verwendung der Karosserieform steht noch aus –
 dieses Modell ist nur für die Testversion gedacht, nicht für einen öffentlichen Pull-Request.
 Eigene Teile (Anbauteile, Chassis, Farben, Fahrzeugdaten): Gnen54, CC BY 4.0.
