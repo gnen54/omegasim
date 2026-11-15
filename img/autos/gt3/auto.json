@@ -4,9 +4,9 @@
  "quelle": "Karosserie von Vehicle World (Designerin Rivanka), Aufbau und Anbauteile von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 203465,
- "indizes": 1168152,
- "indexAb": 6510880,
+ "ecken": 303743,
+ "indizes": 1503624,
+ "indexAb": 9719776,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -167,33 +167,57 @@
    "indizes": 13338
   },
   {
-   "name": "Reifen",
+   "name": "Reifen vorn",
    "rolle": "rad",
    "gruppe": "rad",
+   "achse": "vorn",
    "tex": "gt3_reifen.png",
    "ecke0": 162343,
-   "ecken": 4600,
+   "ecken": 55692,
    "index0": 968430,
-   "indizes": 7500
+   "indizes": 162927
   },
   {
-   "name": "Felge",
+   "name": "Felge vorn",
    "rolle": "rad",
    "gruppe": "rad",
+   "achse": "vorn",
    "tex": "gt3_felge.png",
-   "ecke0": 166943,
-   "ecken": 6538,
-   "index0": 975930,
-   "indizes": 11160
+   "ecke0": 218035,
+   "ecken": 27782,
+   "index0": 1131357,
+   "indizes": 88998
+  },
+  {
+   "name": "Reifen hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "achse": "hinten",
+   "tex": "gt3_reifen.png",
+   "ecke0": 245817,
+   "ecken": 2708,
+   "index0": 1220355,
+   "indizes": 13044
+  },
+  {
+   "name": "Felge hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "achse": "hinten",
+   "tex": "gt3_felge.png",
+   "ecke0": 248525,
+   "ecken": 25234,
+   "index0": 1233399,
+   "indizes": 89163
   },
   {
    "name": "Rücklichter",
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "gt3_ruecklicht.png",
-   "ecke0": 173481,
+   "ecke0": 273759,
    "ecken": 2984,
-   "index0": 987090,
+   "index0": 1322562,
    "indizes": 18039
   },
   {
@@ -201,9 +225,9 @@
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "gt3_reflektor.png",
-   "ecke0": 176465,
+   "ecke0": 276743,
    "ecken": 8342,
-   "index0": 1005129,
+   "index0": 1340601,
    "indizes": 52065
   },
   {
@@ -211,9 +235,9 @@
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "gt3_scheinwerfer.png",
-   "ecke0": 184807,
+   "ecke0": 285085,
    "ecken": 8342,
-   "index0": 1057194,
+   "index0": 1392666,
    "indizes": 52065
   },
   {
@@ -221,9 +245,9 @@
    "rolle": "glas",
    "gruppe": "auto",
    "tex": "gt3_glas.png",
-   "ecke0": 193149,
+   "ecke0": 293427,
    "ecken": 10316,
-   "index0": 1109259,
+   "index0": 1444731,
    "indizes": 58893
   }
  ],
