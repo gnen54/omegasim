@@ -42773,7 +42773,11 @@
     gl.enableVertexAttribArray(SP.ap);
     gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, M.ibo);
-    for (const t of M.aufbauTeile) gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+    // Die Indizes zaehlen je Teil ab dessen erster Ecke (ecke0) - wie im Farb-Durchgang versetzen.
+    for (const t of M.aufbauTeile) {
+      gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, (t.ecke0 || 0) * 32);
+      gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+    }
     const radTeile = M.radTeile;
     const halbW = d.breite / 2;
     for (let k = 0; k < 4; k++) {
@@ -42785,14 +42789,21 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, M.vbo);
         gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, M.ibo);
-        for (const t of radTeile) gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        for (const t of radTeile) {
+          if (t.achse && t.achse !== ax) continue;
+          gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, (t.ecke0 || 0) * 32);
+          gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        }
       } else if (radModell && radModell.teile.length) {
         const xW = seite * Math.max(r.spur / 2, halbW + 0.12 - 0.5 * r.breite);
         matrix(vfKette(lage, vfT(xW, r.radius, z), dreh, vfRx(raddreh || 0), vfS(seite * r.breite, 2 * r.radius, 2 * r.radius)));
         gl.bindBuffer(gl.ARRAY_BUFFER, radModell.vbo);
         gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, radModell.ibo);
-        for (const t of radModell.teile) gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        for (const t of radModell.teile) {
+          gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, (t.ecke0 || 0) * 32);
+          gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        }
       }
     }
     gl.disableVertexAttribArray(SP.ap);
@@ -43625,7 +43636,8 @@
       const dreh = vfRy(ax === 'vorn' ? -(lenkWinkel || 0) : 0);
       const w = vfKette(lage, vfT(seite * r.spur / 2, r.radius, z), dreh, vfRx(raddreh || 0),
         vfS(seite * r.breite, 2 * r.radius, 2 * r.radius));
-      radTeile.forEach((t) => { setze(w, [1, 1, 1], 0, 1, 0, 1, 0.2, 0); teil(t); });
+      // Teile mit "achse" (vorn/hinten) nur an dieser Achse - eigene Raeder je Achse (GT3).
+      radTeile.forEach((t) => { if (t.achse && t.achse !== ax) return; setze(w, [1, 1, 1], 0, 1, 0, 1, 0.2, 0); teil(t); });
       if (!radTeile.length) {
         // Fallback: die echten Rad-Teile der Vulture V5.R (mit Reifen-/Felgen-Textur).
         const radM = radModell;
