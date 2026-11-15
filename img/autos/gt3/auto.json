@@ -4,9 +4,9 @@
  "quelle": "Karosserie von Vehicle World (Designerin Rivanka), Aufbau und Anbauteile von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 250725,
- "indizes": 1073670,
- "indexAb": 8023200,
+ "ecken": 203465,
+ "indizes": 1168152,
+ "indexAb": 6510880,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -26,32 +26,84 @@
   ],
   "rueck": [
    [
-    0.567,
+    0.458,
     0.754,
-    -2.412,
-    0.12
+    -2.411,
+    0.045
    ],
    [
-    -0.567,
+    0.572,
+    0.752,
+    -2.33,
+    0.045
+   ],
+   [
+    0.688,
+    0.741,
+    -2.202,
+    0.045
+   ],
+   [
+    -0.458,
     0.754,
-    -2.412,
-    0.12
+    -2.411,
+    0.045
+   ],
+   [
+    -0.572,
+    0.752,
+    -2.33,
+    0.045
+   ],
+   [
+    -0.688,
+    0.741,
+    -2.202,
+    0.045
    ]
   ],
   "brems": [
    [
-    0.567,
+    0.458,
     0.754,
-    -2.412,
-    0.12
+    -2.411,
+    0.05
    ],
    [
-    -0.567,
+    0.572,
+    0.752,
+    -2.33,
+    0.05
+   ],
+   [
+    0.688,
+    0.741,
+    -2.202,
+    0.05
+   ],
+   [
+    -0.458,
     0.754,
-    -2.412,
-    0.12
+    -2.411,
+    0.05
+   ],
+   [
+    -0.572,
+    0.752,
+    -2.33,
+    0.05
+   ],
+   [
+    -0.688,
+    0.741,
+    -2.202,
+    0.05
    ]
   ]
+ },
+ "haube": {
+  "vor": 0.6,
+  "hoch": 1.12
  },
  "teile": [
   {
@@ -60,58 +112,58 @@
    "gruppe": "auto",
    "tex": "gt3_weiss.png",
    "ecke0": 0,
-   "ecken": 54916,
+   "ecken": 44261,
    "index0": 0,
-   "indizes": 251499
+   "indizes": 270249
   },
   {
    "name": "Karosserie 2",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_weiss.png",
-   "ecke0": 54916,
-   "ecken": 56947,
-   "index0": 251499,
-   "indizes": 251496
+   "ecke0": 44261,
+   "ecken": 44164,
+   "index0": 270249,
+   "indizes": 270246
   },
   {
    "name": "Rote Lackierung",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_rot.png",
-   "ecke0": 111863,
-   "ecken": 46941,
-   "index0": 502995,
-   "indizes": 217443
+   "ecke0": 88425,
+   "ecken": 38245,
+   "index0": 540495,
+   "indizes": 219669
   },
   {
    "name": "Heckflügel",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_schwarz.png",
-   "ecke0": 158804,
-   "ecken": 21457,
-   "index0": 720438,
-   "indizes": 92172
+   "ecke0": 126670,
+   "ecken": 17101,
+   "index0": 760164,
+   "indizes": 106338
   },
   {
    "name": "Diffusor",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_schwarz.png",
-   "ecke0": 180261,
-   "ecken": 17914,
-   "index0": 812610,
-   "indizes": 70371
+   "ecke0": 143771,
+   "ecken": 13938,
+   "index0": 866502,
+   "indizes": 88590
   },
   {
    "name": "Chassis",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_schwarz.png",
-   "ecke0": 198175,
+   "ecke0": 157709,
    "ecken": 4634,
-   "index0": 882981,
+   "index0": 955092,
    "indizes": 13338
   },
   {
@@ -119,9 +171,9 @@
    "rolle": "rad",
    "gruppe": "rad",
    "tex": "gt3_reifen.png",
-   "ecke0": 202809,
+   "ecke0": 162343,
    "ecken": 4600,
-   "index0": 896319,
+   "index0": 968430,
    "indizes": 7500
   },
   {
@@ -129,9 +181,9 @@
    "rolle": "rad",
    "gruppe": "rad",
    "tex": "gt3_felge.png",
-   "ecke0": 207409,
+   "ecke0": 166943,
    "ecken": 6538,
-   "index0": 903819,
+   "index0": 975930,
    "indizes": 11160
   },
   {
@@ -139,61 +191,61 @@
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "gt3_ruecklicht.png",
-   "ecke0": 213947,
-   "ecken": 3770,
-   "index0": 914979,
-   "indizes": 15498
+   "ecke0": 173481,
+   "ecken": 2984,
+   "index0": 987090,
+   "indizes": 18039
   },
   {
    "name": "Scheinwerfer",
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "gt3_reflektor.png",
-   "ecke0": 217717,
-   "ecken": 11346,
-   "index0": 930477,
-   "indizes": 42150
+   "ecke0": 176465,
+   "ecken": 8342,
+   "index0": 1005129,
+   "indizes": 52065
   },
   {
    "name": "Scheinwerferglas",
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "gt3_scheinwerfer.png",
-   "ecke0": 229063,
-   "ecken": 11346,
-   "index0": 972627,
-   "indizes": 42150
+   "ecke0": 184807,
+   "ecken": 8342,
+   "index0": 1057194,
+   "indizes": 52065
   },
   {
    "name": "Scheiben",
    "rolle": "glas",
    "gruppe": "auto",
    "tex": "gt3_glas.png",
-   "ecke0": 240409,
+   "ecke0": 193149,
    "ecken": 10316,
-   "index0": 1014777,
+   "index0": 1109259,
    "indizes": 58893
   }
  ],
  "physik": {
-  "masse": 1265.0,
+  "masse": 1250.0,
   "schwerpunktHoehe": 0.3,
   "radstand": 2.515,
-  "a": 1.4335,
-  "b": 1.0815,
+  "a": 1.4084,
+  "b": 1.1066,
   "vorderachse": 1.0375,
   "hinterachse": -1.4775,
   "laenge": 4.847,
   "breite": 2.001,
   "hoehe": 1.383,
-  "massenVerteilung": 0.7,
-  "lenkGrad": 45.0,
-  "bremsVorn": 0.5,
-  "cx": 0.42,
+  "massenVerteilung": 0.85,
+  "lenkGrad": 21.0,
+  "bremsVorn": 0.58,
+  "cx": 0.4,
   "stirnflaeche": 2.0,
-  "auftriebVorn": 0.62,
-  "auftriebHinten": 0.64,
-  "fluegelVorn": 0.1,
+  "auftriebVorn": 0.42,
+  "auftriebHinten": 0.46,
+  "fluegelVorn": 0.2,
   "fluegelHinten": 0.45,
   "leerlauf": 2000.0,
   "begrenzer": 8500.0,
@@ -215,20 +267,20 @@
   },
   "feder": {
    "vorn": {
-    "k": 67000.0,
-    "druck": 9980.0,
-    "zug": 7940.0,
-    "weg": 0.15,
-    "stab": 0.0
+    "k": 194444.0,
+    "druck": 17361.0,
+    "zug": 26389.0,
+    "weg": 0.09,
+    "stab": 83333.0
    },
    "hinten": {
-    "k": 71000.0,
-    "druck": 10170.0,
-    "zug": 8700.0,
-    "weg": 0.17,
-    "stab": 0.0
+    "k": 159722.0,
+    "druck": 12500.0,
+    "zug": 23611.0,
+    "weg": 0.09,
+    "stab": 30556.0
    }
   },
-  "gefedert": 1165.0
+  "gefedert": 1150.0
  }
 }
