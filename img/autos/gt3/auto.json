@@ -278,14 +278,14 @@
     "radius": 0.325,
     "breite": 0.28,
     "spur": 1.62,
-    "bodenfreiheit": 0.1,
+    "bodenfreiheit": 0.0,
     "mu": 1.25
    },
    "hinten": {
     "radius": 0.35000000000000003,
     "breite": 0.405,
     "spur": 1.525,
-    "bodenfreiheit": 0.1,
+    "bodenfreiheit": 0.0,
     "mu": 1.25
    }
   },
