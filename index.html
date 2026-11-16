@@ -19263,6 +19263,7 @@
     "Spider NG1: Karosserie MODIplay MP-1 Spider von Sturmkind, 3D-Daten für HYBRID von Thomas Strobel (FREAKPALACE Customs). Freigabe von Sturmkind am 16.11.2026: Verwendung erlaubt, solange die Karosserien nicht kommerziell verkauft werden.": "Spider NG1: MODIplay MP-1 Spider body by Sturmkind, 3D data for HYBRID by Thomas Strobel (FREAKPALACE Customs). Permission from Sturmkind on 16 Nov 2026: use is allowed as long as the bodies are not sold commercially.",
     "VW Caravelle: Karosserie von Vehicle World (Designerin Revantika). Schriftliche Freigabe von Vehicle World, die geänderte Karosserie für das virtuelle Bulli-Projekt an die Carrera-Hybrid-Community weiterzugeben.": "VW Caravelle: body by Vehicle World (designer Revantika). Written permission from Vehicle World to share the modified body with the Carrera Hybrid community for the virtual Bulli project.",
     "Porsche 911 GT3: Karosserie „Porsche 911 GT3R 2019“ von Vehicle World (Designerin Revantika). Bisher mündliche Zustimmung, die schriftliche Anfrage vom 15.11.2026 ist noch offen – deshalb vorerst nur in der Testversion.": "Porsche 911 GT3: “Porsche 911 GT3R 2019” body by Vehicle World (designer Revantika). So far verbal consent; the written request of 15 Nov 2026 is still open – so for now only in the test version.",
+    "Pad-Diagnose (F8 schließt)": "Pad diagnostics (F8 closes)",
     "fest zum Auto": "fixed to the car",
     "Woher die 3D-Modelle kommen": "Where the 3D models come from",
     "Die Autos der virtuellen Fahrt stammen aus dem freien Rennspiel Speed Dreams: Vulture V5.R, Lynx 220, FMC GT4 und Boxer 96. Modelle, Texturen und Fahrzeugdaten stehen unter der GNU General Public License, Version 2 oder später. Umgewandelt mit tools/sd_auto.py (Innenraum entfernt, Texturen verkleinert); die Lizenz- und Quellenangabe liegt im Ordner des jeweiligen Autos.": "The cars of the virtual drive come from the free racing game Speed Dreams: Vulture V5.R, Lynx 220, FMC GT4 and Boxer 96. Models, textures and vehicle data are licensed under the GNU General Public License, version 2 or later. Converted with tools/sd_auto.py (interior removed, textures downscaled); the license and source notice is in each car's folder.",
@@ -20886,6 +20887,7 @@
     "Spider NG1: Karosserie MODIplay MP-1 Spider von Sturmkind, 3D-Daten für HYBRID von Thomas Strobel (FREAKPALACE Customs). Freigabe von Sturmkind am 16.11.2026: Verwendung erlaubt, solange die Karosserien nicht kommerziell verkauft werden.": "Spider NG1: carrocería MODIplay MP-1 Spider de Sturmkind, datos 3D para HYBRID de Thomas Strobel (FREAKPALACE Customs). Permiso de Sturmkind del 16/11/2026: se permite el uso siempre que las carrocerías no se vendan comercialmente.",
     "VW Caravelle: Karosserie von Vehicle World (Designerin Revantika). Schriftliche Freigabe von Vehicle World, die geänderte Karosserie für das virtuelle Bulli-Projekt an die Carrera-Hybrid-Community weiterzugeben.": "VW Caravelle: carrocería de Vehicle World (diseñadora Revantika). Permiso por escrito de Vehicle World para compartir la carrocería modificada con la comunidad Carrera Hybrid para el proyecto virtual Bulli.",
     "Porsche 911 GT3: Karosserie „Porsche 911 GT3R 2019“ von Vehicle World (Designerin Revantika). Bisher mündliche Zustimmung, die schriftliche Anfrage vom 15.11.2026 ist noch offen – deshalb vorerst nur in der Testversion.": "Porsche 911 GT3: carrocería “Porsche 911 GT3R 2019” de Vehicle World (diseñadora Revantika). Por ahora consentimiento verbal; la solicitud escrita del 15/11/2026 sigue pendiente, por eso de momento solo en la versión de prueba.",
+    "Pad-Diagnose (F8 schließt)": "Diagnóstico del mando (F8 cierra)",
     "fest zum Auto": "fijo al coche",
     "Woher die 3D-Modelle kommen": "De dónde vienen los modelos 3D",
     "Die Autos der virtuellen Fahrt stammen aus dem freien Rennspiel Speed Dreams: Vulture V5.R, Lynx 220, FMC GT4 und Boxer 96. Modelle, Texturen und Fahrzeugdaten stehen unter der GNU General Public License, Version 2 oder später. Umgewandelt mit tools/sd_auto.py (Innenraum entfernt, Texturen verkleinert); die Lizenz- und Quellenangabe liegt im Ordner des jeweiligen Autos.": "Los coches de la conducción virtual proceden del juego de carreras libre Speed Dreams: Vulture V5.R, Lynx 220, FMC GT4 y Boxer 96. Modelos, texturas y datos del vehículo están bajo la GNU General Public License, versión 2 o posterior. Convertidos con tools/sd_auto.py (interior eliminado, texturas reducidas); la licencia y la fuente están en la carpeta de cada coche.",
@@ -44457,6 +44459,24 @@
     VF.studie = false;
   }
   window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(); } }, true);
+  // F8: Pad-Diagnose (padDiagText in 90-ghosts.js) - zeigt, ob und wo das Gamepad haengen bleibt.
+  let vfPadDiagIv = 0;
+  function vfPadDiagUmschalten() {
+    let el = document.getElementById('vf-pad-diag');
+    if (el) { el.remove(); clearInterval(vfPadDiagIv); return; }
+    el = document.createElement('pre');
+    el.id = 'vf-pad-diag';
+    el.style.cssText = 'position:fixed;left:8px;top:180px;z-index:99999;margin:0;padding:8px 10px;max-width:70vw;'
+      + 'white-space:pre-wrap;font:12px/1.4 monospace;color:#fff;background:rgba(0,0,0,.78);border:1px solid #29b6f6;pointer-events:none';
+    document.body.appendChild(el);
+    const zeichne = () => {
+      if (!el.isConnected || !VF.aktiv) { el.remove(); clearInterval(vfPadDiagIv); return; }
+      el.textContent = t('Pad-Diagnose (F8 schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-');
+    };
+    zeichne();
+    vfPadDiagIv = setInterval(zeichne, 200);
+  }
+  window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'F8' && !e.repeat) { e.preventDefault(); vfPadDiagUmschalten(); } });
   // ============================== SIMULATOR-LINIE (v1.0.14, WIP) ==============================
   //
   // BESTELLT: "SIMULATOR-Linie: begrenzte Suche ueber glatte Linien und Tempoplaene; jeder
@@ -77538,6 +77558,34 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     if (!window.OmegaPad) return null;
     return { an: padNativLage.an, geraete: w ? w[7] : 0, ereignisse: w ? w[8] : 0, zustellMs: w ? w[9] : null };
   }
+  // PAD-DIAGNOSE (F8 in der virtuellen Fahrt). GEMELDET Gnen54 17.11.: "Gamepad geht im virtuellen
+  // Fahren nicht" (Windows, Chrome, EasySMX X15 per Bluetooth als Xbox-Pad) - hier nicht nachstellbar.
+  // Jeder Takt merkt sich, WO pollGamepad ausgestiegen ist und was das Pad lieferte.
+  let padDiag = { grund: 'noch kein Takt', t: 0 };
+  function padDiagSetzen(grund, pad, gas, bremse, lenk) {
+    padDiag = { grund, t: performance.now(), id: pad ? String(pad.id) : '', mapping: pad ? pad.mapping : '',
+      gas, bremse, lenk, knoepfe: pad ? [...(pad.buttons || [])].map((b, i) => (b && b.pressed ? i : -1)).filter((i) => i >= 0) : [],
+      achsen: pad ? [...(pad.axes || [])].map((v) => +v.toFixed(2)) : [] };
+  }
+  function padDiagText() {
+    const alle = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : [];
+    const d = padDiag, alt = performance.now() - d.t;
+    const b = (x) => (x && x.type !== 'none' ? x.type + ' ' + x.index : '-');
+    const z = (x) => (typeof x === 'number' ? x.toFixed(2) : '-');
+    return [
+      'Pads: ' + (alle.length ? alle.map((q) => q.index + ' ' + String(q.id).slice(0, 50) + ' [' + (q.mapping || 'roh') + ']').join(' | ') : 'keins'),
+      'Takt: ' + (padLoopRunning ? 'laeuft' : 'AUS') + (alt > 500 ? ' (seit ' + Math.round(alt) + ' ms kein Takt!)' : ''),
+      'Ausstieg: ' + d.grund,
+      'Pad: ' + (d.id ? d.id.slice(0, 60) + ' [' + (d.mapping || 'roh') + ']' : '-'),
+      'Belegung: Gas ' + b(bindings.throttle) + ', Bremse ' + b(bindings.brake) + ', Lenkung ' + b(bindings.steering),
+      'Werte: Gas ' + z(d.gas) + ', Bremse ' + z(d.bremse) + ', Lenkung ' + z(d.lenk),
+      'Knoepfe: ' + ((d.knoepfe || []).join(' ') || '-') + '   Achsen: ' + (d.achsen || []).join(' '),
+      'Pause: ' + (typeof rennPauseAktiv === 'function' && rennPauseAktiv() ? 'AN' : 'aus')
+        + ', Menue: ' + (typeof konsoleMenue === 'function' && konsoleMenue() ? 'ja' : 'nein')
+        + ', Abgleich-Sperre: ' + (bindSitzung || bindSperreBisLos ? 'JA' : 'nein'),
+      'Ausgang: Lenkung ' + z(steerX) + ', Gas ' + z(throttleY),
+    ].join('\n');
+  }
   function pollGamepad() {
     const spieler = padsFuerSpieler();
     if (spieler.p1) spieler.p1 = padNativ(spieler.p1);
@@ -77566,6 +77614,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
         prevLightFlash = false;
       }
       padConnected = false;
+      padDiagSetzen('kein Pad fuer Spieler 1', null);
       return;
     }
     padConnected = true;
@@ -77573,10 +77622,11 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     // v1.1.45: Abgleich-Sitzung - das Pad erfasst nur, sonst nichts (siehe bindPadSitzung).
     if ((bindSitzung || bindSperreBisLos) && bindPadSitzung(pad, 1)) {
       releaseInput(SRC.PAD);
+      padDiagSetzen('Abgleich-Sitzung / warte bis alle Tasten los', pad);
       return;
     }
     if (!(listeningFor && bindEditSpieler < 2) && rennPauseTaste(pad, bindings, 1)) {
-      releaseInput(SRC.PAD); return;
+      releaseInput(SRC.PAD); padDiagSetzen('Rennpause', pad); return;
     }
     // Startaufstellung offen: das Steuerkreuz waehlt den Knopf (X bestaetigt, flagTasteTick).
     if (typeof raceGridOffen === 'function' && raceGridOffen()) {
@@ -77586,21 +77636,23 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       gridPadVorher = !!r;
     } else gridPadVorher = false;
     // Meisterschaft offen: Steuerkreuz und Tasten gehoeren ihrem Schirm (73-meisterschaft.js).
-    if (typeof meisterPad === 'function' && meisterPad(pad)) return;
+    if (typeof meisterPad === 'function' && meisterPad(pad)) { padDiagSetzen('Meisterschaft-Schirm', pad); return; }
     // Reaktionstest der Studie: das Pad gehoert dem Test (er fragt es selbst ab).
-    if (typeof studieTestAktiv === 'function' && studieTestAktiv()) return;
+    if (typeof studieTestAktiv === 'function' && studieTestAktiv()) { padDiagSetzen('Studie-Reaktionstest', pad); return; }
     // TITELBILDSCHIRM (ACC-Menue): jede Taste fuehrt ins Hauptmenue, links/rechts wechselt die
     // Sprache. Solange danach noch eine Taste gehalten wird, tut dieser Takt nichts weiter -
     // sonst oeffnete dasselbe gehaltene Kreuz im Hauptmenue gleich die naechste Kachel.
-    if (typeof konsolePadTitel === 'function' && konsolePadTitel(pad)) return;
+    if (typeof konsolePadTitel === 'function' && konsolePadTitel(pad)) { padDiagSetzen('Titelbildschirm', pad); return; }
     // Steuerungs-Fuehrung offen: jede Taste wird dort angezeigt, gefahren wird nicht.
     if (typeof konsoleTourPad === 'function' && konsoleTourPad(pad)) {
       releaseInput(SRC.PAD);
+      padDiagSetzen('Steuerungs-Fuehrung / Einfuehrung', pad);
       return;
     }
     // Raumdesigner offen (60b-raum.js): Stick, Kreuz und Tasten gehoeren ihm.
     if (typeof raumPad === 'function' && raumPad(pad)) {
       releaseInput(SRC.PAD);
+      padDiagSetzen('Raumdesigner', pad);
       return;
     }
 
@@ -77610,6 +77662,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     if (listeningFor && bindEditSpieler < 2) {
       releaseInput(SRC.PAD);
       tryCaptureBinding(pad);
+      padDiagSetzen('Tastenzuweisung wartet (Optionen > Controller)', pad);
     } else {
       let throttleRaw = applyDeadzone(Math.max(0, readBindingValue(pad, bindings.throttle)), TRIGGER_DEADZONE);
       let brakeRaw = applyDeadzone(Math.max(0, readBindingValue(pad, bindings.brake)), TRIGGER_DEADZONE);
@@ -77642,6 +77695,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       // silently inverting the gamepad's logical value.
       // applyDeadzone already returns exactly 0 inside the deadzone, so a pad at rest is
       // silent here and no longer overwrites whatever the keyboard is holding.
+      padDiagSetzen('keiner - Pad faehrt', pad, throttleRaw, brakeRaw, steerRaw);
       applySteerInput(SRC.PAD, steerRaw);
       // Rueckwaertsgang per Gas+Bremse (50-drive.js): im von dort eingelegten Rueckwaertsgang gilt statt "Gas minus
       // Bremse" (das waere bei beiden Pedalen 0) der Rueckgabewert.

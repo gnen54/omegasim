@@ -3267,3 +3267,21 @@
     VF.studie = false;
   }
   window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(); } }, true);
+  // F8: Pad-Diagnose (padDiagText in 90-ghosts.js) - zeigt, ob und wo das Gamepad haengen bleibt.
+  let vfPadDiagIv = 0;
+  function vfPadDiagUmschalten() {
+    let el = document.getElementById('vf-pad-diag');
+    if (el) { el.remove(); clearInterval(vfPadDiagIv); return; }
+    el = document.createElement('pre');
+    el.id = 'vf-pad-diag';
+    el.style.cssText = 'position:fixed;left:8px;top:180px;z-index:99999;margin:0;padding:8px 10px;max-width:70vw;'
+      + 'white-space:pre-wrap;font:12px/1.4 monospace;color:#fff;background:rgba(0,0,0,.78);border:1px solid #29b6f6;pointer-events:none';
+    document.body.appendChild(el);
+    const zeichne = () => {
+      if (!el.isConnected || !VF.aktiv) { el.remove(); clearInterval(vfPadDiagIv); return; }
+      el.textContent = t('Pad-Diagnose (F8 schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-');
+    };
+    zeichne();
+    vfPadDiagIv = setInterval(zeichne, 200);
+  }
+  window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'F8' && !e.repeat) { e.preventDefault(); vfPadDiagUmschalten(); } });
