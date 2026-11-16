@@ -4,9 +4,9 @@
  "quelle": "Karosserie von Vehicle World (Designerin Revantika), Innenraum, Fahrer, Kamera und Aufbau von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 432148,
- "indizes": 1585428,
- "indexAb": 13828736,
+ "ecken": 529184,
+ "indizes": 1873623,
+ "indexAb": 16933888,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -171,138 +171,138 @@
    "gruppe": "auto",
    "tex": "caravelle_weiss.png",
    "ecke0": 0,
-   "ecken": 48281,
+   "ecken": 56451,
    "index0": 0,
-   "indizes": 199356
+   "indizes": 199197
   },
   {
    "name": "Karosserie 2",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_weiss.png",
-   "ecke0": 48281,
-   "ecken": 54311,
-   "index0": 199356,
-   "indizes": 199350
+   "ecke0": 56451,
+   "ecken": 60723,
+   "index0": 199197,
+   "indizes": 199077
   },
   {
    "name": "Karosserie 3",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_weiss.png",
-   "ecke0": 102592,
-   "ecken": 50904,
-   "index0": 398706,
-   "indizes": 199356
+   "ecke0": 117174,
+   "ecken": 58502,
+   "index0": 398274,
+   "indizes": 199197
   },
   {
    "name": "Karosserie 4",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_weiss.png",
-   "ecke0": 153496,
-   "ecken": 52476,
-   "index0": 598062,
-   "indizes": 199356
+   "ecke0": 175676,
+   "ecken": 60944,
+   "index0": 597471,
+   "indizes": 199197
   },
   {
    "name": "Dach",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_schwarz.png",
-   "ecke0": 205972,
-   "ecken": 40966,
-   "index0": 797418,
-   "indizes": 176700
+   "ecke0": 236620,
+   "ecken": 47709,
+   "index0": 796668,
+   "indizes": 192624
   },
   {
    "name": "Innenraum",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_innen.png",
-   "ecke0": 246938,
-   "ecken": 9487,
-   "index0": 974118,
-   "indizes": 29871
+   "ecke0": 284329,
+   "ecken": 15578,
+   "index0": 989292,
+   "indizes": 49908
   },
   {
    "name": "Armaturenbrett",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_innen.png",
-   "ecke0": 256425,
-   "ecken": 11806,
-   "index0": 1003989,
-   "indizes": 37605
+   "ecke0": 299907,
+   "ecken": 53696,
+   "index0": 1039200,
+   "indizes": 253164
   },
   {
    "name": "Fahrer",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_fahrer.png",
-   "ecke0": 268231,
-   "ecken": 31346,
-   "index0": 1041594,
-   "indizes": 108417
+   "ecke0": 353603,
+   "ecken": 40884,
+   "index0": 1292364,
+   "indizes": 140928
   },
   {
    "name": "Chassis",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_chassis.png",
-   "ecke0": 299577,
-   "ecken": 7854,
-   "index0": 1150011,
-   "indizes": 25026
+   "ecke0": 394487,
+   "ecken": 10145,
+   "index0": 1433292,
+   "indizes": 31584
   },
   {
    "name": "Scheiben",
    "rolle": "glas",
    "gruppe": "auto",
    "tex": "caravelle_glas.png",
-   "ecke0": 307431,
-   "ecken": 9132,
-   "index0": 1175037,
-   "indizes": 37482
+   "ecke0": 404632,
+   "ecken": 9544,
+   "index0": 1464876,
+   "indizes": 38535
   },
   {
    "name": "Rücklichter",
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "caravelle_ruecklicht.png",
-   "ecke0": 316563,
-   "ecken": 554,
-   "index0": 1212519,
-   "indizes": 2715
+   "ecke0": 414176,
+   "ecken": 453,
+   "index0": 1503411,
+   "indizes": 2274
   },
   {
    "name": "Scheinwerfer",
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "caravelle_reflektor.png",
-   "ecke0": 317117,
-   "ecken": 1137,
-   "index0": 1215234,
-   "indizes": 5775
+   "ecke0": 414629,
+   "ecken": 899,
+   "index0": 1505685,
+   "indizes": 4647
   },
   {
    "name": "Scheinwerferglas",
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "caravelle_scheinwerfer.png",
-   "ecke0": 318254,
-   "ecken": 1137,
-   "index0": 1221009,
-   "indizes": 5775
+   "ecke0": 415528,
+   "ecken": 899,
+   "index0": 1510332,
+   "indizes": 4647
   },
   {
    "name": "Diffusor/Auspuff (Käfer)",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_schwarz.png",
-   "ecke0": 319391,
+   "ecke0": 416427,
    "ecken": 1333,
-   "index0": 1226784,
+   "index0": 1514979,
    "indizes": 4500
   },
   {
@@ -310,9 +310,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "caravelle_kennzeichen.png",
-   "ecke0": 320724,
+   "ecke0": 417760,
    "ecken": 8,
-   "index0": 1231284,
+   "index0": 1519479,
    "indizes": 12
   },
   {
@@ -321,9 +321,9 @@
    "gruppe": "rad",
    "achse": "vorn",
    "tex": "caravelle_reifen.png",
-   "ecke0": 320732,
+   "ecke0": 417768,
    "ecken": 55692,
-   "index0": 1231296,
+   "index0": 1519491,
    "indizes": 162927
   },
   {
@@ -332,9 +332,9 @@
    "gruppe": "rad",
    "achse": "vorn",
    "tex": "caravelle_felge.png",
-   "ecke0": 376424,
+   "ecke0": 473460,
    "ecken": 27782,
-   "index0": 1394223,
+   "index0": 1682418,
    "indizes": 88998
   },
   {
@@ -343,9 +343,9 @@
    "gruppe": "rad",
    "achse": "hinten",
    "tex": "caravelle_reifen.png",
-   "ecke0": 404206,
+   "ecke0": 501242,
    "ecken": 2708,
-   "index0": 1483221,
+   "index0": 1771416,
    "indizes": 13044
   },
   {
@@ -354,9 +354,9 @@
    "gruppe": "rad",
    "achse": "hinten",
    "tex": "caravelle_felge.png",
-   "ecke0": 406914,
+   "ecke0": 503950,
    "ecken": 25234,
-   "index0": 1496265,
+   "index0": 1784460,
    "indizes": 89163
   }
  ]
