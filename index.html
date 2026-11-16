@@ -43542,6 +43542,13 @@
     const zh = naeher ? 1.6 : (nah ? 2.0 : 1.4), vor = naeher ? 7 : (nah ? 8 : 12);
     const k = vfDrehAnwenden({ auge: [VF.x - fx * hinten, hoehe, VF.y - fz * hinten], ziel: [VF.x + fx * vor, zh, VF.y + fz * vor] },
       art, D, VF.x, zh, VF.y);
+    if (naeher && D && D.g) {
+      // Seitennah: je weiter zur Seite / nach vorn geschwenkt, desto naeher ans Auto (bis 25 % naeher
+      // ab 90 Grad) - von schraeg vorn sieht man die Details, von hinten bleibt die Fahrbahn im Blick.
+      const g = Math.abs(Math.atan2(Math.sin(D.g), Math.cos(D.g)));
+      const f = 1 - 0.25 * Math.min(1, g / (Math.PI / 2));
+      k.auge = [VF.x + (k.auge[0] - VF.x) * f, zh + (k.auge[1] - zh) * f, VF.y + (k.auge[2] - VF.y) * f];
+    }
     const soll = k.auge;
     const a = 1 - Math.exp(-Math.max(0, dt) / tau);
     VF.kam = VF.kam ? VF.kam.map((q, i) => q + (soll[i] - q) * a) : soll;
