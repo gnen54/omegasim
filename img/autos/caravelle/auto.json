@@ -4,9 +4,9 @@
  "quelle": "Karosserie von Vehicle World (Designerin Revantika), Innenraum, Fahrer, Kamera und Aufbau von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 354724,
- "indizes": 1278333,
- "indexAb": 11351168,
+ "ecken": 354732,
+ "indizes": 1278345,
+ "indexAb": 11351424,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -296,14 +296,24 @@
    "indizes": 4500
   },
   {
+   "name": "Kennzeichen",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_kennzeichen.png",
+   "ecke0": 243308,
+   "ecken": 8,
+   "index0": 924201,
+   "indizes": 12
+  },
+  {
    "name": "Reifen vorn",
    "rolle": "rad",
    "gruppe": "rad",
    "achse": "vorn",
    "tex": "caravelle_reifen.png",
-   "ecke0": 243308,
+   "ecke0": 243316,
    "ecken": 55692,
-   "index0": 924201,
+   "index0": 924213,
    "indizes": 162927
   },
   {
@@ -312,9 +322,9 @@
    "gruppe": "rad",
    "achse": "vorn",
    "tex": "caravelle_felge.png",
-   "ecke0": 299000,
+   "ecke0": 299008,
    "ecken": 27782,
-   "index0": 1087128,
+   "index0": 1087140,
    "indizes": 88998
   },
   {
@@ -323,9 +333,9 @@
    "gruppe": "rad",
    "achse": "hinten",
    "tex": "caravelle_reifen.png",
-   "ecke0": 326782,
+   "ecke0": 326790,
    "ecken": 2708,
-   "index0": 1176126,
+   "index0": 1176138,
    "indizes": 13044
   },
   {
@@ -334,9 +344,9 @@
    "gruppe": "rad",
    "achse": "hinten",
    "tex": "caravelle_felge.png",
-   "ecke0": 329490,
+   "ecke0": 329498,
    "ecken": 25234,
-   "index0": 1189170,
+   "index0": 1189182,
    "indizes": 89163
   }
  ]
