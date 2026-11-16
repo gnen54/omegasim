@@ -1,0 +1,293 @@
+{
+ "name": "VW Caravelle Oettinger (Gnen54)",
+ "kennung": "caravelle",
+ "quelle": "Karosserie von Vehicle World (Designerin Revantika), Innenraum, Fahrer, Kamera und Aufbau von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
+ "lizenz": "siehe LIZENZ.txt",
+ "koordinaten": "m; +x links, +y oben, +z vorn",
+ "ecken": 333085,
+ "indizes": 1161534,
+ "indexAb": 10658720,
+ "schritt": 32,
+ "schatten": "shadow.png",
+ "lichter": {
+  "front": [
+   [
+    0.7,
+    0.825,
+    1.72,
+    0.16
+   ],
+   [
+    -0.7,
+    0.825,
+    1.72,
+    0.16
+   ]
+  ],
+  "rueck": [
+   [
+    0.9,
+    0.925,
+    -2.195,
+    0.05
+   ],
+   [
+    0.9,
+    1.075,
+    -2.195,
+    0.05
+   ],
+   [
+    0.9,
+    1.225,
+    -2.195,
+    0.05
+   ],
+   [
+    -0.9,
+    0.925,
+    -2.195,
+    0.05
+   ],
+   [
+    -0.9,
+    1.075,
+    -2.195,
+    0.05
+   ],
+   [
+    -0.9,
+    1.225,
+    -2.195,
+    0.05
+   ]
+  ],
+  "brems": [
+   [
+    0.9,
+    0.925,
+    -2.195,
+    0.055
+   ],
+   [
+    0.9,
+    1.075,
+    -2.195,
+    0.055
+   ],
+   [
+    0.9,
+    1.225,
+    -2.195,
+    0.055
+   ],
+   [
+    -0.9,
+    0.925,
+    -2.195,
+    0.055
+   ],
+   [
+    -0.9,
+    1.075,
+    -2.195,
+    0.055
+   ],
+   [
+    -0.9,
+    1.225,
+    -2.195,
+    0.055
+   ]
+  ]
+ },
+ "haube": {
+  "vor": 0.478,
+  "hoch": 1.29,
+  "seite": 0.17,
+  "neigung": 5.1,
+  "fov": 70
+ },
+ "physik": {
+  "masse": 1750.0,
+  "schwerpunktHoehe": 0.6,
+  "radstand": 2.515,
+  "a": 1.2575,
+  "b": 1.2575,
+  "vorderachse": 1.0375,
+  "hinterachse": -1.4775,
+  "laenge": 4.103,
+  "breite": 2.339,
+  "hoehe": 1.762,
+  "massenVerteilung": 0.85,
+  "lenkGrad": 30.0,
+  "bremsVorn": 0.62,
+  "cx": 0.35,
+  "stirnflaeche": 3.0,
+  "auftriebVorn": 0.05,
+  "auftriebHinten": 0.05,
+  "fluegelVorn": 0.0,
+  "fluegelHinten": 0.0,
+  "leerlauf": 850.0,
+  "begrenzer": 5800.0,
+  "reifen": {
+   "vorn": {
+    "radius": 0.325,
+    "breite": 0.28,
+    "spur": 1.62,
+    "bodenfreiheit": 0.0,
+    "mu": 1.05
+   },
+   "hinten": {
+    "radius": 0.35000000000000003,
+    "breite": 0.405,
+    "spur": 1.525,
+    "bodenfreiheit": 0.0,
+    "mu": 1.05
+   }
+  },
+  "feder": {
+   "vorn": {
+    "k": 233333,
+    "druck": 20833,
+    "zug": 31667,
+    "weg": 0.1,
+    "stab": 100000
+   },
+   "hinten": {
+    "k": 191666,
+    "druck": 15000,
+    "zug": 28333,
+    "weg": 0.1,
+    "stab": 36667
+   }
+  },
+  "gefedert": 1640.0
+ },
+ "teile": [
+  {
+   "name": "Karosserie 1",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_weiss.png",
+   "ecke0": 0,
+   "ecken": 46020,
+   "index0": 0,
+   "indizes": 177195
+  },
+  {
+   "name": "Karosserie 2",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_weiss.png",
+   "ecke0": 46020,
+   "ecken": 48698,
+   "index0": 177195,
+   "indizes": 177189
+  },
+  {
+   "name": "Karosserie 3",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_weiss.png",
+   "ecke0": 94718,
+   "ecken": 48414,
+   "index0": 354384,
+   "indizes": 177198
+  },
+  {
+   "name": "Dach",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_schwarz.png",
+   "ecke0": 143132,
+   "ecken": 28312,
+   "index0": 531582,
+   "indizes": 116982
+  },
+  {
+   "name": "Innenraum",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_innen.png",
+   "ecke0": 171444,
+   "ecken": 7820,
+   "index0": 648564,
+   "indizes": 24240
+  },
+  {
+   "name": "Armaturenbrett",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_innen.png",
+   "ecke0": 179264,
+   "ecken": 8184,
+   "index0": 672804,
+   "indizes": 24435
+  },
+  {
+   "name": "Fahrer",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_fahrer.png",
+   "ecke0": 187448,
+   "ecken": 26874,
+   "index0": 697239,
+   "indizes": 87183
+  },
+  {
+   "name": "Chassis",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_chassis.png",
+   "ecke0": 214322,
+   "ecken": 7347,
+   "index0": 784422,
+   "indizes": 22980
+  },
+  {
+   "name": "Reifen vorn",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "achse": "vorn",
+   "tex": "caravelle_reifen.png",
+   "ecke0": 221669,
+   "ecken": 55692,
+   "index0": 807402,
+   "indizes": 162927
+  },
+  {
+   "name": "Felge vorn",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "achse": "vorn",
+   "tex": "caravelle_felge.png",
+   "ecke0": 277361,
+   "ecken": 27782,
+   "index0": 970329,
+   "indizes": 88998
+  },
+  {
+   "name": "Reifen hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "achse": "hinten",
+   "tex": "caravelle_reifen.png",
+   "ecke0": 305143,
+   "ecken": 2708,
+   "index0": 1059327,
+   "indizes": 13044
+  },
+  {
+   "name": "Felge hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "achse": "hinten",
+   "tex": "caravelle_felge.png",
+   "ecke0": 307851,
+   "ecken": 25234,
+   "index0": 1072371,
+   "indizes": 89163
+  }
+ ]
+}

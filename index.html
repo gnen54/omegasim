@@ -42149,7 +42149,7 @@
   // img/autos/v5r/: Modell ohne Innenraum, Rad, Lichtorte und die Fahrzeugdaten aus der .xml. Laengen in
   // Metern, im Auto +x links, +y oben, +z vorn; gezeichnet mal VF_AUTO.L / Laenge (so lang wie der Kasten).
   const VF_AUTO_STORE = 'omegasim-vf-auto';
-  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/', gt3: 'img/autos/gt3/' };
+  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/', caravelle: 'img/autos/caravelle/', gt3: 'img/autos/gt3/' };
   function vfModellPfad(auto) { return VF_MODELL_PFADE[auto || vfAutoWahl()] || 'img/autos/v5r/'; }
   const VF_FEDER_STORE = 'omegasim-vf-feder';
   const VF_FEDER_WERTE = [1, 2, 3, 5, 8];
@@ -43522,9 +43522,13 @@
       // Spider NG1: Augen ueber dem Windschutz des Cockpits statt auf der Haube.
       const hb = VF.modell && VF.modell.meta && VF.modell.meta.haube;
       const vor = (hb ? hb.vor : 0.75) * s, hoch = (hb ? hb.hoch : 0.95 + (VF.modell ? 0.07 : 0.25)) * s;
-      const auge = [VF.x + fx * vor, hoch, VF.y + fz * vor];
+      // Optional (VW Caravelle: Kamera wie im echten Modell): "seite" in m (+ links), "neigung" in Grad
+      // nach unten, "fov" = senkrechter Bildwinkel in Grad.
+      const seite = (hb && hb.seite || 0) * s;
+      const auge = [VF.x + fx * vor + fz * seite, hoch, VF.y + fz * vor - fx * seite];
+      const sinkt = hb && typeof hb.neigung === 'number' ? Math.tan(hb.neigung * Math.PI / 180) * 30 : 1.2;
       VF.kam = auge;
-      return { auge, ziel: [auge[0] + fx * 30, hoch - 1.2, auge[2] + fz * 30], fov: 70, nah: 0.3 };
+      return { auge, ziel: [auge[0] + fx * 30, hoch - sinkt, auge[2] + fz * 30], fov: (hb && hb.fov) || 70, nah: 0.3 };
     }
     if (id === 'oben') {
       // Von oben, parallel zur Start/Ziel-Geraden: die Kamera schwebt mit dem Auto mit (x/y) und
@@ -44110,7 +44114,7 @@
   const VF_MOTOR_GLOBAL = '~global';
   // Standard ist der Vulture V5.R (wie das Auto); "Wie in Optionen" folgt dem globalen Ton (sentinel).
   function vfMotorGewaehlt() {
-    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer' })[vfAutoWahl()] || 'sd_v5r';
+    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer', caravelle: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
     try { const v = localStorage.getItem(VF_MOTOR_STORE); return v === null ? def : v; } catch (e) { return def; }
   }
   function vfMotorZiel() { const g = vfMotorGewaehlt(); if (g && g !== VF_MOTOR_GLOBAL) return g; return $('sound-profile') ? $('sound-profile').value : ''; }
@@ -44163,6 +44167,9 @@
                    { v: 'spider', name: 'Spider NG1 (Gnen54, WIP)' },
                    // Porsche 911 GT3 (Gnen54) auf Vehicle-World-Karosserie (Freigabe nur muendlich) – nur Testversion
                    { v: 'gt3', name: 'Porsche 911 GT3 (Gnen54, WIP)' },
+                   // VW Caravelle (Gnen54) auf Vehicle-World-Karosserie (Freigabe erteilt), Oettinger-Boxer-6 (Werte geschaetzt),
+                   // Motorhauben-Kamera = Kamera im echten Modell (Lage, Neigung, Bildwinkel aus auto.json "haube")
+                   { v: 'caravelle', name: 'VW Caravelle Oettinger (Gnen54, WIP)' },
                    { v: 'kasten', name: t('Einfaches Modell') }];
     const ja = Math.max(0, autos.findIndex((a) => a.v === vfAutoWahl()));
     const autoWahl = (dd) => {
