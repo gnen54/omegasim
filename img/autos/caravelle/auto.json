@@ -4,9 +4,9 @@
  "quelle": "Karosserie von Vehicle World (Designerin Revantika), Innenraum, Fahrer, Kamera und Aufbau von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 352454,
- "indizes": 1270320,
- "indexAb": 11278528,
+ "ecken": 353787,
+ "indizes": 1274820,
+ "indexAb": 11321184,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -116,7 +116,7 @@
   "b": 1.2575,
   "vorderachse": 1.0375,
   "hinterachse": -1.4775,
-  "laenge": 4.103,
+  "laenge": 4.146,
   "breite": 2.339,
   "hoehe": 1.762,
   "massenVerteilung": 0.85,
@@ -256,14 +256,24 @@
    "indizes": 122730
   },
   {
+   "name": "Diffusor/Auspuff (Käfer)",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "caravelle_schwarz.png",
+   "ecke0": 241038,
+   "ecken": 1333,
+   "index0": 916188,
+   "indizes": 4500
+  },
+  {
    "name": "Reifen vorn",
    "rolle": "rad",
    "gruppe": "rad",
    "achse": "vorn",
    "tex": "caravelle_reifen.png",
-   "ecke0": 241038,
+   "ecke0": 242371,
    "ecken": 55692,
-   "index0": 916188,
+   "index0": 920688,
    "indizes": 162927
   },
   {
@@ -272,9 +282,9 @@
    "gruppe": "rad",
    "achse": "vorn",
    "tex": "caravelle_felge.png",
-   "ecke0": 296730,
+   "ecke0": 298063,
    "ecken": 27782,
-   "index0": 1079115,
+   "index0": 1083615,
    "indizes": 88998
   },
   {
@@ -283,9 +293,9 @@
    "gruppe": "rad",
    "achse": "hinten",
    "tex": "caravelle_reifen.png",
-   "ecke0": 324512,
+   "ecke0": 325845,
    "ecken": 2708,
-   "index0": 1168113,
+   "index0": 1172613,
    "indizes": 13044
   },
   {
@@ -294,9 +304,9 @@
    "gruppe": "rad",
    "achse": "hinten",
    "tex": "caravelle_felge.png",
-   "ecke0": 327220,
+   "ecke0": 328553,
    "ecken": 25234,
-   "index0": 1181157,
+   "index0": 1185657,
    "indizes": 89163
   }
  ]
