@@ -2065,6 +2065,9 @@
     // Himmel: Vollbild-Quad, Farbverlauf im WELTRAUM (horizontfolgend beim Umsehen). Ganz hinten.
     if (!VF.himmelProg) { VF.himmelProg = vfProgrammHimmel(gl); VF.himmel = vfHimmel(gl); }
     const k = vfKamera(VF.dtBild || 0.016);
+    // Waagerechter Bildwinkel (auto.json "haube": {"fovH": ...}, VW Caravelle): in den senkrechten fuer
+    // das aktuelle Seitenverhaeltnis umrechnen - so bleibt die Breite des Blicks auf jedem Schirm gleich.
+    if (k.fovH) k.fov = 2 * Math.atan(Math.tan(k.fovH * Math.PI / 360) / Math.max(0.2, w / Math.max(1, h))) * 180 / Math.PI;
     // v1.3.124 Studienmodus: festes Sichtfeld aus Bildschirmgroesse und Sitzabstand.
     if (VF_STUDIE) { const sf = vfStudieFov(); if (sf) k.fov = sf; }
     gl.disable(gl.DEPTH_TEST);
@@ -2363,12 +2366,12 @@
       const hb = VF.modell && VF.modell.meta && VF.modell.meta.haube;
       const vor = (hb ? hb.vor : 0.75) * s, hoch = (hb ? hb.hoch : 0.95 + (VF.modell ? 0.07 : 0.25)) * s;
       // Optional (VW Caravelle: Kamera wie im echten Modell): "seite" in m (+ links), "neigung" in Grad
-      // nach unten, "fov" = senkrechter Bildwinkel in Grad.
+      // nach unten, "fov" = senkrechter Bildwinkel in Grad, "fovH" = waagerechter (hat Vorrang).
       const seite = (hb && hb.seite || 0) * s;
       const auge = [VF.x + fx * vor + fz * seite, hoch, VF.y + fz * vor - fx * seite];
       const sinkt = hb && typeof hb.neigung === 'number' ? Math.tan(hb.neigung * Math.PI / 180) * 30 : 1.2;
       VF.kam = auge;
-      return { auge, ziel: [auge[0] + fx * 30, hoch - sinkt, auge[2] + fz * 30], fov: (hb && hb.fov) || 70, nah: 0.3 };
+      return { auge, ziel: [auge[0] + fx * 30, hoch - sinkt, auge[2] + fz * 30], fov: (hb && hb.fov) || 70, fovH: (hb && hb.fovH) || 0, nah: 0.3 };
     }
     if (id === 'oben') {
       // Von oben, parallel zur Start/Ziel-Geraden: die Kamera schwebt mit dem Auto mit (x/y) und
@@ -2956,7 +2959,12 @@
   // "Wie in Optionen" wird als Sentinel gespeichert, damit es sich vom Standard (Vulture V5.R) unterscheidet.
   const VF_MOTOR_GLOBAL = '~global';
   // Standard ist der Vulture V5.R (wie das Auto); "Wie in Optionen" folgt dem globalen Ton (sentinel).
+  // Gnen54s eigene Autos haben einen FESTEN Motorklang (BESTELLT Gnen54: "der Motorsound soll fest dem
+  // Fahrzeug zugeordnet sein, die Anwahl gesperrt") - die gespeicherte Wahl gilt dort nicht.
+  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer', caravelle: 'boxster986' };
+  function vfMotorFest() { return VF_MOTOR_FEST[vfAutoWahl()] || ''; }
   function vfMotorGewaehlt() {
+    if (vfMotorFest()) return vfMotorFest();
     const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer', caravelle: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
     try { const v = localStorage.getItem(VF_MOTOR_STORE); return v === null ? def : v; } catch (e) { return def; }
   }
@@ -3000,7 +3008,11 @@
       try { localStorage.setItem(VF_MOTOR_STORE, n || VF_MOTOR_GLOBAL); } catch (e) { /* egal */ }
       renderGarage();
     };
-    rechts.appendChild(garWertZeile(t('Motorsound'), werte[j].name, () => wahl(-1), () => wahl(1)));
+    if (vfMotorFest()) {
+      const fest = garWertZeile(t('Motorsound'), werte[j].name + ' (' + t('fest zum Auto') + ')', () => {}, () => {});
+      fest.querySelectorAll('.gk-w button').forEach((k) => { k.disabled = true; k.style.visibility = 'hidden'; });
+      rechts.appendChild(fest);
+    } else rechts.appendChild(garWertZeile(t('Motorsound'), werte[j].name, () => wahl(-1), () => wahl(1)));
     // v1.1.9: welches Auto, und wie deutlich die Federung sichtbar neigt.
     const autos = [{ v: 'v5r', name: 'Vulture V5.R (Speed Dreams)' }, { v: 'lynx220', name: 'Lynx 220 (Jaguar XJ220, Speed Dreams)' },
                    { v: 'fmcgt4', name: 'FMC GT4 (Ford GT40 Mk1, Speed Dreams)' }, { v: 'boxer96', name: 'Boxer 96 (Porsche 911 GT3, Speed Dreams)' },

@@ -7677,6 +7677,9 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
   let yellowRestartGen = 0;
   function yellowRestart() {
     if (flagState !== 'yellow') return;
+    // Freies virtuelles Fahren (kein Rennen): Gelb endet sofort mit Gruen, ohne Anfahrt-Ampel - die gehoert
+    // zum Rennen (GEMELDET Gnen54: "wenn ich die Gelbphase abbreche, kommt auf einmal die Startampel").
+    if (typeof vfAktiv === 'function' && vfAktiv() && raceState === 'idle') { setFlag('green'); return; }
     flagState = 'restart';
     const gen = ++yellowRestartGen;
     updateFlagUi();
