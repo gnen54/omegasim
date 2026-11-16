@@ -2145,9 +2145,10 @@
   // ---- Kamera (v1.1.11) --------------------------------------------------------------------
   // BESTELLT: "Wenn ich den rechten Stick reindruecke im virtuellen Fahren, aendere die Kamera zu
   // Motorhaube oder nahe Verfolgerkamera." R3 (bzw. die Lichthupen-Belegung) oder C schaltet weiter:
-  // Verfolger -> nah -> Motorhaube -> Verfolger. Nachgefuehrt nach der ZEIT (nicht je Bild): auf einem
+  // Verfolger -> nah -> naeher -> Motorhaube -> ... (naeher: Zwischenstufe dicht am Auto, Fahrbahn bleibt sichtbar). Nachgefuehrt nach der ZEIT (nicht je Bild): auf einem
   // langsamen Handy lief die Kamera vorher bei weniger Bildern spuerbar hinterher.
-  const VF_KAMERAS = [{ id: 'verfolger', name: 'Verfolgerkamera' }, { id: 'nah', name: 'Nahe Verfolgerkamera' }, { id: 'haube', name: 'Motorhaube' },
+  const VF_KAMERAS = [{ id: 'verfolger', name: 'Verfolgerkamera' }, { id: 'nah', name: 'Nahe Verfolgerkamera' },
+                      { id: 'naeher', name: 'Seitennahe Kamera' }, { id: 'haube', name: 'Motorhaube' },
                       { id: 'oben', name: 'Von oben (Start/Ziel)' },
                       { id: 'fahrer', name: 'Fahrer am Rand', wip: true }];
   const VF_KAMERA_STORE = 'omegasim-vf-kamera';
@@ -2373,16 +2374,18 @@
       VF.kam = null;
       return { auge, ziel: [VF.x, 0, VF.y], oben, fov: 62, nah: 0.5 };
     }
-    const nah = id === 'nah';
-    const hinten = nah ? 9 : 15, hoehe = nah ? 3.8 : 8, tau = nah ? 0.08 : 0.15;
+    const nah = id === 'nah', naeher = id === 'naeher';
+    // naeher: Zwischenstufe knapp hinter dem Heck und etwas ueber dem Dach (Auto 9,6 lang, 2,4 hoch) -
+    // man sieht die Details des Autos, beim Kreisen auch von der Seite, und noch genug Fahrbahn davor.
+    const hinten = naeher ? 6.5 : (nah ? 9 : 15), hoehe = naeher ? 2.8 : (nah ? 3.8 : 8), tau = naeher ? 0.06 : (nah ? 0.08 : 0.15);
     // Gedreht kreist der SOLL-Ort um das Auto; die Nachfuehrung (tau) bleibt dieselbe.
-    const zh = nah ? 2.0 : 1.4, vor = nah ? 8 : 12;
+    const zh = naeher ? 1.6 : (nah ? 2.0 : 1.4), vor = naeher ? 7 : (nah ? 8 : 12);
     const k = vfDrehAnwenden({ auge: [VF.x - fx * hinten, hoehe, VF.y - fz * hinten], ziel: [VF.x + fx * vor, zh, VF.y + fz * vor] },
       art, D, VF.x, zh, VF.y);
     const soll = k.auge;
     const a = 1 - Math.exp(-Math.max(0, dt) / tau);
     VF.kam = VF.kam ? VF.kam.map((q, i) => q + (soll[i] - q) * a) : soll;
-    return { auge: VF.kam, ziel: k.ziel, fov: nah ? 58 : 54, nah: 0.5 };
+    return { auge: VF.kam, ziel: k.ziel, fov: naeher ? 62 : (nah ? 58 : 54), nah: naeher ? 0.3 : 0.5 };
   }
   function vfModellMalen(gl, pv, blick, auge) {
     vfModellZeichnen(gl, pv, blick, VF.modell, VF.tprog, VF.x, VF.y, VF.h, VF.feder, VF.lenkWinkel, VF.raddreh, VF.radModell,
