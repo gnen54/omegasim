@@ -2518,8 +2518,11 @@
     });
     // 4. Scheiben und Scheinwerferglas (durchscheinend, getoent)
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+    // Sitzt die Kamera IM Auto (VW Caravelle: Onboard-Kamera hinter der Frontscheibe), nur ein Hauch Glas -
+    // sonst waere das Bild durch die Toenung fast schwarz.
+    const innen = auge && Math.hypot(auge[0] - x, auge[2] - y) < d.laenge * s * 0.45 && auge[1] < d.hoehe * s;
     for (const t of M.glasTeile) {
-      if (t.rolle === 'glas') { setze(aufbau, VF_GLAS_TINT, 0, 0.86, 0, 1, 0, 1); teil(t); }
+      if (t.rolle === 'glas') { setze(aufbau, VF_GLAS_TINT, 0, innen ? 0.12 : 0.86, 0, 1, 0, innen ? 0.2 : 1); teil(t); }
       else { setze(aufbau, VF_WEISS, licht ? 0.6 : 0, 0.9, 1, 1, 0, 0.5); teil(t); }
     }
     // 5. Leuchten: Lichtpunkte (zur Kamera gedreht) und vorn der Lichtkegel auf der Bahn
