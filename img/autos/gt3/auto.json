@@ -4,9 +4,9 @@
  "quelle": "Karosserie von Vehicle World (Designerin Revantika), Aufbau und Anbauteile von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 352057,
- "indizes": 1673634,
- "indexAb": 11265824,
+ "ecken": 352568,
+ "indizes": 1674606,
+ "indexAb": 11282176,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -112,48 +112,48 @@
    "gruppe": "auto",
    "tex": "gt3_weiss.png",
    "ecke0": 0,
-   "ecken": 43864,
+   "ecken": 43341,
    "index0": 0,
-   "indizes": 246426
+   "indizes": 243921
   },
   {
    "name": "Karosserie 2",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_weiss.png",
-   "ecke0": 43864,
-   "ecken": 42439,
-   "index0": 246426,
-   "indizes": 246426
+   "ecke0": 43341,
+   "ecken": 42426,
+   "index0": 243921,
+   "indizes": 243921
   },
   {
    "name": "Karosserie 3",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_weiss.png",
-   "ecke0": 86303,
-   "ecken": 44625,
-   "index0": 492852,
-   "indizes": 246423
+   "ecke0": 85767,
+   "ecken": 44040,
+   "index0": 487842,
+   "indizes": 243918
   },
   {
    "name": "Rote Lackierung",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_rot.png",
-   "ecke0": 130928,
-   "ecken": 44056,
-   "index0": 739275,
-   "indizes": 190899
+   "ecke0": 129807,
+   "ecken": 45688,
+   "index0": 731760,
+   "indizes": 199386
   },
   {
    "name": "Heckflügel",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_schwarz.png",
-   "ecke0": 174984,
+   "ecke0": 175495,
    "ecken": 17101,
-   "index0": 930174,
+   "index0": 931146,
    "indizes": 106338
   },
   {
@@ -161,9 +161,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_schwarz.png",
-   "ecke0": 192085,
+   "ecke0": 192596,
    "ecken": 13938,
-   "index0": 1036512,
+   "index0": 1037484,
    "indizes": 88590
   },
   {
@@ -171,9 +171,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "gt3_schwarz.png",
-   "ecke0": 206023,
+   "ecke0": 206534,
    "ecken": 4634,
-   "index0": 1125102,
+   "index0": 1126074,
    "indizes": 13338
   },
   {
@@ -182,9 +182,9 @@
    "gruppe": "rad",
    "tex": "gt3_reifen.png",
    "achse": "vorn",
-   "ecke0": 210657,
+   "ecke0": 211168,
    "ecken": 55692,
-   "index0": 1138440,
+   "index0": 1139412,
    "indizes": 162927
   },
   {
@@ -193,9 +193,9 @@
    "gruppe": "rad",
    "tex": "gt3_felge.png",
    "achse": "vorn",
-   "ecke0": 266349,
+   "ecke0": 266860,
    "ecken": 27782,
-   "index0": 1301367,
+   "index0": 1302339,
    "indizes": 88998
   },
   {
@@ -204,9 +204,9 @@
    "gruppe": "rad",
    "tex": "gt3_reifen.png",
    "achse": "hinten",
-   "ecke0": 294131,
+   "ecke0": 294642,
    "ecken": 2708,
-   "index0": 1390365,
+   "index0": 1391337,
    "indizes": 13044
   },
   {
@@ -215,9 +215,9 @@
    "gruppe": "rad",
    "tex": "gt3_felge.png",
    "achse": "hinten",
-   "ecke0": 296839,
+   "ecke0": 297350,
    "ecken": 25234,
-   "index0": 1403409,
+   "index0": 1404381,
    "indizes": 89163
   },
   {
@@ -225,9 +225,9 @@
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "gt3_ruecklicht.png",
-   "ecke0": 322073,
+   "ecke0": 322584,
    "ecken": 2984,
-   "index0": 1492572,
+   "index0": 1493544,
    "indizes": 18039
   },
   {
@@ -235,9 +235,9 @@
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "gt3_reflektor.png",
-   "ecke0": 325057,
+   "ecke0": 325568,
    "ecken": 8342,
-   "index0": 1510611,
+   "index0": 1511583,
    "indizes": 52065
   },
   {
@@ -245,9 +245,9 @@
    "rolle": "scheinwerferglas",
    "gruppe": "auto",
    "tex": "gt3_scheinwerfer.png",
-   "ecke0": 333399,
+   "ecke0": 333910,
    "ecken": 8342,
-   "index0": 1562676,
+   "index0": 1563648,
    "indizes": 52065
   },
   {
@@ -255,9 +255,9 @@
    "rolle": "glas",
    "gruppe": "auto",
    "tex": "gt3_glas.png",
-   "ecke0": 341741,
+   "ecke0": 342252,
    "ecken": 10316,
-   "index0": 1614741,
+   "index0": 1615713,
    "indizes": 58893
   }
  ],
