@@ -156,6 +156,8 @@
     // v1.1.45 BESTELLT: Ford GT40 Mk1 (FMC GT4, V8) und Porsche 911 GT3 (Boxer 96, Boxer-6).
     'sd_fmc',
     'sd_boxer',
+    // BESTELLT Gnen54 17.11.2026: GT3-Klang "etwas dunkler, zu spitz, zu hell" - Boxer 96 tiefer gestimmt.
+    'sd_boxer_dunkel',
     // ---- ZWEI AUFNAHMEN DES NUTZERS, aus photos/newaudio --------------------------
     // BESTELLT: eigene Aufnahmen; Drehzahlen aus der Video-Anzeige (siehe loops.json).
     // DIESELBE REIHENFOLGE wie im Menue (am Ende der Liste).

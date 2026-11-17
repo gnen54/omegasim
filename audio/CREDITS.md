@@ -52,6 +52,12 @@ Gerechnet wie die anderen mit `tools/sd_engines.py <Ordner des Autos> sd_v5r`. D
 Texturen, Fahrzeugdaten) liegt umgewandelt in `img/autos/v5r/` mit eigener `LIZENZ.txt`
 (`tools/sd_auto.py`). Der Code von OmegaSim bleibt MIT.
 
+### Boxer 96 dunkel (GPL-2.0 oder spaeter) — fuer den Porsche 911 GT3 von Gnen54, 17.11.2026
+
+`audio/sd_boxer_dunkel_*.ogg` sind aus `sd_boxer_*.ogg` (Speed Dreams `sc-boxer-96.wav`, Speed-Dreams-Team,
+**GNU GPL, Version 2 oder spaeter**) gerechnet: um den Faktor 0,84 tiefer gestimmt, Hoehen ab 2,6 kHz gedaempft,
+Bass +3 dB (ffmpeg, Schleifen nahtlos aus der dreifach wiederholten Schleife geschnitten).
+
 Nicht verwendet: `v6_raw.wav` und `rotary2.wav` (als "CC-BY" aus YouTube-Videos
 angegeben, Rechte unklar), `skid_metal.wav` (ohne Lizenzangabe) und die uebrigen
 aelteren Fahrzeugklaenge der Spieldaten.

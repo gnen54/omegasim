@@ -2004,6 +2004,52 @@
   "idleRpm": 2000,
   "limiterRpm": 8500
  },
+ "sd_boxer_dunkel": {
+  "label": "Boxer 96 dunkel (Porsche 911 GT3 von Gnen54)",
+  "cylinders": 6,
+  "source": "Aufnahme aus Speed Dreams 2.4 (data/cars/models/sc-boxer-96/sc-boxer-96.wav): Speed-Dreams-Team (sc-boxer-96), GPL-2.0-or-later; fuer Gnen54s GT3 um den Faktor 0,84 tiefer gestimmt, Hoehen ab 2,6 kHz gedaempft, Bass +3 dB (ffmpeg, 17.11.2026)",
+  "crackle": 0.4,
+  "turbo": false,
+  "loops": {
+   "idle": {
+    "file": "sd_boxer_dunkel_idle.ogg",
+    "baseRpm": 2000,
+    "firingHz": 84.0,
+    "seconds": 3.6565,
+    "load": 1.0
+   },
+   "low": {
+    "file": "sd_boxer_dunkel_low.ogg",
+    "baseRpm": 3240,
+    "firingHz": 136.1,
+    "seconds": 2.2571,
+    "load": 1.0
+   },
+   "mid": {
+    "file": "sd_boxer_dunkel_mid.ogg",
+    "baseRpm": 5248,
+    "firingHz": 220.4,
+    "seconds": 1.3935,
+    "load": 1.0
+   },
+   "high": {
+    "file": "sd_boxer_dunkel_high.ogg",
+    "baseRpm": 8500,
+    "firingHz": 357.0,
+    "seconds": 0.8603,
+    "load": 1.0
+   },
+   "over": {
+    "file": "sd_boxer_dunkel_over.ogg",
+    "baseRpm": 5248,
+    "firingHz": 220.4,
+    "seconds": 1.3935,
+    "load": 0.0
+   }
+  },
+  "idleRpm": 2000,
+  "limiterRpm": 8500
+ },
  "boxster986": {
   "label": "Porsche Boxster 986 (2,5 l Boxer-6, Saugmotor) [WIP]",
   "cylinders": 6,

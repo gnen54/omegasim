@@ -2929,6 +2929,9 @@
     // heil, und virtuellBeenden stellt beides wieder her (bis 1.3.131 loeschte der Start den echten
     // Schaden, und virtuelle Zusammenstoesse blieben danach im Cockpit stehen).
     VF.schadenVorher = (typeof damage === 'number') ? damage : null;
+    // Akku: das virtuelle Auto meldet ueber seine Pakete einen Rohwert, der danach in dashBattery stehen
+    // blieb (= 0 %) - beim Beenden kam dann "Session abbrechen, Box anfahren!" (GEMELDET Gnen54 17.11.).
+    VF.akkuVorher = (typeof dashBattery === 'undefined') ? null : dashBattery;
     VF.flaggeVorher = (typeof flagState !== 'undefined') ? flagState : null;
     if (typeof damage === 'number') damage = 0;
     // Zustand der virtuellen Wertung (derby/knockout): Spieler und NPCs.
@@ -2961,11 +2964,11 @@
   // Standard ist der Vulture V5.R (wie das Auto); "Wie in Optionen" folgt dem globalen Ton (sentinel).
   // Gnen54s eigene Autos haben einen FESTEN Motorklang (BESTELLT Gnen54: "der Motorsound soll fest dem
   // Fahrzeug zugeordnet sein, die Anwahl gesperrt") - die gespeicherte Wahl gilt dort nicht.
-  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer', caravelle: 'boxster986' };
+  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer_dunkel', caravelle: 'boxster986' };
   function vfMotorFest() { return VF_MOTOR_FEST[vfAutoWahl()] || ''; }
   function vfMotorGewaehlt() {
     if (vfMotorFest()) return vfMotorFest();
-    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer', caravelle: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
+    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer_dunkel', caravelle: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
     try { const v = localStorage.getItem(VF_MOTOR_STORE); return v === null ? def : v; } catch (e) { return def; }
   }
   function vfMotorZiel() { const g = vfMotorGewaehlt(); if (g && g !== VF_MOTOR_GLOBAL) return g; return $('sound-profile') ? $('sound-profile').value : ''; }
@@ -3215,6 +3218,8 @@
       if (typeof updateDamageFuelUI === 'function') { try { updateDamageFuelUI(); } catch (e) { /* egal */ } }
     }
     VF.schadenVorher = null;
+    if (typeof dashBattery !== 'undefined') dashBattery = VF.akkuVorher === undefined ? null : VF.akkuVorher;
+    VF.akkuVorher = null;
     if (VF.flaggeVorher === 'green' && typeof flagState !== 'undefined' && flagState !== 'green') {
       try {
         if (typeof gelbBeenden === 'function') gelbBeenden();
