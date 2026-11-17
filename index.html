@@ -41247,6 +41247,28 @@
     }
     return null;
   }
+  // Schliessstelle der Mittellinie (GEMELDET Gnen54 17.11.: "Pendel der NPCs" an der Startlinie, dazu eine
+  // Runde von 0,267 s). Auf seiner Strecke (...QMKLGB, die Boxengasse als letztes Teil) endet die Linie
+  // 5,9 Einheiten HINTER dem Startpunkt - die Teile schliessen nicht genau. Die Spur lief dort also ein
+  // Stueck vorwaerts ueber den Start hinaus und sprang dann zurueck: ein NPC fuhr hin und her und drehte
+  // sich dabei um. Punkte am Ende, die in Startrichtung schon auf oder hinter dem Startpunkt liegen (und
+  // in dieselbe Richtung laufen), fallen weg; der Rest des Spalts wird wie bisher ueberbrueckt.
+  function vfSchliessstelle(pts) {
+    const n = pts.length;
+    if (n < 8) return pts;
+    const p0 = pts[0], l = Math.hypot(pts[1].x - p0.x, pts[1].y - p0.y) || 1;
+    const dx = (pts[1].x - p0.x) / l, dy = (pts[1].y - p0.y) / l;
+    let ende = n;
+    while (ende > n - 24) {
+      const p = pts[ende - 1], q = pts[ende - 2];
+      const vor = (p.x - p0.x) * dx + (p.y - p0.y) * dy;
+      const quer = Math.abs((p.x - p0.x) * -dy + (p.y - p0.y) * dx);
+      const sl = Math.hypot(p.x - q.x, p.y - q.y) || 1;
+      const gleich = ((p.x - q.x) * dx + (p.y - q.y) * dy) / sl > 0.7;
+      if (vor > -0.3 && quer < TRACK_HALF_W && gleich) ende--; else break;
+    }
+    return ende < n ? pts.slice(0, ende) : pts;
+  }
   // Kartentyp -> gemeldeter Code (auf der Schiene).
   function vfCode(typ) {
     if (typ === TILE_TYPE.START) return START_CODE_RAIL;
@@ -44033,7 +44055,7 @@
     vfTouchBauen();   // v1.3.122: Beruehrungs-Steuerung (Touch), falls Geraet und kein Gamepad
     VF.splits = null; VF.besteSplits = null;
     VF.tiles = tiles;
-    VF.pts = trackCenterline(tiles);
+    VF.pts = vfSchliessstelle(trackCenterline(tiles));
     VF.nrm = trackNormals(VF.pts);
     // v1.3.39: Flaechen mit Texturen (die Pixel entstehen nur beim ersten Mal) und der feste Platz der
     // Kamera "Fahrer am Rand".
