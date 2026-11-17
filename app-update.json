@@ -1,5 +1,5 @@
 {"version":"1.4.67","apk":2,"dateien":[
-{"p":"index.html","h":"2f0164f65ba606d95bf7a96fdab15c57d2f9935f133cbfc1af7ad249cceedcb5","g":8183679},
+{"p":"index.html","h":"1c66201c40093e542832cec6b447c61467d1b309af00b6012a45b818710de6c3","g":8184311},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1072,8 +1072,8 @@
 {"p":"img/autos/boxer96/sc-boxer-96.png","h":"640f09d9ac3a983ba8d552cd13bb5ba1182662267f60275d5e99c20f78c2ee59","g":435043},
 {"p":"img/autos/boxer96/shadow.png","h":"fd4e52255152ff3c45fd72f0ae855dacd238025ca79a411b43fec772a4973637","g":1702},
 {"p":"img/autos/caravelle/LIZENZ.txt","h":"12c88fd3bde0201bb567b5c254a1395ad9f62dcfa2205373e69101590936c08c","g":861},
-{"p":"img/autos/caravelle/auto.bin","h":"2db6b346f2b00c1416390c1e12073fceab27809a8624bf01e18b4880904b7771","g":45365650},
-{"p":"img/autos/caravelle/auto.json","h":"c4e77c304bce86ad8fd231a8d399a4a97d663ef742aba3abfbb547fdf34712e3","g":8144},
+{"p":"img/autos/caravelle/auto.bin","h":"db59dd66220dfe53de50a0747e51fa8f179589a18e82ea0674651600cc5b070f","g":45060266},
+{"p":"img/autos/caravelle/auto.json","h":"a44f993449177bda15f74dbd82c59ac53db6ee02fdd0d7962a2d38ba1312b9d0","g":8146},
 {"p":"img/autos/caravelle/caravelle_chassis.png","h":"dc4388a438774faa83d02859c2cecd3003edb77b13f7f114732fbe581c2aeba3","g":79},
 {"p":"img/autos/caravelle/caravelle_fahrer.png","h":"4cdbedee1ceb4386e9889843974c316622bdc25b705a8acbf4be906451cef551","g":79},
 {"p":"img/autos/caravelle/caravelle_felge.png","h":"62b74e1abdd6d9bd7a38248196f8814416d266862441cca1109740d83d984689","g":79},

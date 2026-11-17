@@ -1514,7 +1514,15 @@
         + ' c = pow(filmic(c * 1.05), vec3(1.0/2.2));'
         // Schattenkarte: Bias waechst mit flachem Lichteinfall (Streifen auf schraegen Blechen).
         + ' if (schatt > 0.5 && vsp.x > 0.0 && vsp.x < 1.0 && vsp.y > 0.0 && vsp.y < 1.0 && vsp.z > 0.0 && vsp.z <= 1.0) {'
-        + '   if (schTiefe(texture2D(sch, vsp.xy)) < vsp.z - bias * (1.0 + 3.0 * (1.0 - d))) c *= 0.55; }'
+        // 17.11. (Gnen54: gezackte dunkle Flaechen am Bulli-Armaturenbrett): statt eines harten Abgriffs
+        // fuenf (Mitte + vier Diagonalen, ~1,4 Texel), der Schatten blendet weich - keine Saegezaehne mehr.
+        + '   float zb = vsp.z - bias * (1.0 + 3.0 * (1.0 - d)), sl = 0.0; vec2 o = vec2(0.0007, 0.0007);'
+        + '   sl += step(zb, schTiefe(texture2D(sch, vsp.xy)));'
+        + '   sl += step(zb, schTiefe(texture2D(sch, vsp.xy + o)));'
+        + '   sl += step(zb, schTiefe(texture2D(sch, vsp.xy - o)));'
+        + '   sl += step(zb, schTiefe(texture2D(sch, vsp.xy + vec2(o.x, -o.y))));'
+        + '   sl += step(zb, schTiefe(texture2D(sch, vsp.xy + vec2(-o.x, o.y))));'
+        + '   c *= mix(0.55, 1.0, sl / 5.0); }'
         + ' float f = clamp((vd - 250.0) / 900.0, 0.0, 1.0); gl_FragColor = vec4(mix(c, nebel, f), mix(alpha, alpha * t.a, am)); }'));
     }
     gl.linkProgram(p);
