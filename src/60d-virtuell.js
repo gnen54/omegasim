@@ -808,8 +808,9 @@
         const bs = (i) => (sg === bse(i) ? bu(i) : 0);
         if (tiles[tl.T] && tiles[tl.T].frei) {
           // Freie Strecke (nur virtuell): statt Carrera-Randstein Asphalt bis zur Kante und eine weisse
-          // Randlinie (Gnen54 18.11.: "Fahrbahnraender nur weiss markiert" - Erkennungsmerkmal).
-          const lw = 1.5 * TRACK_UNITS_PER_CM, uk = sg > 0 ? ua : ub, um = (sg > 0 ? 4 : 132) / VF_RAND_B;
+          // Randlinie (Gnen54 18.11.: "Fahrbahnraender nur weiss markiert" - Erkennungsmerkmal). Spaeter
+          // am selben Tag: breiter, so breit wie ein Carrera-Randstein, und rumpelt beim Ueberfahren genauso.
+          const lw = kw, uk = sg > 0 ? ua : ub, um = (sg > 0 ? 4 : 132) / VF_RAND_B;
           for (let i = tl.i0; i <= tl.i1; i++) {
             const iA = off(i, (half + bs(i)) * sg), iB = off(i + 1, (half + bs(i + 1)) * sg);
             const oA = off(i, (half + kw + bs(i)) * sg), oB = off(i + 1, (half + kw + bs(i + 1)) * sg);
@@ -2132,7 +2133,7 @@
     // Rand ueber ihn, rattert es und der Controller brummt.
     const q = Math.abs(o.quer) - zus;
     const kerbRand = TRACK_HALF_W * 2 * 0.095;
-    const kerb = !ab && !VF.frei && q > TRACK_HALF_W - VF_AUTO.B * 0.5 && q < TRACK_HALF_W + kerbRand;
+    const kerb = !ab && q > TRACK_HALF_W - VF_AUTO.B * 0.5 && q < TRACK_HALF_W + kerbRand;
     if (kerb && Math.abs(kmh) > 0.05) {
       if (VF.kerbSeit === undefined || rennZeitJetzt() - VF.kerbSeit > 70) {
         VF.kerbSeit = rennZeitJetzt();
