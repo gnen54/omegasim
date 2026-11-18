@@ -1,5 +1,5 @@
 {"version":"1.4.67","apk":2,"dateien":[
-{"p":"index.html","h":"ca1225d75b15072cd2e5a48962fbd8546823a8aa34e893516124efd85f5d00f8","g":8198285},
+{"p":"index.html","h":"bfcd7d0d9f5dc4b833af55f5d2b1a27f26930666d4fd5ea47eebbbeb0c4400a3","g":8205764},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1197,6 +1197,7 @@
 {"p":"img/strecke-frei.jpg","h":"ee67d428599332c225c099e5371cbc8e76af7cc0d50de45bff46287a97168d2d","g":46689},
 {"p":"img/strecke-kachel-bg.jpg","h":"1e53777be4c21d705d719ed851d454827ee511070b709f1e2ce3efa79694c43b","g":31342},
 {"p":"img/strecke-kachel.jpg","h":"1e53777be4c21d705d719ed851d454827ee511070b709f1e2ce3efa79694c43b","g":31342},
+{"p":"img/strecken/indeq-ring.json","h":"a3e3d6a80a4ee3fe54552eb77d2a665ff179e475c02ca37150a1cfd44327d90d","g":9929},
 {"p":"img/titel-bg.jpg","h":"c02d07a3d67a58813608b14a32f17da24e026400db9ff966cd66729de63f42f6","g":67544},
 {"p":"img/titel.jpg","h":"d0b0567a6ca37be63fbe2040e34c43d19a6da79fd6dbb8f0404cd46d5fdc7e2b","g":39348},
 {"p":"muster-gerade-a4.svg","h":"e919c88d525372efe3b6fc53a269da7bb645122ede31b691b4b4b86cf35799f8","g":2976},

@@ -183,6 +183,10 @@
     // Flaeche 120 x 60 cm (Atlas 2048 x 1024), ohne Fugen und ohne Spiegeln/Toenen je Stueck.
     { id: 'stein', name: 'Stein grau marmoriert', art: 'flaeche', breiteCm: 60, laengeCm: 120, spalten: 1, zeilen: 1,
       ton: [[104, 104, 107]], hell: [130, 130, 133], ader: [70, 70, 75], glanz: 0.34 },
+    // BESTELLT (Gnen54, 18.11.2026): Rasen als Untergrund der freien Strecken ("anstelle Parkett"),
+    // auch fuer Carrera-Bahnen waehlbar. Nahtlose Flaeche 120 x 60 cm, matt.
+    { id: 'rasen', name: 'Rasen', art: 'flaeche', rasen: true, breiteCm: 60, laengeCm: 120, spalten: 1, zeilen: 1,
+      ton: [[62, 104, 40]], hell: [104, 150, 62], ader: [40, 72, 28], glanz: 0.08 },
   ];
   const VF_ATLAS_B = 2048, VF_ATLAS_H = 1024;   // Bodenatlas (8 MB, mit Mipmaps 10,7 MB)
   const VF_BAHN_TEX = 1024, VF_BAHN_SPALTE = 256;  // Fahrbahn: 4 Teile nebeneinander (3 gebraucht, 1 Start/Ziel)
@@ -193,6 +197,8 @@
   const vfTexDaten = { bahn: null, rand: null, boden: null, bodenId: null };
   const vfTexZaehler = { bahn: 0, rand: 0, boden: 0 };
   function vfBodenWahl() {
+    // Freie Strecken (nur virtuell) liegen immer auf Rasen.
+    if (VF.frei || (!VF.aktiv && VF.frei === undefined && typeof vfFreiWahl === 'function' && vfFreiWahl())) return 'rasen';
     try { const v = localStorage.getItem(VF_BODEN_STORE); return VF_BOEDEN.some((b) => b.id === v) ? v : 'eiche'; } catch (e) { return 'eiche'; }
   }
   function vfBodenSetzen(id) { try { localStorage.setItem(VF_BODEN_STORE, id); } catch (e) { /* privat */ } }
@@ -255,6 +261,25 @@
     let t = 0, a = 0.5;
     for (let o = 0, n = 4, m = 2; o < 5; o++, n *= 2, m *= 2, a *= 0.5) t += a * vfSteinRauschen(u, v, n, m, 101 * (o + 1));
     return t;
+  }
+  function vfRasenZeilen(d, AW, AH, y0, y1, P) {
+    const [t0, t1, t2] = P.ton[0], [h0, h1, h2] = P.hell, [a0, a1, a2] = P.ader;
+    for (let y = y0; y < y1; y++) {
+      const v = y / AH;
+      for (let x = 0; x < AW; x++) {
+        const u = x / AW;
+        // grosse Flecken (gemaeht/ungemaeht, trockener), mittlere Buescheligkeit, feine Halme (kurze Striche)
+        const fleck = 0.5 + 0.45 * vfSteinRauschen(u, v, 2, 1, 311) + 0.25 * vfSteinRauschen(u, v, 7, 4, 523);
+        const halm = vfHash(x, Math.floor(y / 4) + (x % 7) * 13), fein = vfHash(x * 3 + 1, y);
+        const hw = Math.max(0, Math.min(1, fleck * 0.75 + halm * 0.35 - 0.05));
+        let r = t0 + (h0 - t0) * hw, g = t1 + (h1 - t1) * hw, b = t2 + (h2 - t2) * hw;
+        const dunkel = fein < 0.12 ? 0.55 : 0;                  // Schatten zwischen den Halmen
+        r += (a0 - r) * dunkel; g += (a1 - g) * dunkel; b += (a2 - b) * dunkel;
+        const i = (y * AW + x) * 4;
+        d[i] = r; d[i + 1] = g; d[i + 2] = b;
+        d[i + 3] = P.glanz * 255;
+      }
+    }
   }
   function vfSteinZeilen(d, AW, AH, y0, y1, P) {
     const [t0, t1, t2] = P.ton[0], [h0, h1, h2] = P.hell, [a0, a1, a2] = P.ader;
@@ -354,10 +379,10 @@
   }
   function* vfBodenBau(P) {
     const AW = VF_ATLAS_B, AH = VF_ATLAS_H, d = new Uint8ClampedArray(AW * AH * 4);
-    const rnd = vfZufall(P.id === 'eiche' ? 1911 : P.id === 'grau' ? 2701 : P.id === 'stein' ? 4409 : 3307);
+    const rnd = vfZufall(P.id === 'eiche' ? 1911 : P.id === 'grau' ? 2701 : P.id === 'stein' ? 4409 : P.id === 'rasen' ? 5813 : 3307);
     const w = AW / P.spalten, h = AH / P.zeilen, stuecke = [];
     if (P.art === 'flaeche') {
-      for (let y = 0; y < AH; y += 64) { vfSteinZeilen(d, AW, AH, y, Math.min(AH, y + 64), P); yield; }
+      for (let y = 0; y < AH; y += 64) { (P.rasen ? vfRasenZeilen : vfSteinZeilen)(d, AW, AH, y, Math.min(AH, y + 64), P); yield; }
       stuecke.push([0, 0, 1, 1]);
     }
     for (let r = 0; P.art !== 'flaeche' && r < P.zeilen; r++) {
@@ -664,8 +689,11 @@
   // Dazu die Markierungen des Originalteils: Teilfuge quer, je Haelfte 10 Querstriche und 8 Punkte.
   function vfBoxVerfeinern(pts, nrm, tiles) {
     const istBox = (k) => k >= 0 && tiles[k] && tiles[k].type === TILE_TYPE.PIT;
-    if (!tiles.some((x) => x.type === TILE_TYPE.PIT) || typeof boxBucht !== 'function') return { pts, nrm, bucht: null, marken: [] };
-    const half = TRACK_HALF_W, tiefe = BOX_BUCHT * half, FEIN = 6, n = pts.length;
+    if (!tiles.some((x) => x.type === TILE_TYPE.PIT) || typeof boxBucht !== 'function') return { pts, nrm, bucht: null, seite: null, marken: [] };
+    // Bucht-Seite: -1 = rechts (Carrera-Boxengasse, rote Seite), +1 = links (freie Strecken, aus der Datei).
+    const seiteK = (k) => (tiles[k] && tiles[k].seite) || -1;
+    const half = TRACK_HALF_W, FEIN = 6, n = pts.length;
+    const tiefeK = (k) => (tiles[k] && tiles[k].bucht ? tiles[k].bucht : BOX_BUCHT) * half;
     const box = {};
     for (let i = 1; i < n; i++) {
       const k = pts[i].tile;
@@ -673,7 +701,7 @@
       if (!box[k]) box[k] = { s: i - 1, b: i }; else box[k].b = i;
     }
     const u = (i, k) => (i - box[k].s) / Math.max(1, box[k].b - box[k].s);
-    const p2 = [], n2 = [], bucht = [];
+    const p2 = [], n2 = [], bucht = [], seite = [];
     for (let i = 0; i < n; i++) {
       const k = pts[i].tile;
       if (i > 0 && box[k]) {
@@ -683,16 +711,26 @@
           const nl = Math.hypot(nx, ny) || 1;
           p2.push({ x: a.x + (z.x - a.x) * q, y: a.y + (z.y - a.y) * q, tile: k });
           n2.push({ x: nx / nl, y: ny / nl });
-          bucht.push(tiefe * boxBucht(u(i - 1, k) + q / Math.max(1, box[k].b - box[k].s)));
+          bucht.push(tiefeK(k) * boxBucht(u(i - 1, k) + q / Math.max(1, box[k].b - box[k].s))); seite.push(seiteK(k));
         }
       }
       p2.push(pts[i]); n2.push(nrm[i]);
-      bucht.push(box[k] ? tiefe * boxBucht(u(i, k)) : 0);
+      bucht.push(box[k] ? tiefeK(k) * boxBucht(u(i, k)) : 0); seite.push(box[k] ? seiteK(k) : -1);
     }
     // Markierungen als flache Vierecke (Mitte, Laengsrichtung, Laenge, Querrichtung, Breite).
     const marken = [];
     for (const k of Object.keys(box)) {
       const { s: i0, b: i1 } = box[k];
+      // Freie Strecke: statt der Carrera-Markierungen der Steg zwischen Bahn und Boxengasse (aus der DXF),
+      // als helle Leiste mit der echten Breite.
+      if (tiles[k].steg) {
+        const sp = tiles[k].steg.pts, sb = tiles[k].steg.b;
+        for (let j = 0; j + 1 < sp.length; j++) {
+          const ax = sp[j][0], ay = sp[j][1], bx = sp[j + 1][0], by = sp[j + 1][1], l = Math.hypot(bx - ax, by - ay) || 1;
+          marken.push({ m: [(ax + bx) / 2, (ay + by) / 2], e: [(bx - ax) / l, (by - ay) / l], l: l + 0.05, q: [-(by - ay) / l, (bx - ax) / l], b: sb, c: [0.92, 0.92, 0.92] });
+        }
+        continue;
+      }
       const A = pts[i0], Z = pts[i1], nn = nrm[Math.min(i1, i0 + 1)];
       const lx = Z.x - A.x, ly = Z.y - A.y, L = Math.hypot(lx, ly) || 1, ex = lx / L, ey = ly / L;
       const P = (uu, v) => [A.x + lx * uu - nn.x * v * half, A.y + ly * uu - nn.y * v * half];
@@ -711,7 +749,7 @@
         }
       }
     }
-    return { pts: p2, nrm: n2, bucht, marken };
+    return { pts: p2, nrm: n2, bucht, seite, marken };
   }
   // Zusatzbreite der Boxenbucht je Punkt der (gefahrenen) Mittellinie, fuer "neben der Bahn" und den
   // Randstein: die Bucht zaehlt als Fahrbahn (Gnen54 17.11.: "an die Box fahren, nachtanken, weiter").
@@ -726,7 +764,7 @@
     }
     for (let i = 0; i < n; i++) {
       const k = pts[i].tile, b = box[k];
-      if (b) out[i] = BOX_BUCHT * TRACK_HALF_W * boxBucht((i - b.s) / Math.max(1, b.b - b.s));
+      if (b) out[i] = (tiles[k].bucht || BOX_BUCHT) * TRACK_HALF_W * boxBucht((i - b.s) / Math.max(1, b.b - b.s));
     }
     return out;
   }
@@ -734,7 +772,7 @@
     const strasse = [], rand = [];
     const fein = vfBoxVerfeinern(pts0, nrm0, tiles);
     const pts = fein.pts, nrm = fein.nrm, bucht = fein.bucht;
-    const bu = (i) => (bucht ? bucht[i] : 0);
+    const bu = (i) => (bucht ? bucht[i] : 0), bse = (i) => (fein.seite ? fein.seite[i] : -1);
     const half = TRACK_HALF_W, kw = TRACK_KERB_W, ky = 0.09, n = pts.length;
     const rnd = vfZufall(4242 + tiles.length * 31 + Math.round(Math.abs(pts[n - 1].x) * 7));
     const off = (i, d) => [pts[i].x + nrm[i].x * d, pts[i].y + nrm[i].y * d];
@@ -761,15 +799,29 @@
         vfViereck(strasse, [a[0], 0, a[1], ua, v0], [b[0], 0, b[1], ua, v1], [c[0], 0, c[1], ub, v1], [d[0], 0, d[1], ub, v0], ct);
         if (bu(i) > 1e-3 || bu(i + 1) > 1e-3) {
           // Boxenbucht: Asphalt vom Rand bis zur ausgestellten Kante (Randspalte der Textur, etwas dunkler).
-          const e = off(i + 1, -half - bu(i + 1)), g = off(i, -half - bu(i)), cb = [ct[0] * 0.9, ct[1] * 0.9, ct[2] * 0.9];
-          vfViereck(strasse, [d[0], 0, d[1], ub, v0], [c[0], 0, c[1], ub, v1], [e[0], 0, e[1], ub, v1], [g[0], 0, g[1], ub, v0], cb);
+          const sb = bse(i), r0 = off(i, half * sb), r1 = off(i + 1, half * sb), ur = sb > 0 ? ua : ub;
+          const e = off(i + 1, (half + bu(i + 1)) * sb), g = off(i, (half + bu(i)) * sb), cb = [ct[0] * 0.9, ct[1] * 0.9, ct[2] * 0.9];
+          vfViereck(strasse, [r0[0], 0, r0[1], ur, v0], [r1[0], 0, r1[1], ur, v1], [e[0], 0, e[1], ur, v1], [g[0], 0, g[1], ur, v0], cb);
         }
       }
       for (const sg of [1, -1]) {
-        const bs = (i) => (sg < 0 ? bu(i) : 0);
+        const bs = (i) => (sg === bse(i) ? bu(i) : 0);
+        if (tiles[tl.T] && tiles[tl.T].frei) {
+          // Freie Strecke (nur virtuell): statt Carrera-Randstein Asphalt bis zur Kante und eine weisse
+          // Randlinie (Gnen54 18.11.: "Fahrbahnraender nur weiss markiert" - Erkennungsmerkmal).
+          const lw = 1.5 * TRACK_UNITS_PER_CM, uk = sg > 0 ? ua : ub, um = (sg > 0 ? 4 : 132) / VF_RAND_B;
+          for (let i = tl.i0; i <= tl.i1; i++) {
+            const iA = off(i, (half + bs(i)) * sg), iB = off(i + 1, (half + bs(i + 1)) * sg);
+            const oA = off(i, (half + kw + bs(i)) * sg), oB = off(i + 1, (half + kw + bs(i + 1)) * sg);
+            const lA = off(i, (half + kw - lw + bs(i)) * sg), lB = off(i + 1, (half + kw - lw + bs(i + 1)) * sg);
+            vfViereck(strasse, [iA[0], 0, iA[1], uk, 0.3], [iB[0], 0, iB[1], uk, 0.4], [oB[0], 0, oB[1], uk, 0.4], [oA[0], 0, oA[1], uk, 0.3], ct);
+            vfViereck(rand, [lA[0], 0.012, lA[1], um, 0.1], [lB[0], 0.012, lB[1], um, 0.1], [oB[0], 0.012, oB[1], um, 0.2], [oA[0], 0.012, oA[1], um, 0.2], [1, 1, 1]);
+          }
+          continue;
+        }
         const mitte = (half + kw / 2) * sg, accS = [0];
         for (let i = tl.i0; i <= tl.i1; i++) {
-          const p = off(i, mitte - bs(i)), q = off(i + 1, mitte - bs(i + 1));
+          const p = off(i, mitte + bs(i) * sg), q = off(i + 1, mitte + bs(i + 1) * sg);
           accS.push(accS[accS.length - 1] + Math.hypot(q[0] - p[0], q[1] - p[1]));
         }
         const Ls = accS[accS.length - 1] || 1, nP = Math.max(1, Math.round(Ls / takt)), k0 = Math.floor(rnd() * 4);
@@ -787,7 +839,7 @@
           if (i === tl.i1) t1 = 1 - f;
           stuecke.push([t0, t1, false]);
           if (i === tl.i1) stuecke.push([t1, 1, true]);
-          const iA = off(i, half * sg - bs(i)), iB = off(i + 1, half * sg - bs(i + 1)), oA = off(i, (half + kw) * sg - bs(i)), oB = off(i + 1, (half + kw) * sg - bs(i + 1));
+          const iA = off(i, (half + bs(i)) * sg), iB = off(i + 1, (half + bs(i + 1)) * sg), oA = off(i, (half + kw + bs(i)) * sg), oB = off(i + 1, (half + kw + bs(i + 1)) * sg);
           for (const [s0, s1, fuge] of stuecke) {
             if (s1 <= s0) continue;
             const i0 = lerp(iA, iB, s0), i1 = lerp(iA, iB, s1), o0 = lerp(oA, oB, s0), o1 = lerp(oA, oB, s1);
@@ -1114,6 +1166,32 @@
   function vfSchaltungAuto() { try { return localStorage.getItem(VF_SCHALTUNG_STORE) !== 'manuell'; } catch (e) { return true; } }
   // Geist: eine Kopie des Autos, die nach der ersten Runde die aufgezeichnete Linie abfaehrt.
   const VF_GEIST_STORE = 'omegasim-vf-geist';
+  // FREIE STRECKEN nur fuer die virtuelle Fahrt (BESTELLT Gnen54 18.11.: "eine nicht fuer Carrera gedachte
+  // Strecke, rein fuer virtuelles Fahren"). Die Datei bringt die Mittellinie (Einheiten wie der Editor,
+  // Abstand ~2,86 = ein Teil hat 14 Punkte) und Pseudo-Kacheln (START / STRAIGHT / PIT), damit Runden,
+  // Randsteine, Boxenbucht und NPCs unveraendert funktionieren. Erzeugt aus Gnen54s DXF (tools ausserhalb).
+  const VF_STRECKE_STORE = 'omegasim-vf-strecke';
+  const VF_FREIE = { indeq: { name: 'InDeQ-Ring', pfad: 'img/strecken/indeq-ring.json' } };
+  function vfFreiWahl() { try { const v = localStorage.getItem(VF_STRECKE_STORE) || ''; return VF_FREIE[v] ? v : ''; } catch (e) { return ''; } }
+  const vfFreiCache = {};
+  function vfFreiLaden(k) {
+    if (vfFreiCache[k]) return Promise.resolve(vfFreiCache[k]);
+    return fetch(VF_FREIE[k].pfad).then((r) => r.json()).then((d) => {
+      // PIT-Kacheln bringen die Tiefe ihrer Bucht mit (halbe Bahnbreiten, echte Boxengasse).
+      const tiles = d.kacheln.map((ty) => ({ type: TILE_TYPE[ty] !== undefined ? TILE_TYPE[ty] : TILE_TYPE.STRAIGHT, frei: true,
+        bucht: ty === 'PIT' ? d.boxBucht : undefined, seite: ty === 'PIT' ? (d.boxSeite || -1) : undefined, steg: ty === 'PIT' ? d.steg : undefined }));
+      const pts = d.pts.map((q) => ({ x: q[0], y: q[1], tile: q[2] }));
+      // geschlossen wie trackCenterline: letzter Punkt = erster (sonst fehlt das letzte Stueck Bahn)
+      pts.push({ x: pts[0].x, y: pts[0].y, tile: pts[pts.length - 1].tile });
+      // Fahrtrichtung wie trackCenterline: Richtung (sin h, -cos h), h in Grad.
+      pts.forEach((p, i) => {
+        const m = pts.length - 1, a = pts[(i - 1 + m) % m], c = pts[(i + 1) % m];
+        p.heading = Math.atan2(c.x - a.x, -(c.y - a.y)) * 180 / Math.PI;
+      });
+      vfFreiCache[k] = { name: d.name, tiles, pts };
+      return vfFreiCache[k];
+    });
+  }
   // Aussenspiegel (BESTELLT Gnen54 17.11.: links und rechts je ein Spiegelbild, nur in der Onboard-Kamera
   // "Motorhaube", Standard aus - jeder Spiegel zeichnet die Szene ein weiteres Mal).
   const VF_SPIEGEL_STORE = 'omegasim-vf-spiegel';
@@ -2046,7 +2124,7 @@
     VF.idx = o.idx;
     if (VF.splits && VF.splits[VF.idx] === undefined) VF.splits[VF.idx] = rennZeitJetzt() - VF.rundeAb;
     // Boxenbucht auf der rechten (roten) Seite: dort ist die Fahrbahn um die Bucht breiter.
-    const zus = o.quer < 0 && VF.bucht ? (VF.bucht[o.idx] || 0) : 0;
+    const zus = Math.sign(o.quer) === (VF.buchtSeite || -1) && VF.bucht ? (VF.bucht[o.idx] || 0) : 0;
     const ab = Math.abs(o.quer) - zus > TRACK_HALF_W * 1.19 + VF_AUTO.B * 0.3;
     if (ab && !VF.abseits) VF.abseitsSeit = rennZeitJetzt();
     VF.abseits = ab;
@@ -2054,7 +2132,7 @@
     // Rand ueber ihn, rattert es und der Controller brummt.
     const q = Math.abs(o.quer) - zus;
     const kerbRand = TRACK_HALF_W * 2 * 0.095;
-    const kerb = !ab && q > TRACK_HALF_W - VF_AUTO.B * 0.5 && q < TRACK_HALF_W + kerbRand;
+    const kerb = !ab && !VF.frei && q > TRACK_HALF_W - VF_AUTO.B * 0.5 && q < TRACK_HALF_W + kerbRand;
     if (kerb && Math.abs(kmh) > 0.05) {
       if (VF.kerbSeit === undefined || rennZeitJetzt() - VF.kerbSeit > 70) {
         VF.kerbSeit = rennZeitJetzt();
@@ -2984,7 +3062,14 @@
     // des virtuellen Autos werden beim Beenden wieder zurueckgenommen.
     VF.tilesVorher = currentTrackTiles;
     try { VF.editorVorher = localStorage.getItem(EDITOR_STRECKE_STORE); } catch (e) { VF.editorVorher = undefined; }
-    const tiles = opts.tiles && opts.tiles.length >= 3 ? opts.tiles : vfTilesWaehlen();
+    const freiK = !(opts.tiles && opts.tiles.length >= 3) && !opts.studie ? vfFreiWahl() : '';
+    if (freiK && !vfFreiCache[freiK]) {
+      vfFreiLaden(freiK).then(() => virtuellStarten(opts), () => vfStartHinweis(t('Strecke konnte nicht geladen werden')));
+      return true;
+    }
+    const frei = freiK ? vfFreiCache[freiK] : null;
+    VF.frei = frei;
+    const tiles = frei ? frei.tiles : (opts.tiles && opts.tiles.length >= 3 ? opts.tiles : vfTilesWaehlen());
     if (!tiles) { vfStartHinweis(t('Erst eine Strecke bauen')); return false; }
     VF.studie = !!opts.studie;
     const schicht = document.createElement('div');
@@ -3046,10 +3131,11 @@
     VF.tiles = tiles;
     // Gezeichnet wird die volle Mittellinie (sonst klafft an der Schliessstelle ein Loch in der Bahn),
     // gefahren, gezaehlt und von den NPCs befahren die an der Schliessstelle gekuerzte.
-    const ptsVoll = trackCenterline(tiles);
+    const ptsVoll = frei ? frei.pts.map((q) => ({ x: q.x, y: q.y, tile: q.tile, heading: q.heading })) : trackCenterline(tiles);
     VF.pts = vfSchliessstelle(ptsVoll);
     VF.nrm = trackNormals(VF.pts);
     VF.bucht = vfBuchtJePunkt(VF.pts, tiles);
+    VF.buchtSeite = tiles.reduce((a, x) => (x.type === TILE_TYPE.PIT && x.seite ? x.seite : a), -1);
     // v1.3.39: Flaechen mit Texturen (die Pixel entstehen nur beim ersten Mal) und der feste Platz der
     // Kamera "Fahrer am Rand".
     try { VF.flaeche = vfFlaechenBauen(gl, ptsVoll, ptsVoll === VF.pts ? VF.nrm : trackNormals(ptsVoll), tiles, VF.grafik); } catch (e) { schicht.remove(); document.body.classList.remove('vf-an'); showHudToast('WebGL: ' + e.message); return false; }
@@ -3287,6 +3373,15 @@
       renderGarage();
     };
     rechts.appendChild(garWertZeile(t('Geist folgt meiner Linie'), geistAn ? t('An') : t('Aus'), geistWahl, geistWahl));
+    // Strecke: die gebaute Bahn oder eine freie Strecke nur fuer die virtuelle Fahrt.
+    const streckeK = vfFreiWahl(), streckeListe = [''].concat(Object.keys(VF_FREIE));
+    const streckeWahl = (d) => {
+      const nk = streckeListe[(streckeListe.indexOf(streckeK) + d + streckeListe.length) % streckeListe.length];
+      try { localStorage.setItem(VF_STRECKE_STORE, nk); } catch (e) { /* egal */ }
+      if (nk) vfFreiLaden(nk).catch(() => {});
+      renderGarage();
+    };
+    rechts.appendChild(garWertZeile(t('Strecke'), streckeK ? VF_FREIE[streckeK].name + ' (' + t('nur virtuell') + ')' : t('Gebaute Bahn'), () => streckeWahl(-1), () => streckeWahl(1)));
     // Aussenspiegel links/rechts, nur in der Kamera "Motorhaube" (Standard aus).
     const spiegelAn = vfSpiegelAn();
     const spiegelWahl = () => {
@@ -3421,6 +3516,7 @@
     } catch (e) { /* ohne Ton weiterfahren */ }
   }
   function virtuellBeenden() {
+    VF.frei = undefined;
     vfSpiegelRahmen(false);
     rennPauseBeenden();
     if (!VF.aktiv) return;
@@ -3509,7 +3605,7 @@
     const zeichne = () => {
       if (!el.isConnected || !VF.aktiv) { el.remove(); clearInterval(vfPadDiagIv); return; }
       let code = '-';
-      try { code = (VF.tiles || currentTrackTiles || []).length > 1 ? trackToCode(VF.tiles || currentTrackTiles) : '-'; } catch (e) { /* ohne */ }
+      try { code = VF.frei ? VF.frei.name : (VF.tiles || currentTrackTiles || []).length > 1 ? trackToCode(VF.tiles || currentTrackTiles) : '-'; } catch (e) { /* ohne */ }
       el.textContent = t('Pad-Diagnose (F8 schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-')
         + '\n' + t('Strecke') + ': ' + code;
     };
