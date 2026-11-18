@@ -1171,7 +1171,7 @@
   // Abstand ~2,86 = ein Teil hat 14 Punkte) und Pseudo-Kacheln (START / STRAIGHT / PIT), damit Runden,
   // Randsteine, Boxenbucht und NPCs unveraendert funktionieren. Erzeugt aus Gnen54s DXF (tools ausserhalb).
   const VF_STRECKE_STORE = 'omegasim-vf-strecke';
-  const VF_FREIE = { indeq: { name: 'InDeQ-Ring', pfad: 'img/strecken/indeq-ring.json' } };
+  const VF_FREIE = { indeq: { name: 'Törnerschleife 2.0', pfad: 'img/strecken/indeq-ring.json' } };
   function vfFreiWahl() { try { const v = localStorage.getItem(VF_STRECKE_STORE) || ''; return VF_FREIE[v] ? v : ''; } catch (e) { return ''; } }
   const vfFreiCache = {};
   function vfFreiLaden(k) {
