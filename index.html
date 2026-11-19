@@ -43723,7 +43723,7 @@
   // Spiegelstelle: auto.json "spiegel": {vor, hoch, seite} in m, sonst aus der Haubenkamera abgeleitet
   // (etwas hinter und unter dem Auge, aussen neben der Karosserie). Rahmen als HTML ueber der Leinwand.
   const VF_SPIEGEL_WINKEL = 12;     // Grad nach aussen gedreht
-  const VF_SPIEGEL_FOV = 36;        // senkrechter Bildwinkel (Spiegel hochkant)
+  const VF_SPIEGEL_FOV = 26;        // senkrechter Bildwinkel (Aussenspiegel, quer)
   // Gamepad -> HUD-Knoepfe der virtuellen Fahrt (aus pollGamepad, 90-ghosts.js): dieselbe Wirkung wie
   // ein Klick, damit Pad und Maus nie auseinanderlaufen.
   function vfKnopf(id) {
@@ -43740,38 +43740,86 @@
       vfFlagPad.seit = null;
     }
   }
+  // 19.11. (BESTELLT Gnen54): die Spiegel sollen wirken wie echte Aussenspiegel - quer, in den unteren
+  // Ecken der Frontscheibe, mit Gehaeuse (Wagenfarbe dunkel) und Glas mit runder Aussenkante. Das Gehaeuse
+  // ist ein SVG ueber dem Bildausschnitt: aussen die Schale, innen das Glas ausgespart (evenodd), so
+  // decken die Rundungen die Ecken des rechteckigen Ausschnitts ab.
+  function vfSpiegelForm(w, h, links, o, r1, r2, t) {
+    // Rechteck mit staerker gerundeter Aussenseite (links beim linken Spiegel), oben zur Aussenseite
+    // leicht abfallend. Die Radien bleiben unter 2,4 x Gehaeusedicke - sonst schauten die Ecken des
+    // (rechteckigen) Bildausschnitts unter der Schale hervor.
+    const k = o || 0;
+    const P = (x, y) => (x + k).toFixed(1) + ',' + (y + k).toFixed(1);
+    return links
+      ? `M${P(r1, t)} L${P(w - r2, 0)} Q${P(w, 0)} ${P(w, r2)} L${P(w, h - r2)} Q${P(w, h)} ${P(w - r2, h)} L${P(r1, h)} Q${P(0, h)} ${P(0, h - r1)} L${P(0, t + r1)} Q${P(0, t)} ${P(r1, t)} Z`
+      : `M${P(0, r2)} Q${P(0, 0)} ${P(r2, 0)} L${P(w - r1, t)} Q${P(w, t)} ${P(w, t + r1)} L${P(w, h - r1)} Q${P(w, h)} ${P(w - r1, h)} L${P(r2, h)} Q${P(0, h)} ${P(0, h - r2)} Z`;
+  }
   function vfSpiegelRahmen(an, rechtecke) {
     let r = VF.spiegelRahmen;
     if (!an) { if (r) { r.forEach((e) => e.remove()); VF.spiegelRahmen = null; } return; }
     if (!r) {
       r = VF.spiegelRahmen = [0, 1].map(() => {
-        const e = document.createElement('div');
-        e.style.cssText = 'position:absolute;box-sizing:content-box;pointer-events:none;border:3px solid #15171b;border-radius:14px;'
-          + 'box-shadow:0 0 0 2px rgba(255,255,255,.18),0 4px 14px rgba(0,0,0,.45);z-index:2';
+        const e = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        e.style.cssText = 'position:absolute;pointer-events:none;overflow:visible;z-index:2;filter:drop-shadow(0 3px 6px rgba(0,0,0,.45))';
         (VF.cv.parentNode || document.body).appendChild(e);
         return e;
       });
     }
     const dpr = VF.cv.width / Math.max(1, VF.cv.clientWidth);
     rechtecke.forEach((q, i) => {
-      const e = r[i], st = e.style;
+      const e = r[i], st = e.style, links = i === 0;
+      const w = q[2] / dpr, h = q[3] / dpr, rand = Math.max(5, h * 0.14);
+      const r1 = h * 0.3, r2 = h * 0.14, t = h * 0.06;
       const l = VF.cv.offsetLeft + q[0] / dpr, o = VF.cv.offsetTop + (VF.cv.height - q[1] - q[3]) / dpr;
-      st.left = (l - 3) + 'px'; st.top = (o - 3) + 'px'; st.width = (q[2] / dpr) + 'px'; st.height = (q[3] / dpr) + 'px';
+      const schl = `${w}x${h}`;
+      if (e.dataset.mass !== schl) {
+        e.dataset.mass = schl;
+        const W = w + rand * 2, H = h + rand * 2;
+        e.setAttribute('width', W); e.setAttribute('height', H); e.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        const aussen = vfSpiegelForm(W, H, links, 0, r1 + rand, r2 + rand, t), innen = vfSpiegelForm(w, h, links, rand, r1, r2, t);
+        e.innerHTML = `<defs><linearGradient id="vfsg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3e46"/><stop offset="1" stop-color="#121418"/></linearGradient></defs>`
+          + `<path fill="url(#vfsg${i})" fill-rule="evenodd" d="${aussen} ${innen}"/>`
+          + `<path fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5" d="${aussen}"/>`;
+      }
+      st.left = (l - rand) + 'px'; st.top = (o - rand) + 'px';
     });
+  }
+  // Einheitliches Armaturenbrett unten im Bild (nicht beim Bulli - der hat sein eigenes im Modell - und
+  // nicht beim offenen Spider mit Windschott). Flache SVG-Kante, kostet keine Bildrate.
+  function vfCockpit(an) {
+    let e = VF.cockpit;
+    if (!an) { if (e) { e.remove(); VF.cockpit = null; } return; }
+    if (!e) {
+      e = VF.cockpit = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      e.setAttribute('viewBox', '0 0 1000 100'); e.setAttribute('preserveAspectRatio', 'none');
+      e.style.cssText = 'position:absolute;left:0;bottom:0;width:100%;height:17%;pointer-events:none';
+      e.innerHTML = '<defs><linearGradient id="vfcp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2e34"/>'
+        + '<stop offset="0.25" stop-color="#1b1d21"/><stop offset="1" stop-color="#0c0d0f"/></linearGradient></defs>'
+        + '<path fill="url(#vfcp)" d="M0,38 C180,30 300,26 380,24 C420,4 580,4 620,24 C700,26 820,30 1000,38 L1000,100 L0,100 Z"/>'
+        + '<path fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.2" vector-effect="non-scaling-stroke" d="M0,38 C180,30 300,26 380,24 C420,4 580,4 620,24 C700,26 820,30 1000,38"/>';
+      // direkt hinter das Bild, ohne z-index: die Anzeigen (Reifen, Tempo, Tank) bleiben darueber.
+      VF.cv.parentNode.insertBefore(e, VF.cv.nextSibling);
+    }
+    e.style.left = VF.cv.offsetLeft + 'px'; e.style.width = VF.cv.clientWidth + 'px';
+    e.style.bottom = 'auto'; e.style.top = (VF.cv.offsetTop + VF.cv.clientHeight * 0.83) + 'px';
   }
   function vfSpiegelMalen(gl, w, h) {
     const an = vfSpiegelAn() && vfKameraId() === 'haube' && !!(VF.modell && VF.tprog) && !vfKameraGedreht();
+    const auto = vfAutoWahl();
+    vfCockpit(an && auto !== 'caravelle' && auto !== 'spider');
     if (!an) { vfSpiegelRahmen(false); return; }
     const d = VF.modell.d, s = VF_AUTO.L / d.laenge;
+    const Hz = vfHzSpieler();
     const hb = VF.modell.meta && VF.modell.meta.haube, sp = VF.modell.meta && VF.modell.meta.spiegel;
     const vor = (sp && typeof sp.vor === 'number' ? sp.vor : (hb ? hb.vor : 0.75) - 0.25) * s;
     const hoch = (sp && typeof sp.hoch === 'number' ? sp.hoch : (hb ? hb.hoch : 1.0) - 0.12) * s;
     const seite = (sp && typeof sp.seite === 'number' ? sp.seite : d.breite / 2 + 0.06) * s;
     const r = VF.h * Math.PI / 180, fx = Math.sin(r), fz = -Math.cos(r);
     const lx = fz, lz = -fx;                                         // links (wie "seite" der Haubenkamera)
-    // Hochkant und ganz am Rand (Gnen54 17.11.: "querliegende Spiegel stoeren im Blickfeld").
-    const sh = Math.round(h * 0.36), sw = Math.round(Math.min(sh * 0.6, w * 0.14));
-    const y0 = Math.round(h * 0.30), rand = Math.max(4, Math.round(w * 0.004));
+    // Wie Aussenspiegel (19.11.): quer, klein, in den unteren Ecken knapp ueber dem Armaturenbrett, ganz
+    // am Rand - die Fahrbahn in der Mitte bleibt frei (17.11.: "Spiegel stoeren im Blickfeld").
+    const sw = Math.round(Math.min(w * 0.17, h * 0.34)), sh = Math.round(sw * 0.58);
+    const y0 = Math.round(h * 0.15), rand = Math.max(10, Math.round(w * 0.018));
     const rechtecke = [[rand, y0, sw, sh], [w - rand - sw, y0, sw, sh]];   // links, rechts (x, y von unten)
     const wi = VF_SPIEGEL_WINKEL * Math.PI / 180;
     gl.enable(gl.SCISSOR_TEST);
@@ -43780,10 +43828,10 @@
       gl.viewport(q[0], q[1], q[2], q[3]); gl.scissor(q[0], q[1], q[2], q[3]);
       gl.clearColor(0.66, 0.78, 0.90, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      const auge = [VF.x + fx * vor + lx * seite * sg, hoch, VF.y + fz * vor + lz * seite * sg];
+      const auge = [VF.x + fx * vor + lx * seite * sg, hoch + Hz.z, VF.y + fz * vor + lz * seite * sg];
       // nach hinten, um VF_SPIEGEL_WINKEL nach aussen gedreht
       const bx = -fx * Math.cos(wi) + lx * sg * Math.sin(wi), bz = -fz * Math.cos(wi) + lz * sg * Math.sin(wi);
-      const ziel = [auge[0] + bx * 30, hoch - 0.6, auge[2] + bz * 30];
+      const ziel = [auge[0] + bx * 30, hoch + Hz.z - 0.6 - Math.tan(Hz.p) * 30, auge[2] + bz * 30];
       const blick = vfBlick(auge, ziel, VF_OBEN);
       const pr = vfPerspektive(VF_SPIEGEL_FOV * Math.PI / 180, q[2] / Math.max(1, q[3]), 0.3, 900);
       for (let k = 0; k < 4; k++) pr[k * 4] = -pr[k * 4];          // x spiegeln (Spaltenmatrix: Zeile 0)
@@ -44901,7 +44949,7 @@
   }
   function virtuellBeenden() {
     VF.frei = undefined;
-    vfSpiegelRahmen(false);
+    vfSpiegelRahmen(false); vfCockpit(false);
     rennPauseBeenden();
     if (!VF.aktiv) return;
     // Laeuft eine Challenge (z. B. die Studienfahrt) mit dem virtuellen Auto, endet sie mit: abgebrochen,
