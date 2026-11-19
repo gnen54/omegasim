@@ -711,11 +711,12 @@
           const nl = Math.hypot(nx, ny) || 1;
           p2.push({ x: a.x + (z.x - a.x) * q, y: a.y + (z.y - a.y) * q, tile: k });
           n2.push({ x: nx / nl, y: ny / nl });
-          bucht.push(tiefeK(k) * boxBucht(u(i - 1, k) + q / Math.max(1, box[k].b - box[k].s))); seite.push(seiteK(k));
+          bucht.push(z.bucht !== undefined ? (a.bucht || 0) + ((z.bucht || 0) - (a.bucht || 0)) * q
+            : tiefeK(k) * boxBucht(u(i - 1, k) + q / Math.max(1, box[k].b - box[k].s))); seite.push(seiteK(k));
         }
       }
       p2.push(pts[i]); n2.push(nrm[i]);
-      bucht.push(box[k] ? tiefeK(k) * boxBucht(u(i, k)) : 0); seite.push(box[k] ? seiteK(k) : -1);
+      bucht.push(pts[i].bucht !== undefined ? pts[i].bucht : (box[k] ? tiefeK(k) * boxBucht(u(i, k)) : 0)); seite.push(box[k] ? seiteK(k) : -1);
     }
     // Markierungen als flache Vierecke (Mitte, Laengsrichtung, Laenge, Querrichtung, Breite).
     const marken = [];
@@ -764,7 +765,8 @@
     }
     for (let i = 0; i < n; i++) {
       const k = pts[i].tile, b = box[k];
-      if (b) out[i] = (tiles[k].bucht || BOX_BUCHT) * TRACK_HALF_W * boxBucht((i - b.s) / Math.max(1, b.b - b.s));
+      if (pts[i].bucht !== undefined) out[i] = pts[i].bucht;
+      else if (b) out[i] = (tiles[k].bucht || BOX_BUCHT) * TRACK_HALF_W * boxBucht((i - b.s) / Math.max(1, b.b - b.s));
     }
     return out;
   }
@@ -778,6 +780,8 @@
     const off = (i, d) => [pts[i].x + nrm[i].x * d, pts[i].y + nrm[i].y * d];
     const zz = (i) => pts[i].z || 0;   // Hoehe (Bruecke), sonst 0
     const lerp = (p, q, t) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
+    // Echte Boxengasse als eigene Flaeche (19.11.): dann keine Bucht aus der Mittellinie zeichnen.
+    const gasse = (tiles.find((x) => x && x.gasse) || {}).gasse;
     const teile = [];
     for (let i = 0; i < n - 1; i++) {
       const T = pts[i + 1].tile, l = teile[teile.length - 1];
@@ -799,7 +803,7 @@
         const a = off(i, half), b = off(i + 1, half), c = off(i + 1, -half), d = off(i, -half);
         const z0 = zz(i), z1 = zz(i + 1);
         vfViereck(strasse, [a[0], z0, a[1], ua, v0], [b[0], z1, b[1], ua, v1], [c[0], z1, c[1], ub, v1], [d[0], z0, d[1], ub, v0], ct);
-        if (bu(i) > 1e-3 || bu(i + 1) > 1e-3) {
+        if (!gasse && (bu(i) > 1e-3 || bu(i + 1) > 1e-3)) {
           // Boxenbucht: Asphalt vom Rand bis zur ausgestellten Kante (Randspalte der Textur, etwas dunkler).
           const sb = bse(i), r0 = off(i, half * sb), r1 = off(i + 1, half * sb), ur = sb > 0 ? ua : ub;
           const e = off(i + 1, (half + bu(i + 1)) * sb), g = off(i, (half + bu(i)) * sb), cb = [ct[0] * 0.9, ct[1] * 0.9, ct[2] * 0.9];
@@ -814,12 +818,15 @@
           // am selben Tag: breiter, so breit wie ein Carrera-Randstein, und rumpelt beim Ueberfahren genauso.
           const lw = kw, uk = sg > 0 ? ua : ub, um = (sg > 0 ? 4 : 132) / VF_RAND_B;
           for (let i = tl.i0; i <= tl.i1; i++) {
-            const iA = off(i, (half + bs(i)) * sg), iB = off(i + 1, (half + bs(i + 1)) * sg);
-            const oA = off(i, (half + kw + bs(i)) * sg), oB = off(i + 1, (half + kw + bs(i + 1)) * sg);
-            const lA = off(i, (half + kw - lw + bs(i)) * sg), lB = off(i + 1, (half + kw - lw + bs(i + 1)) * sg);
+            // Zur echten Gasse hin: Asphalt bis zur Kante, aber keine weisse Linie (dort geht es hinein).
+            const offen = !!gasse && (bs(i) > 1e-3 || bs(i + 1) > 1e-3);
+            const bsZ = (j) => (gasse ? 0 : bs(j));
+            const iA = off(i, (half + bsZ(i)) * sg), iB = off(i + 1, (half + bsZ(i + 1)) * sg);
+            const oA = off(i, (half + kw + bsZ(i)) * sg), oB = off(i + 1, (half + kw + bsZ(i + 1)) * sg);
+            const lA = off(i, (half + kw - lw + bsZ(i)) * sg), lB = off(i + 1, (half + kw - lw + bsZ(i + 1)) * sg);
             const zA = zz(i), zB = zz(i + 1);
             vfViereck(strasse, [iA[0], zA, iA[1], uk, 0.3], [iB[0], zB, iB[1], uk, 0.4], [oB[0], zB, oB[1], uk, 0.4], [oA[0], zA, oA[1], uk, 0.3], ct);
-            vfViereck(rand, [lA[0], zA + 0.012, lA[1], um, 0.1], [lB[0], zB + 0.012, lB[1], um, 0.1], [oB[0], zB + 0.012, oB[1], um, 0.2], [oA[0], zA + 0.012, oA[1], um, 0.2], [1, 1, 1]);
+            if (!offen) vfViereck(rand, [lA[0], zA + 0.012, lA[1], um, 0.1], [lB[0], zB + 0.012, lB[1], um, 0.1], [oB[0], zB + 0.012, oB[1], um, 0.2], [oA[0], zA + 0.012, oA[1], um, 0.2], [1, 1, 1]);
             if (zA > 0 || zB > 0) {
               // Bruecke (19.11.): Bordwand aussen (gedruckt, grau) bis 1,3 ueber die Fahrbahn, unten so
               // tief wie die Platte (11 mm, wie im STL) - darunter bleibt die Durchfahrt offen; an den
@@ -871,6 +878,22 @@
         }
       }
     });
+    if (gasse) {
+      // Boxengasse aus der DXF: Dreiecke (Asphalt, etwas dunkler) und die weissen Waende.
+      const t = gasse.tri, ur = (0.5 * VF_BAHN_SPALTE) / VF_BAHN_TEX, cb = [0.88, 0.88, 0.9];
+      for (let j = 0; j + 5 < t.length; j += 6) {
+        for (const k of [0, 2, 4]) strasse.push(t[j + k], 0, t[j + k + 1], ur, 0.5, cb[0], cb[1], cb[2]);
+      }
+      const uk = 4 / VF_RAND_B;
+      for (const L of gasse.rand) {
+        for (let j = 0; j + 1 < L.length; j++) {
+          const a = L[j], b = L[j + 1], l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+          const qx = -(b[1] - a[1]) / l * kw / 2, qy = (b[0] - a[0]) / l * kw / 2;
+          vfViereck(rand, [a[0] - qx, 0.012, a[1] - qy, uk, 0.1], [b[0] - qx, 0.012, b[1] - qy, uk, 0.1],
+            [b[0] + qx, 0.012, b[1] + qy, uk, 0.2], [a[0] + qx, 0.012, a[1] + qy, uk, 0.2], [1, 1, 1]);
+        }
+      }
+    }
     // Boxenmarkierungen: flach knapp ueber der Fahrbahn, Randstein-Textur an der hellen Wandspalte.
     const um = 4 / VF_RAND_B;
     for (const mk of fein.marken) {
@@ -1248,11 +1271,16 @@
     return fetch(VF_FREIE[k].pfad).then((r) => r.json()).then((d) => {
       // PIT-Kacheln bringen die Tiefe ihrer Bucht mit (halbe Bahnbreiten, echte Boxengasse).
       const tiles = d.kacheln.map((ty) => ({ type: TILE_TYPE[ty] !== undefined ? TILE_TYPE[ty] : TILE_TYPE.STRAIGHT, frei: true,
-        bucht: ty === 'PIT' ? d.boxBucht : undefined, seite: ty === 'PIT' ? (d.boxSeite || -1) : undefined, steg: ty === 'PIT' ? d.steg : undefined }));
+        bucht: ty === 'PIT' ? d.boxBucht : undefined, seite: ty === 'PIT' ? (d.boxSeite || -1) : undefined, steg: ty === 'PIT' ? d.steg : undefined,
+        gasse: ty === 'PIT' && d.boxDreiecke ? { tri: d.boxDreiecke, rand: d.boxRand || [] } : undefined }));
       // 4. Wert (19.11., Bruecke): Hoehe der Fahrbahn in Karteneinheiten (fehlt = 0, flach).
-      const pts = d.pts.map((q) => ({ x: q[0], y: q[1], tile: q[2], z: q[3] || 0 }));
+      // buchtPkt (19.11.): Tiefe der Boxengasse je Punkt aus der echten Gasse der DXF (Karteneinheiten
+      // jenseits der halben Bahn) - die feste Tiefe mit S-Rampe ueberschlug sich in der Kurve vor der
+      // Gasse, GEMELDET Gnen54: Boxeneinfahrt "sieht ganz merkwuerdig aus".
+      const bp = Array.isArray(d.buchtPkt) ? d.buchtPkt : null;
+      const pts = d.pts.map((q, i) => ({ x: q[0], y: q[1], tile: q[2], z: q[3] || 0, bucht: bp ? (bp[i] || 0) : undefined }));
       // geschlossen wie trackCenterline: letzter Punkt = erster (sonst fehlt das letzte Stueck Bahn)
-      pts.push({ x: pts[0].x, y: pts[0].y, tile: pts[pts.length - 1].tile, z: pts[0].z });
+      pts.push({ x: pts[0].x, y: pts[0].y, tile: pts[pts.length - 1].tile, z: pts[0].z, bucht: pts[0].bucht });
       // Fahrtrichtung wie trackCenterline: Richtung (sin h, -cos h), h in Grad.
       pts.forEach((p, i) => {
         const m = pts.length - 1, a = pts[(i - 1 + m) % m], c = pts[(i + 1) % m];
@@ -2539,6 +2567,9 @@
   }
   function vfSpiegelRahmen(an, rechtecke) {
     let r = VF.spiegelRahmen;
+    // GEMELDET Gnen54 19.11.: nach dem ersten Start/Ziel waren die Spiegel weg, bis die Kamera neu
+    // gewaehlt wurde - die Rahmen waren aus der Seite genommen worden, VF.spiegelRahmen zeigte noch drauf.
+    if (r && !r.every((e) => e.isConnected)) { r.forEach((e) => e.remove()); r = VF.spiegelRahmen = null; }
     if (!an) { if (r) { r.forEach((e) => e.remove()); VF.spiegelRahmen = null; } return; }
     if (!r) {
       r = VF.spiegelRahmen = [0, 1].map(() => {
@@ -2574,10 +2605,11 @@
   const VF_COCKPIT_FOVH = 104;
   function vfCockpitVoll() {
     const a = vfAutoWahl();
-    return vfSpiegelAn() && vfKameraId() === 'haube' && !vfKameraGedreht() && a !== 'caravelle' && a !== 'spider';
+    return vfSpiegelAn() && vfKameraId() === 'haube' && !vfKameraWeitGedreht() && a !== 'caravelle' && a !== 'spider';
   }
   function vfCockpit(an) {
     let e = VF.cockpit;
+    if (e && !e.isConnected) e = VF.cockpit = null;   // wie bei den Spiegeln: neu anlegen, falls entfernt
     if (!an) { if (e) { e.remove(); VF.cockpit = null; } return; }
     if (!e) {
       e = VF.cockpit = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -2601,7 +2633,7 @@
     e.style.width = VF.cv.clientWidth + 'px'; e.style.height = VF.cv.clientHeight + 'px';
   }
   function vfSpiegelMalen(gl, w, h) {
-    const an = vfSpiegelAn() && vfKameraId() === 'haube' && !!(VF.modell && VF.tprog) && !vfKameraGedreht();
+    const an = vfSpiegelAn() && vfKameraId() === 'haube' && !!(VF.modell && VF.tprog) && !vfKameraWeitGedreht();
     const voll = an && vfCockpitVoll();
     vfCockpit(voll);
     if (!an) { vfSpiegelRahmen(false); return; }
@@ -2702,6 +2734,10 @@
     return art === 'oben' ? [0, 60 * r] : (art === 'umsehen' ? [-35 * r, 35 * r] : [-10 * r, 60 * r]);
   }
   function vfKameraGedreht() { const D = vfDreh(); return Math.abs(D.g) > VF_DREH_SCHWELLE || Math.abs(D.n) > VF_DREH_SCHWELLE; }
+  // Spiegel und Innenraum erst ab deutlichem Umsehen ausblenden (15 Grad): schon 2 Grad (z. B. ein
+  // Stick, der nicht ganz in die Mitte zurueckfaellt) liessen sie verschwinden, bis die Kamera neu
+  // gewaehlt wurde (GEMELDET Gnen54 19.11.).
+  function vfKameraWeitGedreht() { const D = vfDreh(), w = 15 * Math.PI / 180; return Math.abs(D.g) > w || Math.abs(D.n) > w; }
   function vfKameraStandard() {
     vfDrehNull(); VF.kam = null;
     showHudToast(t('Kamera: Standardansicht'));
@@ -3352,7 +3388,7 @@
     VF.tiles = tiles;
     // Gezeichnet wird die volle Mittellinie (sonst klafft an der Schliessstelle ein Loch in der Bahn),
     // gefahren, gezaehlt und von den NPCs befahren die an der Schliessstelle gekuerzte.
-    const ptsVoll = frei ? frei.pts.map((q) => ({ x: q.x, y: q.y, tile: q.tile, heading: q.heading, z: q.z || 0 })) : trackCenterline(tiles);
+    const ptsVoll = frei ? frei.pts.map((q) => ({ x: q.x, y: q.y, tile: q.tile, heading: q.heading, z: q.z || 0, bucht: q.bucht })) : trackCenterline(tiles);
     VF.pts = vfSchliessstelle(ptsVoll);
     VF.nrm = trackNormals(VF.pts);
     vfHoeheVorbereiten();

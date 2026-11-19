@@ -1,5 +1,5 @@
 {"version":"1.4.67","apk":2,"dateien":[
-{"p":"index.html","h":"072a0f0bb1f467af7a6ade290d85653179a8a5bcdc5721e466346d269fdff552","g":8224193},
+{"p":"index.html","h":"f28037556cc0a8f1a3eecea17085b49202d37c0920daa41d4770acd6fdee2c79","g":8227049},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1252,8 +1252,8 @@
 {"p":"img/strecke-kachel-bg.jpg","h":"1e53777be4c21d705d719ed851d454827ee511070b709f1e2ce3efa79694c43b","g":31342},
 {"p":"img/strecke-kachel.jpg","h":"1e53777be4c21d705d719ed851d454827ee511070b709f1e2ce3efa79694c43b","g":31342},
 {"p":"img/strecken/LIZENZ.txt","h":"1c1ef094875c397ba1ebe36f07e74c89d3f4d171fdab2f6fe920dc02cfb06262","g":455},
-{"p":"img/strecken/indeq-bruecke.json","h":"c04e12c92c5ec9f47d93c523b85a0e022dc792d489f9b98f1a8f026ec2696bdb","g":13151},
-{"p":"img/strecken/indeq-ring.json","h":"2c4e6cbdb96b4284e8ed8401d2611b5a7a946917742cb926b73251e578f35199","g":10023},
+{"p":"img/strecken/indeq-bruecke.json","h":"ef3cd74a0e78f88f3cd464b07cc056695623adb4a7a6b47321feead8ea8534d6","g":23028},
+{"p":"img/strecken/indeq-ring.json","h":"b08df9d9778fa8659f1775cb55be33b2c31eec627e2745e9404e09fa11561101","g":19581},
 {"p":"img/titel-bg.jpg","h":"c02d07a3d67a58813608b14a32f17da24e026400db9ff966cd66729de63f42f6","g":67544},
 {"p":"img/titel.jpg","h":"d0b0567a6ca37be63fbe2040e34c43d19a6da79fd6dbb8f0404cd46d5fdc7e2b","g":39348},
 {"p":"img/virtuell-fahren.jpg","h":"61a3d4070d6c1b3a1ac5e594a1879bd362620b802d41474d66d5ee9f000e840e","g":30974},
