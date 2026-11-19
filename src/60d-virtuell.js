@@ -2567,29 +2567,48 @@
       st.left = (l - rand) + 'px'; st.top = (o - rand) + 'px';
     });
   }
-  // Einheitliches Armaturenbrett unten im Bild (nicht beim Bulli - der hat sein eigenes im Modell - und
-  // nicht beim offenen Spider mit Windschott). Flache SVG-Kante, kostet keine Bildrate.
+  // Einheitlicher Innenraum (19.11., BESTELLT Gnen54: "Optik wie im PKW ... seitlich vom Fahrzeug und die
+  // Spiegel ausserhalb"): Dachkante, A-Saeulen, Tuerbruestung und Armaturenbrett als SVG ueber dem Bild;
+  // die Kamera bekommt dafuer einen breiteren Bildwinkel (VF_COCKPIT_FOVH), die Spiegel sitzen draussen
+  // vor den Seitenscheiben. Nicht beim Bulli (eigener Innenraum im Modell) und nicht beim offenen Spider.
+  const VF_COCKPIT_FOVH = 104;
+  function vfCockpitVoll() {
+    const a = vfAutoWahl();
+    return vfSpiegelAn() && vfKameraId() === 'haube' && !vfKameraGedreht() && a !== 'caravelle' && a !== 'spider';
+  }
   function vfCockpit(an) {
     let e = VF.cockpit;
     if (!an) { if (e) { e.remove(); VF.cockpit = null; } return; }
     if (!e) {
       e = VF.cockpit = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      e.setAttribute('viewBox', '0 0 1000 100'); e.setAttribute('preserveAspectRatio', 'none');
-      e.style.cssText = 'position:absolute;left:0;bottom:0;width:100%;height:17%;pointer-events:none';
+      e.setAttribute('viewBox', '0 0 1000 1000'); e.setAttribute('preserveAspectRatio', 'none');
+      e.style.cssText = 'position:absolute;pointer-events:none';
+      const kante = 'fill="none" stroke="rgba(255,255,255,.13)" stroke-width="1.2" vector-effect="non-scaling-stroke"';
       e.innerHTML = '<defs><linearGradient id="vfcp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2e34"/>'
-        + '<stop offset="0.25" stop-color="#1b1d21"/><stop offset="1" stop-color="#0c0d0f"/></linearGradient></defs>'
-        + '<path fill="url(#vfcp)" d="M0,38 C180,30 300,26 380,24 C420,4 580,4 620,24 C700,26 820,30 1000,38 L1000,100 L0,100 Z"/>'
-        + '<path fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.2" vector-effect="non-scaling-stroke" d="M0,38 C180,30 300,26 380,24 C420,4 580,4 620,24 C700,26 820,30 1000,38"/>';
-      // direkt hinter das Bild, ohne z-index: die Anzeigen (Reifen, Tempo, Tank) bleiben darueber.
-      VF.cv.parentNode.insertBefore(e, VF.cv.nextSibling);
+        + '<stop offset="0.3" stop-color="#1b1d21"/><stop offset="1" stop-color="#0c0d0f"/></linearGradient>'
+        + '<linearGradient id="vfdach" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3e44"/><stop offset="1" stop-color="#202226"/></linearGradient>'
+        + '<linearGradient id="vfsl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#121316"/><stop offset="1" stop-color="#2a2d33"/></linearGradient>'
+        + '<linearGradient id="vfsr" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#121316"/><stop offset="1" stop-color="#2a2d33"/></linearGradient></defs>'
+        // Dach (Himmel) mit leichter Woelbung
+        + '<path fill="url(#vfdach)" d="M0,0 L1000,0 L1000,95 C800,70 200,70 0,95 Z"/><path ' + kante + ' d="M0,95 C200,70 800,70 1000,95"/>'
+        // A-Saeulen: oben innen, unten aussen auf der Tuerbruestung
+        // (aussen davon die Seitenscheibe: dort sitzt der Spiegel frei)
+        + '<path fill="url(#vfsl)" d="M228,78 L276,80 L212,762 L150,762 Z"/><path ' + kante + ' d="M276,80 L212,762 M228,78 L150,762"/>'
+        + '<path fill="url(#vfsr)" d="M772,78 L724,80 L788,762 L850,762 Z"/><path ' + kante + ' d="M724,80 L788,762 M772,78 L850,762"/>'
+        // Tuerbruestung unter den Seitenscheiben
+        + '<path fill="#16181b" d="M0,775 L215,758 L215,1000 L0,1000 Z M1000,775 L785,758 L785,1000 L1000,1000 Z"/><path ' + kante + ' d="M0,775 L215,758 M1000,775 L785,758"/>'
+        // Armaturenbrett mit Instrumenten-Hutze
+        + '<path fill="url(#vfcp)" d="M60,812 C220,800 330,796 390,794 C425,762 575,762 610,794 C670,796 780,800 940,812 L1000,830 L1000,1000 L0,1000 L0,830 Z"/>'
+        + '<path ' + kante + ' d="M60,812 C220,800 330,796 390,794 C425,762 575,762 610,794 C670,796 780,800 940,812"/>';
+      VF.cv.parentNode.insertBefore(e, VF.cv.nextSibling);   // ohne z-index: die Anzeigen bleiben darueber
     }
-    e.style.left = VF.cv.offsetLeft + 'px'; e.style.width = VF.cv.clientWidth + 'px';
-    e.style.bottom = 'auto'; e.style.top = (VF.cv.offsetTop + VF.cv.clientHeight * 0.83) + 'px';
+    e.style.left = VF.cv.offsetLeft + 'px'; e.style.top = VF.cv.offsetTop + 'px';
+    e.style.width = VF.cv.clientWidth + 'px'; e.style.height = VF.cv.clientHeight + 'px';
   }
   function vfSpiegelMalen(gl, w, h) {
     const an = vfSpiegelAn() && vfKameraId() === 'haube' && !!(VF.modell && VF.tprog) && !vfKameraGedreht();
-    const auto = vfAutoWahl();
-    vfCockpit(an && auto !== 'caravelle' && auto !== 'spider');
+    const voll = an && vfCockpitVoll();
+    vfCockpit(voll);
     if (!an) { vfSpiegelRahmen(false); return; }
     const d = VF.modell.d, s = VF_AUTO.L / d.laenge;
     const Hz = vfHzSpieler();
@@ -2601,8 +2620,9 @@
     const lx = fz, lz = -fx;                                         // links (wie "seite" der Haubenkamera)
     // Wie Aussenspiegel (19.11.): quer, klein, in den unteren Ecken knapp ueber dem Armaturenbrett, ganz
     // am Rand - die Fahrbahn in der Mitte bleibt frei (17.11.: "Spiegel stoeren im Blickfeld").
-    const sw = Math.round(Math.min(w * 0.17, h * 0.34)), sh = Math.round(sw * 0.58);
-    const y0 = Math.round(h * 0.15), rand = Math.max(10, Math.round(w * 0.018));
+    // Mit Innenraum: draussen vor den Seitenscheiben, ueber der Tuerbruestung (neben den A-Saeulen).
+    const sw = Math.round(Math.min(w * (voll ? 0.125 : 0.17), h * 0.34)), sh = Math.round(sw * 0.6);
+    const y0 = Math.round(h * (voll ? 0.265 : 0.15)), rand = Math.max(10, Math.round(w * (voll ? 0.01 : 0.018)));
     const rechtecke = [[rand, y0, sw, sh], [w - rand - sw, y0, sw, sh]];   // links, rechts (x, y von unten)
     const wi = VF_SPIEGEL_WINKEL * Math.PI / 180;
     gl.enable(gl.SCISSOR_TEST);
@@ -2866,7 +2886,7 @@
       const auge = [VF.x + fx * vor + fz * seite, hoch, VF.y + fz * vor - fx * seite];
       const sinkt = hb && typeof hb.neigung === 'number' ? Math.tan(hb.neigung * Math.PI / 180) * 30 : 1.2;
       VF.kam = auge;
-      return { auge, ziel: [auge[0] + fx * 30, hoch - sinkt, auge[2] + fz * 30], fov: (hb && hb.fov) || 70, fovH: (hb && hb.fovH) || 0, nah: 0.3 };
+      return { auge, ziel: [auge[0] + fx * 30, hoch - sinkt, auge[2] + fz * 30], fov: (hb && hb.fov) || 70, fovH: (hb && hb.fovH) || (vfCockpitVoll() ? VF_COCKPIT_FOVH : 0), nah: 0.3 };
     }
     if (id === 'oben') {
       // Von oben, parallel zur Start/Ziel-Geraden: die Kamera schwebt mit dem Auto mit (x/y) und
