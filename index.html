@@ -43866,7 +43866,9 @@
     // am Rand - die Fahrbahn in der Mitte bleibt frei (17.11.: "Spiegel stoeren im Blickfeld").
     // Mit Innenraum: draussen vor den Seitenscheiben, ueber der Tuerbruestung (neben den A-Saeulen).
     const sw = Math.round(Math.min(w * (voll ? 0.125 : 0.17), h * 0.34)), sh = Math.round(sw * 0.6);
-    const y0 = Math.round(h * (voll ? 0.265 : 0.15)), rand = Math.max(10, Math.round(w * (voll ? 0.01 : 0.018)));
+    // Bulli (19.11., GEMELDET Gnen54: "auf Hoehe der Hand vom Fahrer"): hoeher, ueber dem Armaturenbrett.
+    const bulli = vfAutoWahl() === 'caravelle';
+    const y0 = Math.round(h * (voll ? 0.265 : (bulli ? 0.46 : 0.15))), rand = Math.max(10, Math.round(w * (voll ? 0.01 : 0.018)));
     const rechtecke = [[rand, y0, sw, sh], [w - rand - sw, y0, sw, sh]];   // links, rechts (x, y von unten)
     const wi = VF_SPIEGEL_WINKEL * Math.PI / 180;
     gl.enable(gl.SCISSOR_TEST);
