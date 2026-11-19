@@ -5882,7 +5882,7 @@
         <span class="home-lade-dreh" id="home-lade-dreh"></span><span class="home-lade-text" id="home-lade-text" data-i18n-skip></span>
       </div>
       <div class="k-titel-fuss">
-        <span class="foot-ver">v<span id="app-version">1.5.93</span></span>
+        <span class="foot-ver">v<span id="app-version">1.5.103</span></span>
         <span data-i18n-skip>OmegaSim &middot; MIT</span>
         <a class="foot-code" href="https://github.com/Luuke42/omegasim"
            target="_blank" rel="noopener noreferrer">Code auf GitHub</a>
@@ -7144,6 +7144,7 @@
       <h3 style="font-size:14px; margin:18px 0 6px 0">Woher die 3D-Modelle kommen</h3>
       <p class="muted">Die Autos der virtuellen Fahrt stammen aus dem freien Rennspiel Speed Dreams: Vulture V5.R, Lynx 220, FMC GT4 und Boxer 96. Modelle, Texturen und Fahrzeugdaten stehen unter der GNU General Public License, Version 2 oder sp&auml;ter. Umgewandelt mit tools/sd_auto.py (Innenraum entfernt, Texturen verkleinert); die Lizenz- und Quellenangabe liegt im Ordner des jeweiligen Autos.</p>
       <p class="muted">Der VW K&auml;fer 1303 RS ist eine eigene Konstruktion von Gnen54 (OmegaSim CAD) und steht unter Creative Commons Namensnennung 4.0 (CC BY 4.0).</p>
+      <p class="muted">Spider NG1: Aufbau von Gnen54 (OmegaSim CAD) auf der Karosserie MODIplay MP-1 Spider von Sturmkind, 3D-Daten f&uuml;r HYBRID von Thomas Strobel (FREAKPALACE Customs). Freigabe von Sturmkind am 16.11.2026: Verwendung erlaubt, solange die Karosserien nicht kommerziell verkauft werden. Eigene Teile, Farben und Fahrzeugdaten: Gnen54, CC BY 4.0.</p>
       <p class="muted">Die Cockpit-Ansicht &bdquo;Mokamit&ldquo; (Digital Dash), die KI-Pers&ouml;nlichkeit der NPCs, der Showroom, die Karriere und der Modus mit zwei Laptops stammen aus Hybrid-Dash von Mo Kamit, MIT-Lizenz.</p>
       <p class="dank-quelle" data-i18n-skip><a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html" target="_blank" rel="noopener noreferrer">gnu.org/licenses/old-licenses/gpl-2.0</a> &middot; img/autos/*/LIZENZ.txt</p>
       <!-- BESTELLT: "in den Credits das GitHub von engine sim verlinken und ggf. die wiss.
@@ -7172,6 +7173,9 @@
       <h2>Patchnotes</h2>
       <p class="muted"><b><span data-i18n-skip>1.5</span></b></p>
       <ul class="muted" id="patchnotes-15" style="padding-left:20px; line-height:1.7">
+        <li>Fahrgef&#252;hl: Im Fahrmodus LibreCorsa (echt und virtuell) gibt es eine Lenkhilfe f&#252;r Gamepad und Tastatur: Der Einschlag l&#228;uft weich an und aus, geht nie &#252;ber den Punkt des besten Grips der Vorderr&#228;der hinaus, die R&#228;der stellen sich beim Loslassen in Fahrtrichtung, und ein rutschendes Heck wird teilweise abgefangen. Kalte Bremsscheiben bremsen bis zu 10 % schw&#228;cher, bis sie warm sind (in LibreCorsa und Pacejka, Schalter wie das Bremsfading). Dreckige Luft hinter einem anderen Auto kostet jetzt auch beim virtuellen Fahren Grip an der Vorderachse.</li>
+        <li>Virtuell fahren: Das Fahrzeug wird jetzt in festen Schritten von 2 ms gerechnet (500 Mal pro Sekunde), unabh&#228;ngig von der Bildrate. Lenkung, Reifen, Federung und Weg verhalten sich bei 30 Bildern pro Sekunde genauso wie bei 120.</li>
+        <li>Virtuell fahren, sch&#246;nere Grafik: Der Himmel mit Wolken und Sonne spiegelt sich jetzt im Lack (Quality), und der Himmel hat einen nat&#252;rlicheren Verlauf mit hellem Saum am Horizont. In der Ferne ist der Dunst Richtung Sonne heller und w&#228;rmer. Am Streckenrand stehen Grasb&#252;schel, die sich wie die Baumkronen im Wind wiegen (Quality, auf Rasen). Der Rasen hat gro&#223;fl&#228;chige Farbunterschiede, das Kachelmuster ist weg. Neu und in der Garage abschaltbar: &#8222;Sichtfeld mit Tempo&#8220;, das Sichtfeld wird mit dem Tempo weiter und auf Randsteinen wackelt das Bild leicht.</li>
         <li>Virtuell fahren: Belag und Randstreifen der Strecke sind doppelt so fein aufgel&#246;st und werden unter flachem Blick sch&#228;rfer gefiltert, das sieht vor allem in der Motorhaubenkamera besser aus. Neue Standardeinstellungen: Grafik &#8222;Quality&#8220; (wer &#8222;Performance&#8220; gew&#228;hlt hat, beh&#228;lt es; auf schwachen Ger&#228;ten schaltet die Bildraten-Wache Effekte ab) und Licht aus beim Start (Knopf &#8222;Licht&#8220; schaltet es an, das Licht beim echten Fahren bleibt, wie es war).</li>
         <li>Garage aufger&#228;umt: Die Kn&#246;pfe unter den Autos (Alle trennen, Zum Cockpit, Virtuell fahren, Onboard-Kamera, Showroom, Zweiter Laptop) stehen jetzt eng in zwei Spalten, man muss kaum noch scrollen. Das Vorschaubild des virtuellen Autos ist kleiner. Beim virtuellen Fahren gibt es oben einen Knopf &#8222;Wetter&#8220;: er schaltet sofort zwischen trocken und Regen um und leuchtet, solange es regnet.</li>
         <li>Virtuell fahren, Fehler behoben: Die Ziellinie sitzt jetzt wie auf dem echten Teil hinten auf der Startgeraden, und genau dort wird die Runde gemessen und angesagt (bisher startete die Zeitnahme irgendwo mitten in der Runde und dann erst wieder nach einem Abflug). Die R&#228;der von FMC GT4, Boxer 96 und Lynx 220 fehlen ab der zweiten Fahrt nicht mehr und stehen nicht mehr &#252;ber die Karosserie hinaus. Der Geist ist jetzt das gew&#228;hlte Auto in seiner Lackfarbe (durchscheinend) und f&#228;hrt deine beste Runde, von Linie zu Linie. Die Ersatzstrecke Balkonia hat nach Start/Ziel eine Boxengasse mit Bucht und Parkstrichen wie das echte Teil.</li>
@@ -17438,6 +17442,11 @@
     "Virtuell fahren: Belag und Randstreifen der Strecke sind doppelt so fein aufgelöst und werden unter flachem Blick schärfer gefiltert, das sieht vor allem in der Motorhaubenkamera besser aus. Neue Standardeinstellungen: Grafik „Quality“ (wer „Performance“ gewählt hat, behält es; auf schwachen Geräten schaltet die Bildraten-Wache Effekte ab) und Licht aus beim Start (Knopf „Licht“ schaltet es an, das Licht beim echten Fahren bleibt, wie es war).": "Virtual driving: the track surface and kerbs now have twice the resolution and are filtered more sharply at shallow angles, which looks better especially in the bonnet camera. New defaults: graphics “Quality” (if you chose “Performance” you keep it; on weak devices the frame-rate guard turns effects off) and lights off at the start (the “Lights” button turns them on; the lights for real driving stay as they were).",
     "Sichtfeld mit Tempo": "Field of view with speed",
     "Das Sichtfeld wird mit dem Tempo weiter, auf Randsteinen wackelt das Bild leicht (Verfolger- und Motorhaubenkamera).": "The field of view widens with speed, and the picture shakes slightly on kerbs (chase and bonnet camera).",
+    "Virtuell fahren, schönere Grafik: Der Himmel mit Wolken und Sonne spiegelt sich jetzt im Lack (Quality), und der Himmel hat einen natürlicheren Verlauf mit hellem Saum am Horizont. In der Ferne ist der Dunst Richtung Sonne heller und wärmer. Am Streckenrand stehen Grasbüschel, die sich wie die Baumkronen im Wind wiegen (Quality, auf Rasen). Der Rasen hat großflächige Farbunterschiede, das Kachelmuster ist weg. Neu und in der Garage abschaltbar: „Sichtfeld mit Tempo“, das Sichtfeld wird mit dem Tempo weiter und auf Randsteinen wackelt das Bild leicht.": "Virtual driving, nicer graphics: the sky with clouds and sun is now reflected in the paint (Quality), and the sky has a more natural gradient with a bright band at the horizon. In the distance the haze is brighter and warmer towards the sun. Tufts of grass line the track and sway in the wind like the tree tops (Quality, on grass). The grass has large-scale colour variation, the tile pattern is gone. New and switchable in the garage: “Field of view with speed”, the field of view widens with speed and the picture shakes slightly on kerbs.",
+    "Virtuell fahren: Das Fahrzeug wird jetzt in festen Schritten von 2 ms gerechnet (500 Mal pro Sekunde), unabhängig von der Bildrate. Lenkung, Reifen, Federung und Weg verhalten sich bei 30 Bildern pro Sekunde genauso wie bei 120.": "Virtual driving: the car is now simulated in fixed 2 ms steps (500 times per second), independent of the frame rate. Steering, tyres, suspension and path behave the same at 30 frames per second as at 120.",
+    "Fahrgefühl: Im Fahrmodus LibreCorsa (echt und virtuell) gibt es eine Lenkhilfe für Gamepad und Tastatur: Der Einschlag läuft weich an und aus, geht nie über den Punkt des besten Grips der Vorderräder hinaus, die Räder stellen sich beim Loslassen in Fahrtrichtung, und ein rutschendes Heck wird teilweise abgefangen. Kalte Bremsscheiben bremsen bis zu 10 % schwächer, bis sie warm sind (in LibreCorsa und Pacejka, Schalter wie das Bremsfading). Dreckige Luft hinter einem anderen Auto kostet jetzt auch beim virtuellen Fahren Grip an der Vorderachse.": "Handling: in the LibreCorsa driving mode (real and virtual) there is a steering assist for gamepad and keyboard: steering eases in and out, never goes past the point of best front grip, the wheels align with the direction of travel when you let go, and a sliding rear is partly caught. Cold brake discs brake up to 10 % weaker until they are warm (in LibreCorsa and Pacejka, same switch as brake fade). Dirty air behind another car now also costs front grip in virtual driving.",
+    "Spider NG1 (Gnen54, WIP)": "Spider NG1 (Gnen54, WIP)",
+    "Spider NG1: Aufbau von Gnen54 (OmegaSim CAD) auf der Karosserie MODIplay MP-1 Spider von Sturmkind, 3D-Daten für HYBRID von Thomas Strobel (FREAKPALACE Customs). Freigabe von Sturmkind am 16.11.2026: Verwendung erlaubt, solange die Karosserien nicht kommerziell verkauft werden. Eigene Teile, Farben und Fahrzeugdaten: Gnen54, CC BY 4.0.": "Spider NG1: built by Gnen54 (OmegaSim CAD) on the MODIplay MP-1 Spider body by Sturmkind, 3D data for HYBRID by Thomas Strobel (FREAKPALACE Customs). Permission from Sturmkind on 16 Nov 2026: use is allowed as long as the bodies are not sold commercially. Own parts, colours and vehicle data: Gnen54, CC BY 4.0.",
     "Community-Bestzeiten: Jede Strecke hat jetzt eine eigene Seite wie die Wochenstrecken, geöffnet mit einem Tipp auf Bild oder Namen in der Liste: große Karte (Tipp für Vollbild), Spiegeln, Länge, Platzbedarf und Abstimmung, Teileprüfung, Medaillen, Start und die Bestenliste mit allen Zeiten. Zurück (oder Kreis) führt in die Liste. Die Liste bleibt nicht mehr bei „Lade …“ stehen. Auf luuke42.github.io/omegasim führt der APK-Link immer zum Release, damit jeder Download gezählt wird.": "Community best times: every track now has its own page like the weekly tracks, opened by tapping its picture or name in the list: large map (tap for full screen), mirroring, length, footprint and setup, parts check, medals, start and the leaderboard with all times. Back (or circle) returns to the list. The list no longer gets stuck on “Loading …”. On luuke42.github.io/omegasim the APK link always goes to the release, so every download is counted.",
     "Töne nach echten Aufnahmen nachgestimmt (gerechnet, keine Aufnahme in der App): Reifenquietschen höher (um 800 Hz statt 620) und mit zitternder Tonhöhe wie haftendes und rutschendes Gummi; Schalten mit rauschendem Metall-Klacken statt Ton; Abblasventil länger (0,6 s) und mit langsamem Flattern; Auspuffknaller tiefer und voller; Laderpfeifen endet bei 5,8 kHz statt 7. Neu unter den Motorton-Zusätzen (experimentell): Abrollgeräusch, Reifen und Fahrtwind werden mit dem Tempo lauter und heller.": "Sounds retuned against real recordings (still synthesised, no recording in the app): tyre squeal higher (around 800 Hz instead of 620) with a jittering pitch like rubber gripping and slipping; gearshift with a noisy metal clack instead of a tone; blow-off valve longer (0.6 s) with a slow flutter; exhaust pops lower and fuller; turbo whistle tops out at 5.8 kHz instead of 7. New among the engine sound extras (experimental): rolling noise, tyres and wind get louder and brighter with speed.",
     "Raum hat ein eigenes Menü (Strecke → Raum, und „Raum“ in der FAHREN-Streckenkachel auf der Bahn): Größe, Raumgestalter, Tutorial und gespeicherte Räume mit Namen zum Laden und Löschen. Im Editor blendet der Schalter „Raum“ den Raum aus; ausgeblendet zählt er auch für Zufallsstrecken nicht. Ziehen im Editor: die Strecke folgt jetzt Finger, Maus und rechtem Stick, der Raum bleibt liegen. Alle Streckenbilder (Fahren-Kachel, Übersicht, Startaufstellung, Listen) zeigen die Originalteile mit Pfeilen. Neue Ladeanimation: ein Streckenteil dreht sich, abwechselnd Gerade und Rechtskurve. Community-Bestzeiten (vorher Community-Strecken): beim Einreichen wählt man die Abstimmung (Arcade, Pro, GT3, F1, Realismus GT3), die Liste zeigt sie, und gefahren wird damit. Einzelrennen nach einem Mehrspieler-Rennen fragt nicht mehr „für alle?“, wenn niemand sonst da ist.": "Room has its own menu (Track → Room, and “Room” in the DRIVE track tile on the rail): size, room designer, tutorial and saved rooms with names to load and delete. In the editor the “Room” switch hides the room; hidden, it is also ignored for random tracks. Dragging in the editor: the track now follows finger, mouse and right stick, the room stays put. All track pictures (drive tile, overview, starting grid, lists) show the original pieces with arrows. New loading animation: a track piece spins, alternating straight and right curve. Community best times (formerly community tracks): when submitting you choose the setup (Arcade, Pro, GT3, F1, Realism GT3), the list shows it, and it is driven with it. A single-player race after a multiplayer race no longer asks “for everyone?” when nobody else is there.",
@@ -20308,6 +20317,8 @@
     "Achsen:": "Ejes:",
     "Acht Probeblätter, um die Kodierung zu knacken": "Ocho hojas de prueba para descifrar la codificación",
     "Akku": "Batería",
+    "Spider NG1 (Gnen54, WIP)": "Spider NG1 (Gnen54, WIP)",
+    "Spider NG1: Aufbau von Gnen54 (OmegaSim CAD) auf der Karosserie MODIplay MP-1 Spider von Sturmkind, 3D-Daten für HYBRID von Thomas Strobel (FREAKPALACE Customs). Freigabe von Sturmkind am 16.11.2026: Verwendung erlaubt, solange die Karosserien nicht kommerziell verkauft werden. Eigene Teile, Farben und Fahrzeugdaten: Gnen54, CC BY 4.0.": "Spider NG1: construido por Gnen54 (OmegaSim CAD) sobre la carrocería MODIplay MP-1 Spider de Sturmkind, datos 3D para HYBRID de Thomas Strobel (FREAKPALACE Customs). Permiso de Sturmkind del 16/11/2026: se permite el uso siempre que las carrocerías no se vendan comercialmente. Piezas, colores y datos propios: Gnen54, CC BY 4.0.",
     "Sichtfeld mit Tempo": "Campo de visión con la velocidad",
     "Das Sichtfeld wird mit dem Tempo weiter, auf Randsteinen wackelt das Bild leicht (Verfolger- und Motorhaubenkamera).": "El campo de visión se amplía con la velocidad y la imagen tiembla un poco sobre los pianos (cámara de persecución y de capó).",
     "virtuell": "virtual",
@@ -24332,6 +24343,29 @@
     return Math.sin(C * Math.atan(bu - E * (bu - Math.atan(bu))));
   }
   const pacBCache = {};
+  // v1.5.101 (H1): wo die Reifenkurve pacY(u) ihren Scheitel hat (Ausnutzung u), je Form einmal gesucht.
+  const pacScheitelCache = {};
+  function pacScheitel(B, C, E) {
+    const key = B + '|' + C + '|' + E;
+    if (pacScheitelCache[key] !== undefined) return pacScheitelCache[key];
+    let bestU = 1, bestY = -1;
+    for (let u = 0.5; u <= 4; u += 0.005) { const y = pacY(u, B, C, E); if (y > bestY) { bestY = y; bestU = u; } }
+    pacScheitelCache[key] = Math.max(1, bestU);
+    return pacScheitelCache[key];
+  }
+  // v1.5.101 (H1): S-Kurve fuer den Lenkwunsch. Gedaempfte Feder zweiter Ordnung (kritisch, omega LC_S_OMEGA) in
+  // festen 2-ms-Schritten: der Einschlag laeuft weich an, schnell durch und weich aus, ohne Ueberschwingen.
+  const LC_S_OMEGA = 26;
+  function lcSKurve(st, ziel, dt) {
+    if (st.lcS === undefined) { st.lcS = ziel; st.lcV = 0; }
+    const n = Math.max(1, Math.ceil(dt / 0.002)), h = dt / n, w = LC_S_OMEGA;
+    for (let i = 0; i < n; i++) {
+      st.lcV += (w * w * (ziel - st.lcS) - 2 * w * st.lcV) * h;
+      st.lcS += st.lcV * h;
+    }
+    st.lcS = Math.max(-1, Math.min(1, st.lcS));
+    return st.lcS;
+  }
   // v1.1.3: stetige Lenkabschwaechung unter Gas fuer Pacejka (siehe config pacGasMax). g ist die
   // Laengsausnutzung (0..1); der Regler throttleSteerRelief skaliert: 75 % = Vorgabe, 0 % = vierfach,
   // 100 % = keine.
@@ -24982,6 +25016,11 @@
         brakeFadeStartC: 520,
         brakeFadeFullC: 780,
         brakeFadeMax: 0.35,     // hoechstens 35 % der Bremskraft
+        // v1.5.101 (H2) BESTELLT: "Bremstemperatur (kalt schwaecher, ueberhitzt Fading)". Unter brakeColdC
+        // bremst die Scheibe schwaecher, bei Umgebungstemperatur um brakeColdMax; linear bis brakeColdC. Haengt am
+        // selben Schalter wie das Fading (brakeFadeEffect, 0 = aus). Nur LibreCorsa und Pacejka.
+        brakeColdC: 110,
+        brakeColdMax: 0.10,
 
         // ---- Windschatten (Block 4.2) ----
         // Die WIRKUNG steht hier, die Messung nicht: wer vorn faehrt, weiss nur die
@@ -25158,6 +25197,7 @@
         brakeTempF: 25,
         brakeTempR: 25,
         brakeFade: 0,     // 0..brakeFadeMax, Anteil verlorener Bremskraft
+        brakeKalt: 0,     // v1.5.101 (H2): 0..brakeColdMax, Anteil verlorener Bremskraft wegen kalter Scheiben
         // Von aussen gesetzt, siehe dirtyAirEffect. 0 = freie Luft.
         dirtyAir: 0,
         tyrePull: 0,      // Lenk-Offset aus der Ungleichheit, in Servo-Einheiten
@@ -25460,7 +25500,11 @@
       const E = (cfg.granE === null || cfg.granE === undefined) ? cfg.pacejkaE : cfg.granE;
       const B = pacB(C, E);
       const wirk = (u) => (u <= 1 ? 1 : pacY(u, B, C, E) / u);
-      let zielU = wirk(uV) * pacGasFaktor(cfg, st.longUse);
+      // v1.5.101 (H1, nur LibreCorsa): die Lenkhilfe haelt die Vorderachse am Scheitel der Reifenkurve. Ueberlenken
+      // bringt dann keinen Kraftverlust mehr (die Kraft bleibt die des Scheitels), statt ueber den Scheitel zu rutschen.
+      const lcHilfe = cfg.granArt === 'librecorsa' && cfg.lenkHilfe !== false;
+      const uSp = lcHilfe ? pacScheitel(B, C, E) : Infinity;
+      let zielU = (uV > uSp ? pacY(uSp, B, C, E) / uV : wirk(uV)) * pacGasFaktor(cfg, st.longUse);
       // ABS-Gefuehl: beim Bremsen bleibt am Limit mindestens granAbs vom Einschlag.
       // v1.4.54: ein ABS aus dem Setup (setupAbs >= 0) ersetzt das des Fahrgefuehls.
       const absW = st.setupAbs >= 0 ? st.setupAbs : cfg.granAbs;
@@ -25468,7 +25512,10 @@
       st.pacUnter += (zielU - st.pacUnter) * (1 - Math.exp(-dt / 0.08));
       let zielO = 0;
       const richtung = Math.sign(lenk);
-      const gegen = !!(st.pacRichtung && richtung && richtung !== st.pacRichtung);
+      // H1: mit Lenkhilfe zaehlt ein losgelassener Stick wie Gegenlenken (die Raeder stellen sich in Fahrtrichtung),
+      // und ein Rutsch baut sich nur zur Haelfte auf (Rutsch einfangen).
+      const gegen = !!(st.pacRichtung && richtung && richtung !== st.pacRichtung)
+        || (lcHilfe && !!st.pacRichtung && Math.abs(roh) < 0.1);
       if (heck && uH > 1 && uH > uV) {
         if (!st.pacRichtung && richtung) st.pacRichtung = richtung;
         if (!gegen) zielO = Math.min(cfg.pacejkaUeberMax, 1 - wirk(uH));
@@ -25476,6 +25523,7 @@
       }
       // v1.4.54 TC: unter Gas faengt die Regelung das Heck zur Haelfte ab (Stufe 5).
       if (st.setupTc > 0 && gas > 0.4) zielO *= 1 - 0.5 * st.setupTc;
+      if (lcHilfe) zielO *= 0.5;   // H1: Rutsch einfangen
       // Gierdynamik-Rueckfuehrung (Einspurmodell-Instrument): der Schwimmwinkel stabilisiert
       // das Heck - zu viel Rutsch wird sanft abgefangen, statt zu kippen.
       if (cfg.granGier > 0 && Math.abs(st.slipAngle) > 0.04 && st.pacRichtung) {
@@ -26369,6 +26417,13 @@
       st.brakeFade = Math.min(1, cfg.brakeFadeEffect
         * (bias * fadeVon(st.brakeTempF)
            + (1 - bias) * fadeVon(st.brakeTempR)));
+      // H2: kalte Scheiben, je Achse mit ihrem Anteil an der Bremskraft (wie das Fading).
+      const kaltVon = (T) => Math.max(0, Math.min(1, (cfg.brakeColdC - T) / Math.max(1, cfg.brakeColdC - cfg.brakeAmbientC)))
+        * cfg.brakeColdMax;
+      // Nur in den Modi mit Reifenmodell (LibreCorsa, Pacejka): "Omega" und "Physik" bleiben bitgleich mit ihrem
+      // festgehaltenen Stand (Selbsttests "bitgleich").
+      st.brakeKalt = (cfg.gran || cfg.pacejka) ? Math.min(0.5, Math.min(1, cfg.brakeFadeEffect)
+        * (bias * kaltVon(st.brakeTempF) + (1 - bias) * kaltVon(st.brakeTempR))) : 0;
 
       const resist = this.resistAt(st.speedKmh, A, onPower, st.currentGear, st.setupDrag); // always >= 0
       let accel = 0;
@@ -26385,7 +26440,7 @@
           isBraking = true;
           const uR = Math.abs(st.speedKmh) / cfg.topSpeedKmh;
           accel = +((cfg.brakeDecelBase + cfg.brakeDecelAero * uR) * inputs.brake
-                    * (1 - st.brakeFade) + resist);
+                    * (1 - st.brakeFade) * (1 - (st.brakeKalt || 0)) + resist);
         } else if (inputs.throttle > 0.02 && !st.isShifting) {
           accel = -this.thrustAt(st.speedKmh, -1, inputs.throttle, A) * st.gripLong * surf + resist;
         } else {
@@ -26419,7 +26474,7 @@
           // Luftwiderstand haben mit der Bremsscheibe nichts zu tun.
           accel = -(resist + (cfg.brakeDecelBase + cfg.brakeDecelAero * uB)
                              * inputs.brake * st.gripLong * surf * dive
-                             * st.tyreGrip * (1 - st.brakeFade) / st.massFactor * (st.setupBremsF || 1));
+                             * st.tyreGrip * (1 - st.brakeFade) * (1 - (st.brakeKalt || 0)) / st.massFactor * (st.setupBremsF || 1));
           // ABS is now only an indicator plus a haptic pulse. Modulating the byte here
           // would reintroduce precisely the stutter that took so long to remove.
           if (inputs.brake > 0.8 && st.speedKmh > cfg.topSpeedKmh * 0.15) {
@@ -26593,7 +26648,10 @@
       const maxStep = cfg.steerDaempfungMs > 0
         ? dt * 1000 / cfg.steerDaempfungMs * weg
         : Infinity;
-      const dS = targetSteer - this.state.dampedSteering;
+      // v1.5.101 (H1, nur LibreCorsa): Lenkhilfe fuer Gamepad und Tastatur - der Wunsch laeuft durch eine S-Kurve
+      // (gedaempfte Feder zweiter Ordnung) statt als Sprung in den Ratenbegrenzer.
+      const lcHilfe = cfg.granArt === 'librecorsa' && cfg.lenkHilfe !== false;
+      const dS = (lcHilfe ? lcSKurve(this.state, targetSteer, dt) : targetSteer) - this.state.dampedSteering;
       this.state.dampedSteering += Math.max(-maxStep, Math.min(maxStep, dS));
       this.state.dampedSteering = Math.max(-1, Math.min(1, this.state.dampedSteering));
 
@@ -43735,7 +43793,8 @@
   // z: { vy (m/s, rechts +), r (rad/s, rechts +) }, vx (m/s), ax (m/s^2 Laengsbeschleunigung, aus der
   // Laengs-G der App), antrieb (0..1 Gasanteil), lenk (-1..1), mu (Griff-Faktor).
   // P: Fahrprofil (VF_GT3 oder vfPhysikAus() eines Autos). kV/kH: Abtrieb je Achse in N je (m/s)^2.
-  function vfDynamik(z, vx, ax, antrieb, lenk, dt, mu, P) {
+  // muVorn (v1.5.101, H5): zusaetzlicher Faktor nur fuer den Griff der Vorderachse (dreckige Luft hinter einem Auto).
+  function vfDynamik(z, vx, ax, antrieb, lenk, dt, mu, P, muVorn) {
     P = P || VF_GT3;
     const g = 9.81, L = P.a + P.b;
     const delta = Math.max(-1, Math.min(1, lenk)) * P.lenkGrad * Math.PI / 180;
@@ -43751,7 +43810,7 @@
     // gutmuetig, weil die entlastete Achse relativ mehr Griff behaelt.
     const fz0V = P.m * g * P.b / L, fz0H = P.m * g * P.a / L;
     const fzV = Math.max(800, fz0V - dFz + (P.kV || 0) * va), fzH = Math.max(800, fz0H + dFz + (P.kH || 0) * va);
-    const maxV = P.muV * f * fzV * (1 - P.lastEmpf * (fzV / fz0V - 1));
+    const maxV = P.muV * f * (muVorn === undefined ? 1 : muVorn) * fzV * (1 - P.lastEmpf * (fzV / fz0V - 1));
     const maxH = P.muH * f * fzH * (1 - P.lastEmpf * (fzH / fz0H - 1));
     const brems = ax < 0 ? P.m * -ax : 0;
     // ABS und Traktionskontrolle wie im GT3: beide lassen dem Reifen einen Rest Seitenkraft.
@@ -43781,7 +43840,7 @@
   // img/autos/v5r/: Modell ohne Innenraum, Rad, Lichtorte und die Fahrzeugdaten aus der .xml. Laengen in
   // Metern, im Auto +x links, +y oben, +z vorn; gezeichnet mal VF_AUTO.L / Laenge (so lang wie der Kasten).
   const VF_AUTO_STORE = 'omegasim-vf-auto';
-  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/' };
+  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/' };
   function vfModellPfad(auto) { return VF_MODELL_PFADE[auto || vfAutoWahl()] || 'img/autos/v5r/'; }
   const VF_FEDER_STORE = 'omegasim-vf-feder';
   const VF_FEDER_WERTE = [1, 2, 3, 5, 8];
@@ -43804,6 +43863,8 @@
   function vfLackId(hex) { const f = VF_LACK_FARBEN.find((x) => x.v === (hex || '')); return f ? f.id : 'auto'; }
   // Die Farbe der Karosserie: Der Shader faerbt sie um (Helligkeit des Texels mal Lackfarbe, uniform lack = 1), statt zu
   // multiplizieren - sonst wuerde Rot auf einem gelben Auto Orange. Ohne Farbe bleibt das Modell, wie es ist.
+  // v1.5.104: Beim Umfaerben ist die Helligkeit des Texels auf 0,82 begrenzt (Shader, min(...)): helle Grundlacke (gelber
+  // Kaefer und Spider) wurden sonst ausgewaschen, Rot wurde Rosa und Blau Tuerkis.
   function vfLackTint(hex) { return hex ? vfHex(hex) : VF_WEISS; }
   // Eine gespeicherte Wahl, die es nicht mehr gibt (z. B. 'porsche', 1.3.94-1.3.131, entfernt), faellt
   // still auf den Vulture V5.R zurueck - kein 404 beim Laden und kein Absturz.
@@ -44348,7 +44409,7 @@
       gl.attachShader(p, vfShader(gl, gl.FRAGMENT_SHADER,
         'precision mediump float; varying vec2 vuv; varying vec3 vn; varying float vd; varying float vsd; uniform vec3 dunst;'
         + 'uniform sampler2D tx; uniform vec3 tint; uniform float emis; uniform float alpha; uniform float am; uniform float licht; uniform vec3 nebel; uniform float lack; uniform vec3 sonne;'
-        + 'void main(){ vec4 t = texture2D(tx, vuv); vec3 tb = mix(t.rgb, vec3(dot(t.rgb, vec3(0.299, 0.587, 0.114)) * 1.7), lack); vec3 N = normalize(vn);'
+        + 'void main(){ vec4 t = texture2D(tx, vuv); vec3 tb = mix(t.rgb, vec3(min(dot(t.rgb, vec3(0.299, 0.587, 0.114)) * 1.7, 0.82)), lack); vec3 N = normalize(vn);'
         + ' float d = max(dot(N, normalize(vec3(0.35, 0.9, 0.25))), 0.0); float s = pow(max(dot(N, normalize(vec3(0.2, 0.75, -0.6))), 0.0), 24.0);'
         + ' float l = mix(1.0, 0.42 + 0.66 * d, licht); vec3 c = tb * tint * (l * sonne + emis) + vec3(s * 0.35 * licht) * sonne;'
         + ' float f = clamp((vd - 250.0) / 900.0, 0.0, 1.0); gl_FragColor = vec4(mix(c, mix(nebel, dunst, vsd * vsd), f), mix(alpha, alpha * t.a, am)); }'));
@@ -44367,7 +44428,7 @@
         + 'uniform vec3 horizont; uniform vec3 zenit;'
         + 'vec3 filmic(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14), 0.0, 1.0); }'
         + 'HP float schTiefe(HP vec4 v){ return dot(v, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0)); }'
-        + 'void main(){ vec4 t = texture2D(tx, vuv); vec3 tb = mix(t.rgb, vec3(dot(t.rgb, vec3(0.299, 0.587, 0.114)) * 1.7), lack); vec3 N = normalize(vn); vec3 L = normalize(vec3(0.35, 0.9, 0.25));'
+        + 'void main(){ vec4 t = texture2D(tx, vuv); vec3 tb = mix(t.rgb, vec3(min(dot(t.rgb, vec3(0.299, 0.587, 0.114)) * 1.7, 0.82)), lack); vec3 N = normalize(vn); vec3 L = normalize(vec3(0.35, 0.9, 0.25));'
         + ' vec3 V = normalize(vv); float d = max(dot(N, L), 0.0); vec3 R = reflect(-L, N); float rv = max(dot(R, V), 0.0);'
         + ' vec3 amb = mix(vec3(0.30, 0.27, 0.23), vec3(0.55, 0.68, 0.90), N.y * 0.5 + 0.5);'
         + ' float sheen = pow(max(dot(N, normalize(L + V)), 0.0), 64.0) * 0.45;'
@@ -44486,7 +44547,12 @@
     gl.enableVertexAttribArray(SP.ap);
     gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, M.ibo);
-    for (const t of M.aufbauTeile) gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+    // v1.5.104 (aus PR 3 von gnen54): die Indizes zaehlen je Teil ab dessen erster Ecke (ecke0) - wie im Farb-Durchgang
+    // versetzen. Vorher warfen mehrteilige Modelle (Kaefer, Spider) falsche Schatten.
+    for (const t of M.aufbauTeile) {
+      gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, (t.ecke0 || 0) * 32);
+      gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+    }
     // v1.5.19 GEMELDET: "entferne die komischen sich drehenden flachen/spitzen Schatten der Raeder im Quality-Modus".
     // Die Raeder gingen DREHEND in die Schattenkarte; bei der steilen Sonne sieht die Karte die Felge fast von der
     // Kante, und Speichen oder Ventil warfen eine flache bzw. spitze Silhouette, die mitlief. Auch ohne Drehung blieben
@@ -44504,14 +44570,21 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, M.vbo);
         gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, M.ibo);
-        for (const t of radTeile) gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        for (const t of radTeile) {
+          if (t.achse && t.achse !== ax) continue;
+          gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, (t.ecke0 || 0) * 32);
+          gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        }
       } else if (radModell && radModell.teile.length) {
         const xW = seite * vfRadX(r, halbW);
         matrix(vfKette(lage, vfT(xW, r.radius, z), dreh, vfRx(0), vfS(seite * r.breite, 2 * r.radius, 2 * r.radius)));
         gl.bindBuffer(gl.ARRAY_BUFFER, radModell.vbo);
         gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, radModell.ibo);
-        for (const t of radModell.teile) gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        for (const t of radModell.teile) {
+          gl.vertexAttribPointer(SP.ap, 3, gl.FLOAT, false, 32, (t.ecke0 || 0) * 32);
+          gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+        }
       }
     }
     }
@@ -44777,6 +44850,117 @@
     log('Virtuell: Bildraten-Wache Stufe ' + W.stufe + ' bei ' + fps + ' Bildern/s.', 'info');
   }
 
+  // ---- v1.5.96 (V1): FESTE PHYSIK-TEILSCHRITTE ----
+  // BESTELLT (V1): das Fahrzeug im virtuellen Fahren rechnet in festen Teilschritten von VF_TEIL.dt (500 Hz), unabhaengig
+  // von der Bildrate. Bis 1.5.95 lief Lenkung, Reifenmodell, Gier- und Querdynamik, Weg und Federung einmal je Bild mit dem
+  // Bildabstand (bis 50 ms): bei 30 Bildern/s fuhr sich das Auto anders (traeger, Federung zappelte) als bei 120. Jetzt
+  // sammelt VF.physRest die Bildzeit, und es laufen so viele Teilschritte, wie hineinpassen (hoechstens VF_TEIL.max je Bild;
+  // haengt ein Bild laenger, verfaellt der Rest wie vorher ueber 50 ms). Alles andere (Ort auf der Strecke, Randstein,
+  // NPCs, Kollision, Geist) bleibt je Bild.
+  const VF_TEIL = { dt: 1 / 500, max: 30 };
+  function vfFahrPhysik(dt, kmh, st, hand, reifenModus) {
+    VF.physRest = (VF.physRest || 0) + dt;
+    let n = 0;
+    while (VF.physRest >= VF_TEIL.dt - 1e-9 && n < VF_TEIL.max) {
+      vfFahrTeilschritt(VF_TEIL.dt, kmh, st, hand, reifenModus);
+      VF.physRest -= VF_TEIL.dt; n++;
+    }
+    if (n >= VF_TEIL.max) VF.physRest = 0;
+    VF.teilschritte = n;
+    return n;
+  }
+  // ---- v1.5.101 (H1): LENKHILFE, nur im Handling LibreCorsa ----
+  // BESTELLT: "H1 (aber nur für LibreCorsa Modi)". Fuer Gamepad und Tastatur, wie in Rennspielen:
+  //  1. S-Kurve: der Einschlag folgt dem Stick ueber eine kritisch gedaempfte Feder (weich an, weich aus).
+  //  2. Scheitel: der Einschlag geht nie weiter, als die Vorderachse am Scheitel ihrer Reifenkurve braucht
+  //     (Schraeglaufwinkel aV <= Scheitelwinkel). Ueberlenken schiebt dann nicht ueber die Vorderraeder.
+  //  3. Selbstausrichten: laesst man den Stick los, stellen sich die Vorderraeder in Fahrtrichtung (Schraeglauf vorn 0).
+  //     In einem Rutsch ist das von selbst Gegenlenken.
+  //  4. Rutsch einfangen: rutscht das Heck ueber seinen Scheitel, lenkt die Hilfe anteilig gegen (VF_LH.fang).
+  const VF_LH = { omega: 26, fang: 0.5, totzone: 0.08 };
+  function vfLenkHilfe(ziel, dt, vx) {
+    const P = VF.P || VF_GT3, z = VF.dyn || { vy: 0, r: 0 }, g = P.lenkGrad * Math.PI / 180;
+    let soll = ziel;
+    if (vx > 3) {
+      const betaV = Math.atan2(z.vy + P.a * z.r, vx), betaH = Math.atan2(z.vy - P.b * z.r, vx);
+      const spV = Math.tan(Math.PI / (2 * P.C)) / P.BV, spH = Math.tan(Math.PI / (2 * P.C)) / P.BH;
+      // 3. Stick in der Mitte: Raeder in Fahrtrichtung.
+      if (Math.abs(ziel) < VF_LH.totzone) soll = betaV / g;
+      // 4. Heck ueber dem Scheitel: anteilig gegenlenken (aH > 0 heisst, das Heck schiebt nach links aussen).
+      if (Math.abs(betaH) > spH) soll += VF_LH.fang * (betaH - Math.sign(betaH) * spH) / g;
+      // 2. Nicht ueber den Scheitel vorn: delta in [betaV - spV, betaV + spV].
+      soll = Math.max((betaV - spV) / g, Math.min((betaV + spV) / g, soll));
+    }
+    soll = Math.max(-1, Math.min(1, soll));
+    // 1. S-Kurve.
+    if (VF.lhV === undefined) VF.lhV = 0;
+    const w = VF_LH.omega;
+    VF.lhV += (w * w * (soll - (VF.lenkIst || 0)) - 2 * w * VF.lhV) * dt;
+    return Math.max(-1, Math.min(1, (VF.lenkIst || 0) + VF.lhV * dt));
+  }
+  function vfFahrTeilschritt(sdt, kmh, st, hand, reifenModus) {
+    // v1.1.11 GEMELDET: "Virtuelles Fahren ruckelt und ist sehr traege." Bisher lenkte das Auto mit
+    // physEngine.state.dampedSteering: das rechnet die Physik nur alle 45 ms (Treppenstufen in der
+    // Gierrate = Ruckeln), mit der Servodaempfung und der Lenkbegrenzung bei Tempo des ECHTEN Autos
+    // (= traege). Jetzt direkt der Stick (steerX), voller Einschlag in 0,12 s, bei hohem Tempo etwas
+    // weniger Einschlag wie ein Spiel-Lenkfilter; den Rest erledigt das Reifenmodell.
+    const vVollL = Math.abs(kmh) * REAL_SCALE / 3.6;
+    const lenkZiel = Math.max(-1, Math.min(1, typeof steerX === 'number' ? steerX : 0)) / (1 + (vVollL / 55) * (vVollL / 55));
+    // v1.5.101 (H1, nur LibreCorsa): Lenkhilfe fuer Gamepad und Tastatur, siehe vfLenkHilfe.
+    const hilfe = hand === 'librecorsa' && Math.abs(kmh) > 0;
+    if (hilfe) VF.lenkIst = vfLenkHilfe(lenkZiel, sdt, Math.max(0, kmh * REAL_SCALE / 3.6));
+    else {
+      const schritt = sdt / 0.09;
+      VF.lenkIst = (VF.lenkIst || 0) + Math.max(-schritt, Math.min(schritt, lenkZiel - (VF.lenkIst || 0)));
+    }
+    const lenk = VF.lenkIst;
+    if (kmh < 0) {
+      // Rueckwaerts (Rangieren): rein kinematisch wie bisher.
+      const neu = vfSchritt(VF, kmh, lenk, sdt, physEngine.config.gripScale);
+      VF.x = neu.x; VF.y = neu.y; VF.h = neu.h;
+      VF.dyn = { vy: 0, r: 0 };
+      VF.ax = 0; VF.ay = 0;
+    } else {
+      const vVoll = kmh * REAL_SCALE / 3.6;                                  // m/s eines GT3
+      // Laengs: die Laengs-G der App (-1 = Vollbremsung) auf GT3-Werte (1,5 g), nicht die Ableitung
+      // des Modellauto-Tempos - das beschleunigt umgerechnet weit ueber jedes echte Auto.
+      const ax = (st.gLong || 0) * 15;
+      if (!VF.dyn) VF.dyn = { vy: 0, r: 0 };
+      let mu = (physEngine.config.gripScale || 1) * (VF.abseits ? 0.55 : 1);
+      if (reifenModus) {
+        // Reifentemperatur (v1.2.62, Korrektur v1.3.5): kalt = weniger Griff, warm = optimal,
+        // ueberhitzt = weniger. Bis 1.3.4 heizte sie mit bis zu 0,25/s und kuehlte nur mit
+        // 0,01/s - nach wenigen Sekunden stand sie dauerhaft am Anschlag (ueberhitzt).
+        if (VF.tyreTemp === undefined) VF.tyreTemp = 0;
+        VF.tyreTemp = vfReifenTemp(VF.tyreTemp, vVollL, VF.ay || 0, sdt);
+        mu *= vfReifenGriff(VF.tyreTemp, hand);
+      }
+      // H5 (v1.5.101): dreckige Luft (st.dirtyAir, gesetzt in vfVerkehr) kostet Griff an der Vorderachse, wie beim
+      // echten Fahren (dirtyAirMax mal dirtyAirEffect aus den Optionen). Der Windschatten bleibt, wie er ist.
+      const luftV = 1 - (physEngine.config.dirtyAirMax || 0) * Math.max(0, Math.min(2, physEngine.config.dirtyAirEffect || 0))
+        * Math.max(0, Math.min(1, st.dirtyAir || 0));
+      vfDynamik(VF.dyn, vVoll, ax, Math.max(0, st.longUse || 0), lenk, sdt, mu, VF.P, luftV);
+      VF.ax = ax; VF.ay = vVoll * VF.dyn.r;
+      // Nickbewegung: beim Bremsen senkt sich die Nase, beim Beschleunigen hebt sie sich (dezent).
+      VF.pitch = Math.max(-0.03, Math.min(0.03, -(VF.ax || 0) * 0.0018));
+      // Weg in der Bahnwelt: Tempo des Modellautos, Richtung = Kurs + Schwimmwinkel.
+      VF.h += VF.dyn.r * sdt * 180 / Math.PI;
+      const beta = Math.atan2(VF.dyn.vy, Math.max(0.1, vVoll));
+      const vE = kmh / 3.6 * 100 * TRACK_UNITS_PER_CM;
+      const rich = VF.h * Math.PI / 180 + beta;
+      VF.x += Math.sin(rich) * vE * sdt;
+      VF.y -= Math.cos(rich) * vE * sdt;
+    }
+    // Raeder drehen mit dem Weg, Federung folgt Laengs- und Querbeschleunigung (neben der Bahn ruettelt es).
+    const wegE = kmh / 3.6 * 100 * TRACK_UNITS_PER_CM * sdt;
+    VF.raddreh = ((VF.raddreh || 0) + wegE / (VF_AUTO.L / 4.64 * 0.335)) % (Math.PI * 2);
+    if (VF.modell) {
+      if (!VF.feder) VF.feder = { z: 0, vz: 0, th: 0, vth: 0, ph: 0, vph: 0 };
+      // Zufallsstoesse neben der Bahn: je Teilschritt einer; mit sqrt(Bild/Teilschritt) so stark wie vorher einer je Bild.
+      const stoss = VF.abseits && Math.abs(kmh) > 0.05 ? (Math.random() - 0.5) * VF.modell.d.masse * 9 * Math.sqrt(Math.max(1, (VF.dtBild || sdt) / sdt)) : 0;
+      vfFederung(VF.feder, VF.ax || 0, VF.ay || 0, sdt, VF.modell.d, stoss);
+    }
+  }
   function vfBild(now) {
     if (!VF.aktiv) return;
     VF.raf = requestAnimationFrame(vfBild);
@@ -44798,49 +44982,8 @@
     const kmh = (st.speedKmh || 0) * (VF.tempoFaktor || 1);
     const hand = vfHandling();
     const reifenModus = hand === 'gran' || hand === 'acc' || hand === 'librecorsa';
-    // v1.1.11 GEMELDET: "Virtuelles Fahren ruckelt und ist sehr traege." Bisher lenkte das Auto mit
-    // physEngine.state.dampedSteering: das rechnet die Physik nur alle 45 ms (Treppenstufen in der
-    // Gierrate = Ruckeln), mit der Servodaempfung und der Lenkbegrenzung bei Tempo des ECHTEN Autos
-    // (= traege). Jetzt direkt der Stick (steerX), voller Einschlag in 0,12 s, bei hohem Tempo etwas
-    // weniger Einschlag wie ein Spiel-Lenkfilter; den Rest erledigt das Reifenmodell.
-    const vVollL = Math.abs(kmh) * REAL_SCALE / 3.6;
-    const lenkZiel = Math.max(-1, Math.min(1, typeof steerX === 'number' ? steerX : 0)) / (1 + (vVollL / 55) * (vVollL / 55));
-    const schritt = dt / 0.09;
-    VF.lenkIst = (VF.lenkIst || 0) + Math.max(-schritt, Math.min(schritt, lenkZiel - (VF.lenkIst || 0)));
+    vfFahrPhysik(dt, kmh, st, hand, reifenModus);
     const lenk = VF.lenkIst;
-    if (kmh < 0) {
-      // Rueckwaerts (Rangieren): rein kinematisch wie bisher.
-      const neu = vfSchritt(VF, kmh, lenk, dt, physEngine.config.gripScale);
-      VF.x = neu.x; VF.y = neu.y; VF.h = neu.h;
-      VF.dyn = { vy: 0, r: 0 };
-      VF.ax = 0; VF.ay = 0;
-    } else {
-      const vVoll = kmh * REAL_SCALE / 3.6;                                  // m/s eines GT3
-      // Laengs: die Laengs-G der App (-1 = Vollbremsung) auf GT3-Werte (1,5 g), nicht die Ableitung
-      // des Modellauto-Tempos - das beschleunigt umgerechnet weit ueber jedes echte Auto.
-      const ax = (st.gLong || 0) * 15;
-      if (!VF.dyn) VF.dyn = { vy: 0, r: 0 };
-      let mu = (physEngine.config.gripScale || 1) * (VF.abseits ? 0.55 : 1);
-      if (reifenModus) {
-        // Reifentemperatur (v1.2.62, Korrektur v1.3.5): kalt = weniger Griff, warm = optimal,
-        // ueberhitzt = weniger. Bis 1.3.4 heizte sie mit bis zu 0,25/s und kuehlte nur mit
-        // 0,01/s - nach wenigen Sekunden stand sie dauerhaft am Anschlag (ueberhitzt).
-        if (VF.tyreTemp === undefined) VF.tyreTemp = 0;
-        VF.tyreTemp = vfReifenTemp(VF.tyreTemp, vVollL, VF.ay || 0, dt);
-        mu *= vfReifenGriff(VF.tyreTemp, hand);
-      }
-      vfDynamik(VF.dyn, vVoll, ax, Math.max(0, st.longUse || 0), lenk, dt, mu, VF.P);
-      VF.ax = ax; VF.ay = vVoll * VF.dyn.r;
-      // Nickbewegung: beim Bremsen senkt sich die Nase, beim Beschleunigen hebt sie sich (dezent).
-      VF.pitch = Math.max(-0.03, Math.min(0.03, -(VF.ax || 0) * 0.0018));
-      // Weg in der Bahnwelt: Tempo des Modellautos, Richtung = Kurs + Schwimmwinkel.
-      VF.h += VF.dyn.r * dt * 180 / Math.PI;
-      const beta = Math.atan2(VF.dyn.vy, Math.max(0.1, vVoll));
-      const vE = kmh / 3.6 * 100 * TRACK_UNITS_PER_CM;
-      const rich = VF.h * Math.PI / 180 + beta;
-      VF.x += Math.sin(rich) * vE * dt;
-      VF.y -= Math.cos(rich) * vE * dt;
-    }
     // Geist: jede Runde wird von Linie zu Linie aufgezeichnet; die beste faehrt als Kopie mit (vfGeistRunde).
     if (VF.geist) {
       const g = VF.geist;
@@ -44859,14 +45002,6 @@
         g.y = p0[1] + (p1[1] - p0[1]) * f;
         g.h = p0[2] + (p1[2] - p0[2]) * f;
       }
-    }
-    // Raeder drehen mit dem Weg, Federung folgt Laengs- und Querbeschleunigung (neben der Bahn ruettelt es).
-    const wegE = kmh / 3.6 * 100 * TRACK_UNITS_PER_CM * dt;
-    VF.raddreh = ((VF.raddreh || 0) + wegE / (VF_AUTO.L / 4.64 * 0.335)) % (Math.PI * 2);
-    if (VF.modell) {
-      if (!VF.feder) VF.feder = { z: 0, vz: 0, th: 0, vth: 0, ph: 0, vph: 0 };
-      const stoss = VF.abseits && Math.abs(kmh) > 0.05 ? (Math.random() - 0.5) * VF.modell.d.masse * 9 : 0;
-      vfFederung(VF.feder, VF.ax || 0, VF.ay || 0, dt, VF.modell.d, stoss);
     }
     VF.lenkWinkel = Math.max(-1, Math.min(1, lenk)) * (VF.P ? VF.P.lenkGrad : VF_GT3.lenkGrad) * Math.PI / 180;
     const o = vfOrt(VF.pts, VF.nrm, VF.x, VF.y, VF.idx);
@@ -45897,7 +46032,8 @@
       const quetsch = q ? vfS(1 + 0.6 * q, 1 - q, 1) : VF_EINS;
       const w = vfKette(lage, vfT(seite * r.spur / 2, r.radius * (1 - q), z), dreh, quetsch, vfRx(raddreh || 0),
         vfS(seite * r.breite, 2 * r.radius, 2 * r.radius));
-      radTeile.forEach((t) => { setze(w, [1, 1, 1], 0, 1, 0, 1, 0.2, 0); teil(t); });
+      // v1.5.104 (aus PR 3 von gnen54): Teile mit "achse" (vorn/hinten) nur an dieser Achse - eigene Raeder je Achse (Spider NG1).
+      radTeile.forEach((t) => { if (t.achse && t.achse !== ax) return; setze(w, [1, 1, 1], 0, 1, 0, 1, 0.2, 0); teil(t); });
       if (!radTeile.length) {
         // Fallback: die echten Rad-Teile der Vulture V5.R (mit Reifen-/Felgen-Textur).
         const radM = radModell;
@@ -46216,6 +46352,8 @@
     VF.dunstF = vfDunstFarbe(vfTz());   // v1.5.94 (G3)
     VF.sichtAn = vfSichtTempoAn();      // v1.5.94 (G7)
     VF.fovPlus = 0; VF.kerbJetzt = false; VF.umw = null; VF.umwKaputt = false;
+    VF.physRest = 0;                     // v1.5.96 (V1)
+    VF.lhV = 0;                          // v1.5.101 (H1)
     VF.bloom = null; VF.bloomKaputt = false;
     // v1.3.113 Quality: echte Schattenkarte (Depth-Textur) aus Richtung der Sonne. Ohne die
     // Erweiterung bleibt der weiche Blob-Schatten (M.schatten).
@@ -46383,7 +46521,7 @@
   const VF_MOTOR_GLOBAL = '~global';
   // Standard ist der Vulture V5.R (wie das Auto); "Wie in Optionen" folgt dem globalen Ton (sentinel).
   function vfMotorGewaehlt() {
-    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
+    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm' })[vfAutoWahl()] || 'sd_v5r';
     try { const v = localStorage.getItem(VF_MOTOR_STORE); return v === null ? def : v; } catch (e) { return def; }
   }
   function vfMotorZiel() { const g = vfMotorGewaehlt(); if (g && g !== VF_MOTOR_GLOBAL) return g; return $('sound-profile') ? $('sound-profile').value : ''; }
@@ -46432,6 +46570,9 @@
                    { v: 'fmcgt4', name: 'FMC GT4 (Ford GT40 Mk1, Speed Dreams)' }, { v: 'boxer96', name: 'Boxer 96 (Porsche 911 GT3, Speed Dreams)' },
                    // Eigenbau von Gnen54 (CC BY 4.0), WIP: Fahrdaten geschaetzt, siehe img/autos/kaefer/LIZENZ.txt
                    { v: 'kaefer', name: t('VW Käfer 1303 RS mit Boxster-Motor (Gnen54, WIP)') },
+                   // v1.5.104: Eigenbau von Gnen54 auf der Modiplay-MP1-Karosserie (Freigabe Sturmkind, nicht kommerziell),
+                   // PR 3 auf Luuke42/omegasim. WIP: Fahrdaten geschaetzt (Lister Storm LMP), siehe img/autos/spider/LIZENZ.txt
+                   { v: 'spider', name: t('Spider NG1 (Gnen54, WIP)') },
                    { v: 'kasten', name: t('Einfaches Modell') }];
     const ja = Math.max(0, autos.findIndex((a) => a.v === vfAutoWahl()));
     const autoWahl = (dd) => {
@@ -120166,6 +120307,92 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       }
     }
     return { ok: !f.length, mass: f.length ? f.join('; ') : G.bueschel + ' Bueschel, Dunst Abend ' + dA.map((x) => x.toFixed(2)).join('/') };
+  });
+  // v1.5.96 BESTELLT (V1): feste Physik-Teilschritte (500 Hz) im virtuellen Fahren, unabhaengig von der Bildrate.
+  stAdd('Virtuell v1.5.96: Fahrphysik in festen Teilschritten, gleiche Fahrt bei 30 und 120 Bildern/s', () => {
+    if (typeof virtuellStarten !== 'function' || VF.aktiv) return { skip: true, mass: 'virtuelle Fahrt laeuft oder fehlt' };
+    const f = [];
+    const merkTab = kAktiverTab(), st = physEngine.state, merk = { v: st.speedKmh, lenk: steerX, g: st.gLong, lu: st.longUse };
+    let mass = '';
+    try {
+      if (!virtuellStarten({ tiles: codeToTrack('SG3R2G3R2').tiles, studie: true })) return { skip: true, mass: 'kein WebGL' };
+      const hand = vfHandling(), reifen = hand === 'gran' || hand === 'acc' || hand === 'librecorsa';
+      const start = { x: VF.x, y: VF.y, h: VF.h };
+      const fahre = (bilder) => {
+        Object.assign(VF, { x: start.x, y: start.y, h: start.h, dyn: { vy: 0, r: 0 }, lenkIst: 0, physRest: 0, tyreTemp: 0, feder: null, ax: 0, ay: 0 });
+        let schritte = 0;
+        for (let i = 0; i < bilder; i++) { VF.dtBild = 1 / bilder; schritte += vfFahrPhysik(1 / bilder, 140, st, hand, reifen); }
+        return { x: VF.x, y: VF.y, h: VF.h, r: VF.dyn.r, schritte };
+      };
+      st.speedKmh = 140; st.gLong = 0; st.longUse = 0; steerX = 0.6;
+      const a = fahre(30), b = fahre(120);
+      if (Math.abs(a.schritte - 500) > 1 || Math.abs(b.schritte - 500) > 1) f.push('Teilschritte ' + a.schritte + ' / ' + b.schritte + ' statt 500 je Sekunde');
+      const weg = Math.hypot(a.x - start.x, a.y - start.y), abw = Math.hypot(a.x - b.x, a.y - b.y);
+      if (!(weg > 1)) f.push('Auto faehrt nicht (' + weg.toFixed(2) + ')');
+      if (abw > weg * 0.01) f.push('Weg bei 30 und 120 Bildern/s um ' + abw.toFixed(3) + ' verschieden (Weg ' + weg.toFixed(1) + ')');
+      if (Math.abs(a.h - b.h) > 0.5) f.push('Kurs ' + a.h.toFixed(2) + ' / ' + b.h.toFixed(2));
+      // Ein langes Bild (Haenger) rechnet hoechstens VF_TEIL.max Schritte.
+      VF.physRest = 0;
+      if (vfFahrPhysik(0.5, 140, st, hand, reifen) !== VF_TEIL.max || VF.physRest !== 0) f.push('Haenger nicht begrenzt');
+      mass = 'Weg ' + weg.toFixed(1) + ', Abweichung ' + abw.toFixed(4) + ', Kurs ' + a.h.toFixed(2) + '/' + b.h.toFixed(2);
+    } finally {
+      if (VF.aktiv) { try { virtuellBeenden(); } catch (e) { /* weiter */ } }
+      st.speedKmh = merk.v; steerX = merk.lenk; st.gLong = merk.g; st.longUse = merk.lu;
+      showTab(merkTab);
+    }
+    return { ok: !f.length, mass: f.length ? f.join('; ') : mass };
+  });
+  // v1.5.101 BESTELLT: H1 (Lenkhilfe, nur LibreCorsa), H2 (Bremstemperatur: kalt schwaecher), H5 (dreckige Luft).
+  stAdd('Fahrgefuehl v1.5.101: Lenkhilfe LibreCorsa (S-Kurve, Scheitel, Ausrichten), kalte Bremse, dreckige Luft virtuell', () => {
+    const f = [];
+    // H2: kalte Scheiben bremsen schwaecher, warme nicht, Schalter aus = nichts.
+    const e = new CarreraPhysicsEngine(), st = e.state, cfg = e.config;
+    Object.assign(cfg, { gran: true, pacejka: true }, GRAN_WERTE.librecorsa);
+    st.driveMode = 'forward'; st.currentGear = 3; cfg.brakeFadeEffect = 1;
+    st.speedKmh = 100 / REAL_SCALE; e.update({ throttle: 0, brake: 0.5, steering: 0 }, 0.02);
+    if (!(st.brakeKalt > 0.08 && st.brakeKalt <= cfg.brakeColdMax + 1e-9)) f.push('kalt: ' + st.brakeKalt);
+    st.brakeTemp4 = [300, 300, 300, 300]; st.speedKmh = 100 / REAL_SCALE; e.update({ throttle: 0, brake: 0.5, steering: 0 }, 0.02);
+    if (st.brakeKalt > 1e-6) f.push('warm noch kalt: ' + st.brakeKalt);
+    cfg.brakeFadeEffect = 0; st.brakeTemp4 = [25, 25, 25, 25]; st.speedKmh = 100 / REAL_SCALE; e.update({ throttle: 0, brake: 0.5, steering: 0 }, 0.02);
+    if (st.brakeKalt !== 0) f.push('Schalter aus, trotzdem kalt: ' + st.brakeKalt);
+    const eo = new CarreraPhysicsEngine(); eo.state.driveMode = 'forward'; eo.state.currentGear = 3; eo.config.brakeFadeEffect = 1;
+    eo.state.speedKmh = 100 / REAL_SCALE; eo.update({ throttle: 0, brake: 0.5, steering: 0 }, 0.02);
+    if (eo.state.brakeKalt !== 0) f.push('kalte Bremse auch in Omega/Physik');
+    // H1 echt: S-Kurve ohne Ueberschwingen, weich an, nach 0,25 s fast am Ziel.
+    const s1 = {};
+    let v10 = 0, maxV = 0;
+    for (let i = 0; i < 50; i++) { const v = lcSKurve(s1, i ? 1 : 0, i ? 0.01 : 0.01); if (i === 1) v10 = v; maxV = Math.max(maxV, v); }
+    if (!(v10 < 0.1)) f.push('S-Kurve springt (' + v10.toFixed(2) + ' nach 10 ms)');
+    if (!(s1.lcS > 0.9 && maxV <= 1.0001)) f.push('S-Kurve Ende ' + s1.lcS.toFixed(3) + ', hoechstens ' + maxV.toFixed(3));
+    // H1 echt: am Limit haelt die Hilfe die Kraft am Scheitel (mehr als ohne Hilfe), nur in LibreCorsa.
+    const lauf = (hilfe, werte) => {
+      const en = new CarreraPhysicsEngine(); Object.assign(en.config, { gran: true, pacejka: true }, werte, { lenkHilfe: hilfe });
+      en.state.driveMode = 'forward'; en.state.currentGear = 3;
+      for (let i = 0; i < 60; i++) { en.state.speedKmh = 250 / REAL_SCALE; en.update({ throttle: 0.9, brake: 0, steering: 1 }, 0.045); }
+      return en.state;
+    };
+    const mit = lauf(true, GRAN_WERTE.librecorsa), ohne = lauf(false, GRAN_WERTE.librecorsa);
+    if (!(mit.pacNutzV > 1)) f.push('Testfall nicht am Limit (vorn ' + mit.pacNutzV.toFixed(2) + ')');
+    if (!(mit.pacUnter * mit.pacNutzV >= ohne.pacUnter * ohne.pacNutzV - 1e-6)) f.push('Hilfe kostet Kraft vorn (' + (mit.pacUnter * mit.pacNutzV).toFixed(3) + ' < ' + (ohne.pacUnter * ohne.pacNutzV).toFixed(3) + ')');
+    const andere = lauf(true, Object.assign({}, GRAN_WERTE.librecorsa, { granArt: 'gran' })), andereOhne = lauf(false, Object.assign({}, GRAN_WERTE.librecorsa, { granArt: 'gran' }));
+    if (Math.abs(andere.pacUnter - andereOhne.pacUnter) > 1e-9 || andere.lcS !== undefined) f.push('Hilfe wirkt ausserhalb von LibreCorsa');
+    // H1 virtuell: Stick in der Mitte im Rutsch = Gegenlenken; voller Stick nie ueber den Scheitel vorn.
+    const merk = { P: VF.P, dyn: VF.dyn, lenk: VF.lenkIst, lhV: VF.lhV };
+    try {
+      VF.P = vfHandlingProfil(VF_GT3); VF.lenkIst = 0; VF.lhV = 0;
+      VF.dyn = { vy: 4, r: 0 };
+      for (let i = 0; i < 200; i++) VF.lenkIst = vfLenkHilfe(0, 0.002, 40);
+      if (!(VF.lenkIst > 0.02)) f.push('kein Gegenlenken im Rutsch (' + VF.lenkIst.toFixed(3) + ')');
+      VF.dyn = { vy: 0, r: 0 }; VF.lenkIst = 0; VF.lhV = 0;
+      for (let i = 0; i < 300; i++) VF.lenkIst = vfLenkHilfe(1, 0.002, 40);
+      const g = VF.P.lenkGrad * Math.PI / 180, sp = Math.tan(Math.PI / (2 * VF.P.C)) / VF.P.BV;
+      if (!(VF.lenkIst < 1 && Math.abs(VF.lenkIst * g - sp) < sp * 0.05)) f.push('Scheitel vorn: ' + (VF.lenkIst * g).toFixed(4) + ' statt ' + sp.toFixed(4));
+    } finally { VF.P = merk.P; VF.dyn = merk.dyn; VF.lenkIst = merk.lenk; VF.lhV = merk.lhV; }
+    // H5 virtuell: weniger Griff vorn = weniger Gier im Kurvenlimit (Untersteuern).
+    const P = vfHandlingProfil(VF_GT3), za = { vy: 0, r: 0 }, zb = { vy: 0, r: 0 };
+    for (let i = 0; i < 300; i++) { vfDynamik(za, 40, 0, 0, 0.6, 0.01, 1, P, 1); vfDynamik(zb, 40, 0, 0, 0.6, 0.01, 1, P, 0.82); }
+    if (!(Math.abs(zb.r) < Math.abs(za.r) * 0.97)) f.push('dreckige Luft ohne Wirkung vorn (' + za.r.toFixed(3) + ' / ' + zb.r.toFixed(3) + ')');
+    return { ok: !f.length, mass: f.length ? f.join('; ') : 'kalt ' + (cfg.brakeColdMax * 100) + ' %, Scheitel gehalten, Gier in dreckiger Luft ' + (zb.r / za.r * 100).toFixed(0) + ' %' };
   });
   stAdd('Virtuell v1.5.10: Lackfarbe umfaerbt nur die Karosserie, Vorschaubild je Auto und Farbe', async () => {
     const f = [];
