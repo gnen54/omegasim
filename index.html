@@ -43936,7 +43936,7 @@
   // Der Pad-Stick gilt nur fuer Achsen, die keine Belegung in Optionen -> Controller traegt, und nur
   // bei Standard-Belegung des Pads (sonst koennten Achse 2/3 die Trigger sein und dauernd drehen).
   const VF_DREH_GIER = 200 * Math.PI / 180, VF_DREH_NICK = 100 * Math.PI / 180, VF_DREH_TAU = 0.12;
-  const VF_DREH_TOT = 0.16, VF_DREH_SCHWELLE = 2 * Math.PI / 180, VF_DREH_PAD_MS = 250;
+  const VF_DREH_TOT = 0.25, VF_DREH_SCHWELLE = 2 * Math.PI / 180, VF_DREH_PAD_MS = 250;
   const VF_DREH_TASTEN = { t: 'hoch', f: 'links', g: 'runter', h: 'rechts' };
   function vfDreh() {
     if (!VF.dreh) VF.dreh = { g: 0, n: 0, vg: 0, vn: 0 };
@@ -44109,6 +44109,14 @@
     // Rechter Stick / T-F-G-H: die Drehung laeuft nach der Zeit (in der Pause ist dt 0).
     const art = vfDrehArt(id), D = vfDreh(), ein = vfDrehEingabe();
     vfDrehSchritt(D, ein[0], ein[1], dt, vfDrehGrenzen(art));
+    // Im Auto (Haube, Fahrer) federt der Blick nach dem Loslassen von selbst zurueck nach vorn
+    // (GEMELDET Gnen54 19.11.: "laenger neben der Strecke ... Kameraschwenk zur Fahrerseite" - ein Stick,
+    // der beim Ruetteln des Pads knapp ausserhalb der Totzone hing, drehte den Blick langsam weg;
+    // Totzone dazu 0,16 -> 0,25).
+    if (art === 'umsehen') {
+      if (ein[0] || ein[1]) VF.drehLos = 0; else VF.drehLos = (VF.drehLos || 0) + dt;
+      if (VF.drehLos > 0.5 && !D.vg && !D.vn) { const f = Math.exp(-dt / 0.25); D.g *= f; D.n *= f; if (Math.abs(D.g) < 1e-3) D.g = 0; if (Math.abs(D.n) < 1e-3) D.n = 0; }
+    }
     const k0 = vfKameraBasis(id, fx, fz, dt, art, D);
     const k = art === 'kreisen' ? k0 : vfDrehAnwenden(k0, art, D, VF.x, 0, VF.y);
     // Bruecke: Kamera mit hoch; im Auto (Haube, Fahrer) neigt sich der Blick mit der Rampe.
