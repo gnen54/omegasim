@@ -776,6 +776,7 @@
     const half = TRACK_HALF_W, kw = TRACK_KERB_W, ky = 0.09, n = pts.length;
     const rnd = vfZufall(4242 + tiles.length * 31 + Math.round(Math.abs(pts[n - 1].x) * 7));
     const off = (i, d) => [pts[i].x + nrm[i].x * d, pts[i].y + nrm[i].y * d];
+    const zz = (i) => pts[i].z || 0;   // Hoehe (Bruecke), sonst 0
     const lerp = (p, q, t) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
     const teile = [];
     for (let i = 0; i < n - 1; i++) {
@@ -796,7 +797,8 @@
         let v0 = acc[i - tl.i0] / L, v1 = acc[i - tl.i0 + 1] / L;
         if (fv) { v0 = 1 - v0; v1 = 1 - v1; }
         const a = off(i, half), b = off(i + 1, half), c = off(i + 1, -half), d = off(i, -half);
-        vfViereck(strasse, [a[0], 0, a[1], ua, v0], [b[0], 0, b[1], ua, v1], [c[0], 0, c[1], ub, v1], [d[0], 0, d[1], ub, v0], ct);
+        const z0 = zz(i), z1 = zz(i + 1);
+        vfViereck(strasse, [a[0], z0, a[1], ua, v0], [b[0], z1, b[1], ua, v1], [c[0], z1, c[1], ub, v1], [d[0], z0, d[1], ub, v0], ct);
         if (bu(i) > 1e-3 || bu(i + 1) > 1e-3) {
           // Boxenbucht: Asphalt vom Rand bis zur ausgestellten Kante (Randspalte der Textur, etwas dunkler).
           const sb = bse(i), r0 = off(i, half * sb), r1 = off(i + 1, half * sb), ur = sb > 0 ? ua : ub;
@@ -815,8 +817,25 @@
             const iA = off(i, (half + bs(i)) * sg), iB = off(i + 1, (half + bs(i + 1)) * sg);
             const oA = off(i, (half + kw + bs(i)) * sg), oB = off(i + 1, (half + kw + bs(i + 1)) * sg);
             const lA = off(i, (half + kw - lw + bs(i)) * sg), lB = off(i + 1, (half + kw - lw + bs(i + 1)) * sg);
-            vfViereck(strasse, [iA[0], 0, iA[1], uk, 0.3], [iB[0], 0, iB[1], uk, 0.4], [oB[0], 0, oB[1], uk, 0.4], [oA[0], 0, oA[1], uk, 0.3], ct);
-            vfViereck(rand, [lA[0], 0.012, lA[1], um, 0.1], [lB[0], 0.012, lB[1], um, 0.1], [oB[0], 0.012, oB[1], um, 0.2], [oA[0], 0.012, oA[1], um, 0.2], [1, 1, 1]);
+            const zA = zz(i), zB = zz(i + 1);
+            vfViereck(strasse, [iA[0], zA, iA[1], uk, 0.3], [iB[0], zB, iB[1], uk, 0.4], [oB[0], zB, oB[1], uk, 0.4], [oA[0], zA, oA[1], uk, 0.3], ct);
+            vfViereck(rand, [lA[0], zA + 0.012, lA[1], um, 0.1], [lB[0], zB + 0.012, lB[1], um, 0.1], [oB[0], zB + 0.012, oB[1], um, 0.2], [oA[0], zA + 0.012, oA[1], um, 0.2], [1, 1, 1]);
+            if (zA > 0 || zB > 0) {
+              // Bruecke (19.11.): Bordwand aussen (gedruckt, grau) bis 1,3 ueber die Fahrbahn, unten so
+              // tief wie die Platte (11 mm, wie im STL) - darunter bleibt die Durchfahrt offen; an den
+              // flachen Rampenenden reicht sie bis zum Boden. Dazu die Unterseite der Platte.
+              const wo = 1.3, dk = 1.0, wf = [0.58, 0.6, 0.63], wi = [0.5, 0.52, 0.55], uw2 = 4 / VF_RAND_B;
+              const bA = Math.max(0, zA - dk), bB = Math.max(0, zB - dk);
+              const aA = off(i, (half + kw + 0.25) * sg), aB = off(i + 1, (half + kw + 0.25) * sg);
+              vfViereck(rand, [oA[0], bA, oA[1], uw2, 0.1], [oB[0], bB, oB[1], uw2, 0.1], [oB[0], zB + wo, oB[1], uw2, 0.2], [oA[0], zA + wo, oA[1], uw2, 0.2], wi);
+              vfViereck(rand, [aA[0], bA, aA[1], uw2, 0.1], [aB[0], bB, aB[1], uw2, 0.1], [aB[0], zB + wo, aB[1], uw2, 0.2], [aA[0], zA + wo, aA[1], uw2, 0.2], wf);
+              vfViereck(rand, [oA[0], zA + wo, oA[1], uw2, 0.1], [oB[0], zB + wo, oB[1], uw2, 0.1], [aB[0], zB + wo, aB[1], uw2, 0.2], [aA[0], zA + wo, aA[1], uw2, 0.2], wf);
+              if (sg > 0) {
+                const uA = off(i, -(half + kw)), uB = off(i + 1, -(half + kw));
+                vfViereck(rand, [oA[0], bA, oA[1], uw2, 0.1], [oB[0], bB, oB[1], uw2, 0.1],
+                  [uB[0], bB, uB[1], uw2, 0.2], [uA[0], bA, uA[1], uw2, 0.2], [0.35, 0.36, 0.38]);
+              }
+            }
           }
           continue;
         }
@@ -1066,9 +1085,57 @@
     return o;
   }
   // Weltlage des Autos: Drehung um y, sodass lokal +z in Fahrtrichtung (sin h, -cos h) zeigt.
+  // ---- HOEHE (19.11., BESTELLT Gnen54: Toernerschleife 2.0 mit Bruecke) ----------------------
+  // Die Mittellinie traegt je Punkt eine Hoehe z (sonst 0). Gebraucht wird sie nur an erhoehten
+  // Stuecken; dort liegen Bruecke und Unterfuehrung am selben Kartenort. Unterschieden wird ueber
+  // die Fahrtrichtung: wer laengs der Bruecke faehrt (oder rueckwaerts), ist oben; die Strasse
+  // darunter kreuzt schraeg. Das eigene Auto nimmt seinen Bahnpunkt (VF.idx), das ist eindeutig.
+  function vfHoeheVorbereiten() {
+    const P = VF.pts, n = P.length, seg = [];
+    for (let i = 0; i + 1 < n; i++) {
+      if (!((P[i].z || 0) > 0 || (P[i + 1].z || 0) > 0)) continue;
+      const dx = P[i + 1].x - P[i].x, dy = P[i + 1].y - P[i].y, l = Math.hypot(dx, dy) || 1;
+      seg.push({ i, ax: P[i].x, ay: P[i].y, ex: dx / l, ey: dy / l, l, z0: P[i].z || 0, z1: P[i + 1].z || 0 });
+    }
+    VF.hoehe = seg.length ? seg : null;
+  }
+  const VF_HZ_NULL = { z: 0, p: 0 };
+  function vfHzSeg(sg, x, y, vor) {
+    const t = Math.max(0, Math.min(1, ((x - sg.ax) * sg.ex + (y - sg.ay) * sg.ey) / sg.l));
+    const p = Math.atan2(sg.z1 - sg.z0, sg.l);
+    return { z: sg.z0 + (sg.z1 - sg.z0) * t, p: vor ? p : -p };
+  }
+  function vfHz(x, y, h) {
+    if (!VF.hoehe) return VF_HZ_NULL;
+    const r = h * Math.PI / 180, fx = Math.sin(r), fy = -Math.cos(r);
+    let best = null, bq = TRACK_HALF_W + TRACK_KERB_W + VF_AUTO.B;
+    for (const sg of VF.hoehe) {
+      const t = ((x - sg.ax) * sg.ex + (y - sg.ay) * sg.ey) / sg.l;
+      if (t < -0.3 || t > 1.3) continue;
+      const q = Math.abs((x - sg.ax) * -sg.ey + (y - sg.ay) * sg.ex);
+      const c = fx * sg.ex + fy * sg.ey;
+      if (q < bq && Math.abs(c) > 0.6) { bq = q; best = { sg, vor: c > 0 }; }
+    }
+    return best ? vfHzSeg(best.sg, x, y, best.vor) : VF_HZ_NULL;
+  }
+  // Eigenes Auto: ueber den Bahnpunkt (auch quer stehend auf der Bruecke eindeutig).
+  function vfHzSpieler() {
+    if (!VF.hoehe) return VF_HZ_NULL;
+    const i = VF.idx || 0, P = VF.pts, n = P.length;
+    let best = null, bd = Infinity;
+    for (const sg of VF.hoehe) {
+      const d = Math.min(Math.abs(sg.i - i), n - Math.abs(sg.i - i));
+      if (d < bd) { bd = d; best = sg; }
+    }
+    if (!best || bd > 2) return VF_HZ_NULL;
+    const r = VF.h * Math.PI / 180;
+    return vfHzSeg(best, VF.x, VF.y, Math.sin(r) * best.ex - Math.cos(r) * best.ey >= 0);
+  }
   function vfLage(x, y, h) {
     const th = Math.PI - h * Math.PI / 180, c = Math.cos(th), s = Math.sin(th);
-    return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, x, 0, y, 1];
+    const H = VF.hoehe ? (x === VF.x && y === VF.y ? vfHzSpieler() : vfHz(x, y, h)) : VF_HZ_NULL;
+    const m = [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, x, H.z, y, 1];
+    return H.p ? vfMal(m, vfRx(-H.p)) : m;
   }
   const VF_EINS = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   const VF_OBEN = [0, 1, 0], VF_WEISS = [1, 1, 1], VF_GLAS_TINT = [0.18, 0.22, 0.27];
@@ -1172,7 +1239,8 @@
   // Abstand ~2,86 = ein Teil hat 14 Punkte) und Pseudo-Kacheln (START / STRAIGHT / PIT), damit Runden,
   // Randsteine, Boxenbucht und NPCs unveraendert funktionieren. Erzeugt aus Gnen54s DXF (tools ausserhalb).
   const VF_STRECKE_STORE = 'omegasim-vf-strecke';
-  const VF_FREIE = { indeq: { name: 'Törnerschleife 2.0', pfad: 'img/strecken/indeq-ring.json' } };
+  const VF_FREIE = { indeq: { name: 'Törnerschleife 2.0', pfad: 'img/strecken/indeq-ring.json' },
+    indeqBruecke: { name: 'Törnerschleife 2.0 mit Brücke', pfad: 'img/strecken/indeq-bruecke.json' } };
   function vfFreiWahl() { try { const v = localStorage.getItem(VF_STRECKE_STORE) || ''; return VF_FREIE[v] ? v : ''; } catch (e) { return ''; } }
   const vfFreiCache = {};
   function vfFreiLaden(k) {
@@ -1181,9 +1249,10 @@
       // PIT-Kacheln bringen die Tiefe ihrer Bucht mit (halbe Bahnbreiten, echte Boxengasse).
       const tiles = d.kacheln.map((ty) => ({ type: TILE_TYPE[ty] !== undefined ? TILE_TYPE[ty] : TILE_TYPE.STRAIGHT, frei: true,
         bucht: ty === 'PIT' ? d.boxBucht : undefined, seite: ty === 'PIT' ? (d.boxSeite || -1) : undefined, steg: ty === 'PIT' ? d.steg : undefined }));
-      const pts = d.pts.map((q) => ({ x: q[0], y: q[1], tile: q[2] }));
+      // 4. Wert (19.11., Bruecke): Hoehe der Fahrbahn in Karteneinheiten (fehlt = 0, flach).
+      const pts = d.pts.map((q) => ({ x: q[0], y: q[1], tile: q[2], z: q[3] || 0 }));
       // geschlossen wie trackCenterline: letzter Punkt = erster (sonst fehlt das letzte Stueck Bahn)
-      pts.push({ x: pts[0].x, y: pts[0].y, tile: pts[pts.length - 1].tile });
+      pts.push({ x: pts[0].x, y: pts[0].y, tile: pts[pts.length - 1].tile, z: pts[0].z });
       // Fahrtrichtung wie trackCenterline: Richtung (sin h, -cos h), h in Grad.
       pts.forEach((p, i) => {
         const m = pts.length - 1, a = pts[(i - 1 + m) % m], c = pts[(i + 1) % m];
@@ -2186,6 +2255,22 @@
     // Boxenbucht auf der rechten (roten) Seite: dort ist die Fahrbahn um die Bucht breiter.
     const zus = Math.sign(o.quer) === (VF.buchtSeite || -1) && VF.bucht ? (VF.bucht[o.idx] || 0) : 0;
     vfBoxDurchfahrt(o, zus);
+    // Bruecke und Rampen: seitlich begrenzt (Bordwand), herunterfallen gibt es nicht.
+    const Hb = vfHzSpieler();
+    if (Hb.z > 0.3) {
+      const grenze = TRACK_HALF_W + TRACK_KERB_W - VF_AUTO.B * 0.5;
+      if (Math.abs(o.quer) > grenze) {
+        const zu = (Math.abs(o.quer) - grenze) * Math.sign(o.quer);
+        VF.x -= VF.nrm[o.idx].x * zu; VF.y -= VF.nrm[o.idx].y * zu; o.quer -= zu;
+        if (Math.abs(st.speedKmh) > 0.05 && (VF.wandSeit === undefined || rennZeitJetzt() - VF.wandSeit > 300)) {
+          VF.wandSeit = rennZeitJetzt(); padRumble(0.6, 0.4, 90, 'kerb', 1);
+        }
+        st.speedKmh *= Math.exp(-2.5 * dt);
+      }
+    }
+    // Steigung bremst bergauf, beschleunigt bergab (Hangabtrieb, g * sin).
+    // physEngine rechnet ein grosses Auto, verkleinert um REAL_SCALE - die Schwerkraft ebenso.
+    if (Hb.p) st.speedKmh -= 9.81 * Math.sin(Hb.p) * 3.6 * dt / REAL_SCALE;
     const ab = Math.abs(o.quer) - zus > TRACK_HALF_W * 1.19 + VF_AUTO.B * 0.3;
     if (ab && !VF.abseits) VF.abseitsSeit = rennZeitJetzt();
     VF.abseits = ab;
@@ -2231,6 +2316,8 @@
     const vAbs = Math.abs(physEngine.state.speedKmh || 0);
     for (const npc of (VF.npcs || [])) {
       if (npc.koAus || npc.derbyAus) continue;
+      // Bruecke: einer oben, einer unten durch - kein Kontakt, kein Windschatten.
+      if (VF.hoehe && Math.abs(vfHz(npc.x, npc.y, npc.h).z - vfHzSpieler().z) > 1.5) continue;
       const dx = npc.x - VF.x, dy = npc.y - VF.y;
       const long = dx * fwdX + dy * fwdY;
       const lat = dx * latX + dy * latY;
@@ -2706,8 +2793,15 @@
     // Rechter Stick / T-F-G-H: die Drehung laeuft nach der Zeit (in der Pause ist dt 0).
     const art = vfDrehArt(id), D = vfDreh(), ein = vfDrehEingabe();
     vfDrehSchritt(D, ein[0], ein[1], dt, vfDrehGrenzen(art));
-    const k = vfKameraBasis(id, fx, fz, dt, art, D);
-    return art === 'kreisen' ? k : vfDrehAnwenden(k, art, D, VF.x, 0, VF.y);
+    const k0 = vfKameraBasis(id, fx, fz, dt, art, D);
+    const k = art === 'kreisen' ? k0 : vfDrehAnwenden(k0, art, D, VF.x, 0, VF.y);
+    // Bruecke: Kamera mit hoch; im Auto (Haube, Fahrer) neigt sich der Blick mit der Rampe.
+    const H = vfHzSpieler();
+    if (!H.z && !H.p) return k;
+    const innen = id === 'haube' || id === 'fahrer';
+    const weit = Math.hypot(k.ziel[0] - k.auge[0], k.ziel[2] - k.auge[2]);
+    return Object.assign({}, k, { auge: [k.auge[0], k.auge[1] + H.z, k.auge[2]],
+      ziel: [k.ziel[0], k.ziel[1] + H.z + (innen ? Math.tan(H.p) * weit : 0), k.ziel[2]] });
   }
   function vfKameraBasis(id, fx, fz, dt, art, D) {
     if (id === 'fahrer' && VF.fahrer) { VF.kam = null; return vfFahrerKamera(VF.fahrer, VF.x, VF.y, dt); }
@@ -3195,9 +3289,10 @@
     VF.tiles = tiles;
     // Gezeichnet wird die volle Mittellinie (sonst klafft an der Schliessstelle ein Loch in der Bahn),
     // gefahren, gezaehlt und von den NPCs befahren die an der Schliessstelle gekuerzte.
-    const ptsVoll = frei ? frei.pts.map((q) => ({ x: q.x, y: q.y, tile: q.tile, heading: q.heading })) : trackCenterline(tiles);
+    const ptsVoll = frei ? frei.pts.map((q) => ({ x: q.x, y: q.y, tile: q.tile, heading: q.heading, z: q.z || 0 })) : trackCenterline(tiles);
     VF.pts = vfSchliessstelle(ptsVoll);
     VF.nrm = trackNormals(VF.pts);
+    vfHoeheVorbereiten();
     VF.bucht = vfBuchtJePunkt(VF.pts, tiles);
     VF.buchtSeite = tiles.reduce((a, x) => (x.type === TILE_TYPE.PIT && x.seite ? x.seite : a), -1);
     // v1.3.39: Flaechen mit Texturen (die Pixel entstehen nur beim ersten Mal) und der feste Platz der
