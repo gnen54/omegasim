@@ -2159,7 +2159,7 @@
  "manta400_rec": {
   "label": "Opel Manta 400 (Aufnahme)",
   "cylinders": 4,
-  "source": "Aufnahme vom Nutzer (Best of Opel Manta 400 Michael Gerber - by Rallyeszene.de), stetige Ausschnitte; nur im Fork gnen54/omegasim",
+  "source": "Saubere Aufnahme eines Freundes von Gnen54 (20.11.2026), Ausschnitte auf feste Zuendfrequenz geglaettet; nur im Fork gnen54/omegasim",
   "crackle": 0.55,
   "turbo": false,
   "idleRpm": 2262,
@@ -2167,37 +2167,30 @@
   "loops": {
    "idle": {
     "file": "manta400_rec_idle.ogg",
-    "baseRpm": 2262,
-    "firingHz": 75.4,
-    "seconds": 1.64,
-    "load": 1.0
-   },
-   "low": {
-    "file": "manta400_rec_low.ogg",
-    "baseRpm": 3714,
-    "firingHz": 123.8,
-    "seconds": 1.64,
+    "baseRpm": 4350,
+    "firingHz": 145.0,
+    "seconds": 0.4997,
     "load": 1.0
    },
    "mid": {
     "file": "manta400_rec_mid.ogg",
-    "baseRpm": 7107,
-    "firingHz": 236.9,
-    "seconds": 1.64,
+    "baseRpm": 5340,
+    "firingHz": 178.0,
+    "seconds": 0.541,
     "load": 1.0
    },
    "high": {
     "file": "manta400_rec_high.ogg",
-    "baseRpm": 7752,
-    "firingHz": 258.4,
-    "seconds": 1.64,
+    "baseRpm": 6840,
+    "firingHz": 228.0,
+    "seconds": 1.0088,
     "load": 1.0
    },
    "over": {
     "file": "manta400_rec_over.ogg",
-    "baseRpm": 3714,
-    "firingHz": 123.8,
-    "seconds": 1.64,
+    "baseRpm": 3660,
+    "firingHz": 122.0,
+    "seconds": 0.4123,
     "load": 0.0
    }
   }

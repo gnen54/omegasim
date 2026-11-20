@@ -209,7 +209,7 @@ BESTELLT: "motorsounds: ford tudor slantback 1937 und vw käfer 1300 (herbie)."
 | `kaefer1300` | VW Kaefer 1300 | 1,3-l-Boxer-4, luftgekuehlt, ~40 PS, ~4200/min | 1-4-3-2, Haelften (VW-Zaehlung: 1/2 eine Bank, 3/4 die andere) |
 | `boxster986` | Porsche Boxster 986 | 2,5-l-Boxer-6, Saugmotor, ~204 PS, Begrenzer ~6900/min | 1-6-2-4-3-5, Haelften |
 | `manta400` | Opel Manta 400 Gruppe B | 2,4-l-Reihen-4, 16V, Saugmotor, ~275 PS, Begrenzer ~8000/min | 1-3-4-2, Reihe |
-| `manta400_rec` | Opel Manta 400 (Aufnahme) | Ausschnitte aus „Best of Opel Manta 400 Michael Gerber – by Rallyeszene.de“, vom Nutzer bereitgestellt, nur im Fork | 1-3-4-2, Reihe |
+| `manta400_rec` | Opel Manta 400 (Aufnahme) | Saubere Aufnahme eines Freundes von Gnen54 (20.11.2026), Ausschnitte auf feste Zündfrequenz geglättet (tools/manta_rec2.py), nur im Fork | 1-3-4-2, Reihe |
 
 **Beide sind als WIP gekennzeichnet, und zwar staerker als die bisherigen WIP-Eintraege
 oben.** Bei jenen war zumindest die Geometrie (Zylinderzahl, Zuendfolge, Bankaufteilung)
