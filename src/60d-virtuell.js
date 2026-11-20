@@ -893,6 +893,22 @@
             [b[0] + qx, 0.012, b[1] + qy, uk, 0.2], [a[0] + qx, 0.012, a[1] + qy, uk, 0.2], [1, 1, 1]);
         }
       }
+      // Anfang und Ende des Tankbereichs: fein gestrichelte Querlinie (20.11., Gnen54: "sonst stehst du zu
+      // weit vorne, versuchst zu tanken und es funktioniert nicht"). Gleiche Schwelle wie vfBoxDurchfahrt.
+      let bMax = 0;
+      for (let i = 0; i < n; i++) bMax = Math.max(bMax, bu(i) || 0);
+      const drin = (i) => (bu((i + n) % n) || 0) > bMax * 0.3;
+      if (bMax > 0) for (let i = 0; i < n; i++) {
+        if (!drin(i) || (drin(i - 1) && drin(i + 1))) continue;
+        const sg = bse(i), tief = half + bMax * 1.3, sl = kw * 0.5, lw = kw * 0.12;
+        const zi = zz(i), e = [nrm[i].x * sg, nrm[i].y * sg], q = [-e[1] * lw, e[0] * lw];
+        for (let d = half + kw; d + sl <= tief; d += sl * 2) {
+          const p0 = off(i, d * sg), p1 = off(i, (d + sl) * sg);
+          if (!vfInGasse(gasse, [(p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2])) continue;
+          vfViereck(rand, [p0[0] - q[0], zi + 0.014, p0[1] - q[1], uk, 0.1], [p1[0] - q[0], zi + 0.014, p1[1] - q[1], uk, 0.1],
+            [p1[0] + q[0], zi + 0.014, p1[1] + q[1], uk, 0.2], [p0[0] + q[0], zi + 0.014, p0[1] + q[1], uk, 0.2], [1, 1, 1]);
+        }
+      }
     }
     // Boxenmarkierungen: flach knapp ueber der Fahrbahn, Randstein-Textur an der hellen Wandspalte.
     const um = 4 / VF_RAND_B;
