@@ -2095,5 +2095,65 @@
   },
   "idleRpm": 850,
   "limiterRpm": 6900
+ },
+ "manta400": {
+  "label": "Opel Manta 400 Gruppe B (2,4 l Reihen-4, 16V, Saugmotor) [WIP]",
+  "cylinders": 4,
+  "source": "vollst\u00e4ndig synthetisiert (Modell nach engine-sim, MIT)",
+  "crackle": 0.55,
+  "turbo": false,
+  "loops": {
+   "idle": {
+    "file": "manta400_idle.ogg",
+    "baseRpm": 1000,
+    "firingHz": 33.3,
+    "seconds": 2.04,
+    "load": 1.0
+   },
+   "low": {
+    "file": "manta400_low.ogg",
+    "baseRpm": 1495,
+    "firingHz": 49.8,
+    "seconds": 2.0067,
+    "load": 1.0
+   },
+   "low2": {
+    "file": "manta400_low2.ogg",
+    "baseRpm": 2236,
+    "firingHz": 74.5,
+    "seconds": 1.9857,
+    "load": 1.0
+   },
+   "low3": {
+    "file": "manta400_low3.ogg",
+    "baseRpm": 3344,
+    "firingHz": 111.5,
+    "seconds": 2.0096,
+    "load": 1.0
+   },
+   "mid": {
+    "file": "manta400_mid.ogg",
+    "baseRpm": 5000,
+    "firingHz": 166.7,
+    "seconds": 1.992,
+    "load": 1.0
+   },
+   "high": {
+    "file": "manta400_high.ogg",
+    "baseRpm": 7600,
+    "firingHz": 253.3,
+    "seconds": 2.0053,
+    "load": 1.0
+   },
+   "over": {
+    "file": "manta400_over.ogg",
+    "baseRpm": 5000,
+    "firingHz": 166.7,
+    "seconds": 1.992,
+    "load": 0.0
+   }
+  },
+  "idleRpm": 1000,
+  "limiterRpm": 8000
  }
 }

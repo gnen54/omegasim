@@ -951,6 +951,25 @@ CARS = {
         'crackle': 0.25,
         'gain_wobble': 0.05, 'clatter_variiert': True,
     },
+    'manta400': {
+        'label': 'Opel Manta 400 Gruppe B (2,4 l Reihen-4, 16V, Saugmotor) [WIP]',
+        # BESTELLT Gnen54 20.11.2026: "Fahrverhalten und Motorsound wie Opel Manta B400" (nur im Fork).
+        # Cosworth-Vierventilkopf auf dem Opel-CIH-Block, 2410 ccm, Saugmotor mit zwei Doppel-
+        # vergasern bzw. Einspritzung; Rallye-Ausfuehrung um 275 PS bei 7200/min, Begrenzer ~8000.
+        # Reihen-4, Zuendfolge 1-3-4-2, Zuendabstand 180 Grad.
+        'banks': inline_from_order([1, 3, 4, 2], 4), 'cylinders': 4,
+        'limiter': 8000,
+        'rpms': {'idle': 1000, 'mid': 5000, 'high': 7600},
+        # Rallye-Anlage: 4-in-1-Faecherkruemmer, kurzer offener Endtopf - rauer und heller als
+        # ein Serienvierzylinder.
+        'primary_in': 18.0, 'res_q': 3.6, 'partials': 6, 'ir_ms': 28.0,
+        'pulse_ms': 2.0, 'bright': 0.47,
+        # offene Ansaugtrichter: deutliches Ansaugroecheln
+        'noise': 0.16, 'noise_hz': 2400.0,
+        'clatter': 0.18, 'clatter_hz': 2400.0, 'drive': 3.2,
+        'scatter_t': 0.016, 'scatter_g': 0.06, 'crackle': 0.55,
+        'gain_wobble': 0.05, 'clatter_variiert': True,
+    },
     'boxster986': {
         'label': 'Porsche Boxster 986 (2,5 l Boxer-6, Saugmotor) [WIP]',
         # BESTELLT (13.11.2026): "Der Kaefer soll den Sound einer Porsche-Maschine, Porsche

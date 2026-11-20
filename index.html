@@ -42460,7 +42460,7 @@
   // img/autos/v5r/: Modell ohne Innenraum, Rad, Lichtorte und die Fahrzeugdaten aus der .xml. Laengen in
   // Metern, im Auto +x links, +y oben, +z vorn; gezeichnet mal VF_AUTO.L / Laenge (so lang wie der Kasten).
   const VF_AUTO_STORE = 'omegasim-vf-auto';
-  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/', caravelle: 'img/autos/caravelle/', gt3: 'img/autos/gt3/' };
+  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/', caravelle: 'img/autos/caravelle/', gt3: 'img/autos/gt3/', manta: 'img/autos/manta/' };
   function vfModellPfad(auto) { return VF_MODELL_PFADE[auto || vfAutoWahl()] || 'img/autos/v5r/'; }
   const VF_FEDER_STORE = 'omegasim-vf-feder';
   const VF_FEDER_WERTE = [1, 2, 3, 5, 8];
@@ -44759,11 +44759,11 @@
   // Standard ist der Vulture V5.R (wie das Auto); "Wie in Optionen" folgt dem globalen Ton (sentinel).
   // Gnen54s eigene Autos haben einen FESTEN Motorklang (BESTELLT Gnen54: "der Motorsound soll fest dem
   // Fahrzeug zugeordnet sein, die Anwahl gesperrt") - die gespeicherte Wahl gilt dort nicht.
-  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer_dunkel', caravelle: 'boxster986' };
+  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer_dunkel', caravelle: 'boxster986', manta: 'manta400' };
   function vfMotorFest() { return VF_MOTOR_FEST[vfAutoWahl()] || ''; }
   function vfMotorGewaehlt() {
     if (vfMotorFest()) return vfMotorFest();
-    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer_dunkel', caravelle: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
+    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', gt3: 'sd_boxer_dunkel', caravelle: 'boxster986', manta: 'manta400' })[vfAutoWahl()] || 'sd_v5r';
     try { const v = localStorage.getItem(VF_MOTOR_STORE); return v === null ? def : v; } catch (e) { return def; }
   }
   function vfMotorZiel() { const g = vfMotorGewaehlt(); if (g && g !== VF_MOTOR_GLOBAL) return g; return $('sound-profile') ? $('sound-profile').value : ''; }
@@ -44823,6 +44823,8 @@
                    // VW Caravelle (Gnen54) auf Vehicle-World-Karosserie (Freigabe erteilt), Oettinger-Boxer-6 (Werte geschaetzt),
                    // Motorhauben-Kamera = Kamera im echten Modell (Lage, Neigung, Bildwinkel aus auto.json "haube")
                    { v: 'caravelle', name: 'VW Caravelle Oettinger (Gnen54, WIP)' },
+                   // Opel Manta B400 (Gnen54, fuer einen Freund) - KEINE Freigabe: nur im Fork, nie in einen PR
+                   { v: 'manta', name: 'Opel Manta B400 (Gnen54, WIP)' },
                    { v: 'kasten', name: t('Einfaches Modell') }];
     const ja = Math.max(0, autos.findIndex((a) => a.v === vfAutoWahl()));
     const autoWahl = (dd) => {
@@ -60425,6 +60427,8 @@
     'fordtudor37', 'kaefer1300',
     // BESTELLT 13.11.2026: Porsche-Boxster-Klang fuer den getunten Kaefer (1303 RS mit Boxster-Motor), WIP.
     'boxster986',
+    // BESTELLT Gnen54 20.11.2026: Opel Manta 400 (2,4 l Reihen-4, 16V) fuer den Manta B400, WIP.
+    'manta400',
     // ---- SECHS AUFNAHMEN AUS SPEED DREAMS, v1.0.13, WIP ------------------------------
     //
     // BESTELLT: Motorklaenge aus Speed Dreams. Nur die CC0-Proben aus data/sound (siehe

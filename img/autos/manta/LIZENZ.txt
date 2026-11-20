@@ -1,0 +1,3 @@
+Opel Manta B400 - Karosserie und Anbauteile: STL von Gnen54 (fuer einen Freund).
+Keine Freigabe zur Veroeffentlichung: nur im Fork gnen54/omegasim, nicht fuer Pull-Requests.
+Raeder/Chassis: aus dem GT3-Aufbau (siehe img/autos/gt3/LIZENZ.txt).

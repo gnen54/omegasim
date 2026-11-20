@@ -141,6 +141,8 @@
     'fordtudor37', 'kaefer1300',
     // BESTELLT 13.11.2026: Porsche-Boxster-Klang fuer den getunten Kaefer (1303 RS mit Boxster-Motor), WIP.
     'boxster986',
+    // BESTELLT Gnen54 20.11.2026: Opel Manta 400 (2,4 l Reihen-4, 16V) fuer den Manta B400, WIP.
+    'manta400',
     // ---- SECHS AUFNAHMEN AUS SPEED DREAMS, v1.0.13, WIP ------------------------------
     //
     // BESTELLT: Motorklaenge aus Speed Dreams. Nur die CC0-Proben aus data/sound (siehe
