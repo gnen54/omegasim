@@ -143,6 +143,8 @@
     'boxster986',
     // BESTELLT Gnen54 20.11.2026: Opel Manta 400 (2,4 l Reihen-4, 16V) fuer den Manta B400, WIP.
     'manta400',
+    // 20.11.2026: Manta 400 aus der Aufnahme des Nutzers (Rallyeszene.de-Video), nur im Fork.
+    'manta400_rec',
     // ---- SECHS AUFNAHMEN AUS SPEED DREAMS, v1.0.13, WIP ------------------------------
     //
     // BESTELLT: Motorklaenge aus Speed Dreams. Nur die CC0-Proben aus data/sound (siehe

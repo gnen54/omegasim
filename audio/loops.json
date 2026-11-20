@@ -2155,5 +2155,51 @@
   },
   "idleRpm": 1000,
   "limiterRpm": 8000
+ },
+ "manta400_rec": {
+  "label": "Opel Manta 400 (Aufnahme)",
+  "cylinders": 4,
+  "source": "Aufnahme vom Nutzer (Best of Opel Manta 400 Michael Gerber - by Rallyeszene.de), stetige Ausschnitte; nur im Fork gnen54/omegasim",
+  "crackle": 0.55,
+  "turbo": false,
+  "idleRpm": 2262,
+  "limiterRpm": 8000,
+  "loops": {
+   "idle": {
+    "file": "manta400_rec_idle.ogg",
+    "baseRpm": 2262,
+    "firingHz": 75.4,
+    "seconds": 1.64,
+    "load": 1.0
+   },
+   "low": {
+    "file": "manta400_rec_low.ogg",
+    "baseRpm": 3714,
+    "firingHz": 123.8,
+    "seconds": 1.64,
+    "load": 1.0
+   },
+   "mid": {
+    "file": "manta400_rec_mid.ogg",
+    "baseRpm": 7107,
+    "firingHz": 236.9,
+    "seconds": 1.64,
+    "load": 1.0
+   },
+   "high": {
+    "file": "manta400_rec_high.ogg",
+    "baseRpm": 7752,
+    "firingHz": 258.4,
+    "seconds": 1.64,
+    "load": 1.0
+   },
+   "over": {
+    "file": "manta400_rec_over.ogg",
+    "baseRpm": 3714,
+    "firingHz": 123.8,
+    "seconds": 1.64,
+    "load": 0.0
+   }
+  }
  }
 }

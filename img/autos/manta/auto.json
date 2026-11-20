@@ -125,7 +125,7 @@
   "auftriebHinten": 0.08,
   "fluegelVorn": 0.0,
   "fluegelHinten": 0.08,
-  "leerlauf": 1000.0,
+  "leerlauf": 1500.0,
   "begrenzer": 8000.0,
   "reifen": {
    "vorn": {
