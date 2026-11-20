@@ -819,7 +819,7 @@
           const lw = kw, uk = sg > 0 ? ua : ub, um = (sg > 0 ? 4 : 132) / VF_RAND_B;
           for (let i = tl.i0; i <= tl.i1; i++) {
             // Zur echten Gasse hin: Asphalt bis zur Kante, aber keine weisse Linie (dort geht es hinein).
-            const offen = !!gasse && (bs(i) > 1e-3 || bs(i + 1) > 1e-3);
+            const offen = !!gasse && (bs(i) > 1e-3 || bs(i + 1) > 1e-3 || [0.6, 1.6, 3].some((f) => vfInGasse(gasse, off(i, (half + kw * f) * sg)) || vfInGasse(gasse, off(i + 1, (half + kw * f) * sg))));
             const bsZ = (j) => (gasse ? 0 : bs(j));
             const iA = off(i, (half + bsZ(i)) * sg), iB = off(i + 1, (half + bsZ(i + 1)) * sg);
             const oA = off(i, (half + kw + bsZ(i)) * sg), oB = off(i + 1, (half + kw + bsZ(i + 1)) * sg);
@@ -2961,9 +2961,32 @@
     VF.kam = VF.kam ? VF.kam.map((q, i) => q + (soll[i] - q) * a) : soll;
     return { auge: VF.kam, ziel: k.ziel, fov: naeher ? 62 : (nah ? 58 : 54), nah: naeher ? 0.3 : 0.5 };
   }
+  // Lichthupe auch am virtuellen Auto (20.11., GEMELDET Gnen54: "Lichthupe funktioniert nicht auf den
+  // virtuellen Bahnen"): dieselbe Taktung wie am echten Auto (resolveLights in 70-race.js).
+  // Liegt ein Kartenpunkt in der Boxengasse (Dreiecke aus der DXF)? Fuer Ein- und Ausfahrt: dort keine
+  // weisse Randlinie ueber die Oeffnung (20.11., Gnen54: "Boxeneingang und -ausgang frei, schwarz").
+  function vfInGasse(g, q) {
+    const t = g.tri;
+    for (let j = 0; j + 5 < t.length; j += 6) {
+      const ax = t[j], ay = t[j + 1], bx = t[j + 2], by = t[j + 3], cx = t[j + 4], cy = t[j + 5];
+      const d = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
+      if (!d) continue;
+      const l1 = ((by - cy) * (q[0] - cx) + (cx - bx) * (q[1] - cy)) / d, l2 = ((cy - ay) * (q[0] - cx) + (ax - cx) * (q[1] - cy)) / d;
+      if (l1 >= 0 && l2 >= 0 && l1 + l2 <= 1) return true;
+    }
+    return false;
+  }
+  function vfLichtMitHupe(an) {
+    try {
+      const jetzt = rennZeitJetzt();
+      if (jetzt >= lightFx.flashUntil) return an;
+      const el = FLASH_MS - (lightFx.flashUntil - jetzt);
+      return (el % FLASH_PERIOD_MS) < FLASH_ON_MS ? !an : an;
+    } catch (e) { return an; }
+  }
   function vfModellMalen(gl, pv, blick, auge) {
     vfModellZeichnen(gl, pv, blick, VF.modell, VF.tprog, VF.x, VF.y, VF.h, VF.feder, VF.lenkWinkel, VF.raddreh, VF.radModell,
-      (typeof headlightsOn === 'undefined' ? true : !!headlightsOn),
+      vfLichtMitHupe(typeof headlightsOn === 'undefined' ? true : !!headlightsOn),
       !!(physEngine.outputs && physEngine.outputs.lights && physEngine.outputs.lights.brake), vfFederSicht(), VF.pitch || 0, auge);
   }
   // Ein Modell an einer Stelle zeichnen. Wird fuer das Spielerauto und fuer jeden NPC benutzt:
