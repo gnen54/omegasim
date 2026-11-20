@@ -49,13 +49,27 @@ def glaetten(x, a, b, ziel):
     return np.interp(src, np.arange(len(x)), x)
 
 
+def entrauschen(loop, hz, rest=0.18, breite=4.0):
+    """Kammfilter auf der fertigen (periodischen) Schleife: Motor = Vielfache der halben
+    Zuendfrequenz (Kurbelwellen-Ordnungen). Alles dazwischen ist Rauschen und wird auf 'rest'
+    abgesenkt (nicht ganz weg, sonst klingt es kuenstlich). Gnen54 20.11.: "etwas Entrauschen
+    wuerde bestimmt viel bringen"; das Knallen bleibt."""
+    S = np.fft.rfft(loop); f = np.fft.rfftfreq(len(loop), 1 / pr.SR)
+    g = (hz / 2.0)
+    d = np.abs(f / g - np.round(f / g)) * g          # Abstand zur naechsten Ordnung in Hz
+    maske = rest + (1 - rest) * np.exp(-0.5 * (d / breite) ** 2)
+    maske[f < 40] = 0.0                                # Rumpeln/Wind unter 40 Hz weg
+    maske[f > 9000] *= 0.5                             # Zischen oben etwas leiser
+    return np.fft.irfft(S * maske, len(loop))
+
+
 def main(src):
     os.makedirs(WORK, exist_ok=True)
     x = pr.decode(src)
     loops = {}
     for name, (a, b, hz, last) in SCHNITTE.items():
         seg = glaetten(x, a, b, hz)
-        loop = pr.circular(seg); loop = loop / (np.max(np.abs(loop)) + 1e-9) * 0.86
+        loop = entrauschen(pr.circular(seg), hz); loop = loop / (np.max(np.abs(loop)) + 1e-9) * 0.86
         wav = os.path.join(WORK, 'manta400_rec_%s.wav' % name); pr.write_wav(wav, loop)
         ogg = os.path.join(OUT, 'manta400_rec_%s.ogg' % name)
         subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-c:a', 'libvorbis', '-q:a', '4', '-ac', '1', ogg], check=True)
