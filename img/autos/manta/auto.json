@@ -4,9 +4,9 @@
  "quelle": "Karosserie und Anbauteile von Gnen54 (für einen Freund), 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße; Räder und Chassis vom GT3. Nur im Fork, keine Freigabe.",
  "lizenz": "siehe LIZENZ.txt",
  "koordinaten": "m; +x links, +y oben, +z vorn",
- "ecken": 884339,
- "indizes": 4385127,
- "indexAb": 28298848,
+ "ecken": 883990,
+ "indizes": 4383759,
+ "indexAb": 28287680,
  "schritt": 32,
  "schatten": "shadow.png",
  "lichter": {
@@ -168,138 +168,138 @@
    "gruppe": "auto",
    "tex": "manta_weiss.png",
    "ecke0": 0,
-   "ecken": 50121,
+   "ecken": 50128,
    "index0": 0,
-   "indizes": 273894
+   "indizes": 273885
   },
   {
    "name": "Karosserie 2",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 50121,
-   "ecken": 48990,
-   "index0": 273894,
-   "indizes": 273792
+   "ecke0": 50128,
+   "ecken": 48991,
+   "index0": 273885,
+   "indizes": 273783
   },
   {
    "name": "Karosserie 3",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 99111,
-   "ecken": 50138,
-   "index0": 547686,
-   "indizes": 274542
+   "ecke0": 99119,
+   "ecken": 50143,
+   "index0": 547668,
+   "indizes": 274533
   },
   {
    "name": "Karosserie 4",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 149249,
-   "ecken": 47976,
-   "index0": 822228,
-   "indizes": 274527
+   "ecke0": 149262,
+   "ecken": 47981,
+   "index0": 822201,
+   "indizes": 274521
   },
   {
    "name": "Karosserie 5",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 197225,
-   "ecken": 48459,
-   "index0": 1096755,
-   "indizes": 271377
+   "ecke0": 197243,
+   "ecken": 48457,
+   "index0": 1096722,
+   "indizes": 271371
   },
   {
    "name": "Karosserie 6",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 245684,
-   "ecken": 48019,
-   "index0": 1368132,
-   "indizes": 273171
+   "ecke0": 245700,
+   "ecken": 48014,
+   "index0": 1368093,
+   "indizes": 273165
   },
   {
    "name": "Karosserie 7",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 293703,
-   "ecken": 59618,
-   "index0": 1641303,
-   "indizes": 272853
+   "ecke0": 293714,
+   "ecken": 59610,
+   "index0": 1641258,
+   "indizes": 272847
   },
   {
    "name": "Karosserie 8",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 353321,
-   "ecken": 50005,
-   "index0": 1914156,
-   "indizes": 274431
+   "ecke0": 353324,
+   "ecken": 50004,
+   "index0": 1914105,
+   "indizes": 274425
   },
   {
    "name": "Karosserie 9",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 403326,
+   "ecke0": 403328,
    "ecken": 50452,
-   "index0": 2188587,
-   "indizes": 274485
+   "index0": 2188530,
+   "indizes": 274479
   },
   {
    "name": "Karosserie 10",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 453778,
-   "ecken": 47968,
-   "index0": 2463072,
-   "indizes": 274551
+   "ecke0": 453780,
+   "ecken": 47965,
+   "index0": 2463009,
+   "indizes": 274542
   },
   {
    "name": "Gelbe Lackierung",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_gelb.png",
-   "ecke0": 501746,
-   "ecken": 34483,
-   "index0": 2737623,
-   "indizes": 141774
+   "ecke0": 501745,
+   "ecken": 33358,
+   "index0": 2737551,
+   "indizes": 137667
   },
   {
    "name": "Schwarzer Streifen",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_schwarz.png",
-   "ecke0": 536229,
-   "ecken": 29351,
-   "index0": 2879397,
-   "indizes": 116238
+   "ecke0": 535103,
+   "ecken": 29566,
+   "index0": 2875218,
+   "indizes": 117177
   },
   {
    "name": "Silbergraue Lackierung",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_grau.png",
-   "ecke0": 565580,
-   "ecken": 36816,
-   "index0": 2995635,
-   "indizes": 154104
+   "ecke0": 564669,
+   "ecken": 37378,
+   "index0": 2992395,
+   "indizes": 155976
   },
   {
    "name": "Frontspoiler",
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 602396,
+   "ecke0": 602047,
    "ecken": 14053,
-   "index0": 3149739,
+   "index0": 3148371,
    "indizes": 78348
   },
   {
@@ -307,9 +307,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 616449,
+   "ecke0": 616100,
    "ecken": 10763,
-   "index0": 3228087,
+   "index0": 3226719,
    "indizes": 57846
   },
   {
@@ -317,9 +317,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_weiss.png",
-   "ecke0": 627212,
+   "ecke0": 626863,
    "ecken": 39526,
-   "index0": 3285933,
+   "index0": 3284565,
    "indizes": 225432
   },
   {
@@ -327,9 +327,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_schwarz.png",
-   "ecke0": 666738,
+   "ecke0": 666389,
    "ecken": 31952,
-   "index0": 3511365,
+   "index0": 3509997,
    "indizes": 115821
   },
   {
@@ -337,9 +337,9 @@
    "rolle": "glas",
    "gruppe": "auto",
    "tex": "manta_glas.png",
-   "ecke0": 698690,
+   "ecke0": 698341,
    "ecken": 22360,
-   "index0": 3627186,
+   "index0": 3625818,
    "indizes": 128592
   },
   {
@@ -347,9 +347,9 @@
    "rolle": "scheinwerfer",
    "gruppe": "auto",
    "tex": "manta_reflektor.png",
-   "ecke0": 721050,
+   "ecke0": 720701,
    "ecken": 20116,
-   "index0": 3755778,
+   "index0": 3754410,
    "indizes": 113580
   },
   {
@@ -357,9 +357,9 @@
    "rolle": "ruecklicht",
    "gruppe": "auto",
    "tex": "manta_ruecklicht.png",
-   "ecke0": 741166,
+   "ecke0": 740817,
    "ecken": 27123,
-   "index0": 3869358,
+   "index0": 3867990,
    "indizes": 148299
   },
   {
@@ -367,9 +367,9 @@
    "rolle": "karosserie",
    "gruppe": "auto",
    "tex": "manta_schwarz.png",
-   "ecke0": 768289,
+   "ecke0": 767940,
    "ecken": 4634,
-   "index0": 4017657,
+   "index0": 4016289,
    "indizes": 13338
   },
   {
@@ -378,9 +378,9 @@
    "gruppe": "rad",
    "tex": "manta_reifen.png",
    "achse": "vorn",
-   "ecke0": 772923,
+   "ecke0": 772574,
    "ecken": 55692,
-   "index0": 4030995,
+   "index0": 4029627,
    "indizes": 162927
   },
   {
@@ -389,9 +389,9 @@
    "gruppe": "rad",
    "tex": "manta_felge.png",
    "achse": "vorn",
-   "ecke0": 828615,
+   "ecke0": 828266,
    "ecken": 27782,
-   "index0": 4193922,
+   "index0": 4192554,
    "indizes": 88998
   },
   {
@@ -400,9 +400,9 @@
    "gruppe": "rad",
    "tex": "manta_reifen.png",
    "achse": "hinten",
-   "ecke0": 856397,
+   "ecke0": 856048,
    "ecken": 2708,
-   "index0": 4282920,
+   "index0": 4281552,
    "indizes": 13044
   },
   {
@@ -411,9 +411,9 @@
    "gruppe": "rad",
    "tex": "manta_felge.png",
    "achse": "hinten",
-   "ecke0": 859105,
+   "ecke0": 858756,
    "ecken": 25234,
-   "index0": 4295964,
+   "index0": 4294596,
    "indizes": 89163
   }
  ]
