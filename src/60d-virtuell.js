@@ -2135,10 +2135,15 @@
   function vfModellDaten(pfad) {
     pfad = pfad || vfModellPfad();
     if (!vfModellLaden[pfad]) {
-      vfModellLaden[pfad] = Promise.all([
-        fetch(pfad + 'auto.json').then((r) => { if (!r.ok) throw new Error('auto.json ' + r.status); return r.json(); }),
-        fetch(pfad + 'auto.bin').then((r) => { if (!r.ok) throw new Error('auto.bin ' + r.status); return r.arrayBuffer(); }),
-      ]).then(([meta, bin]) => {
+      // 21.11. (GEMELDET Gnen54, Screenshot: Manta "zerfetzt"): auto.json und auto.bin kamen aus
+      // verschiedenen Staenden (Browser-/Pages-Cache) - neue Teileliste auf alter Geometrie. Jetzt erst die
+      // json frisch holen, dann die bin mit einer Kennung ihres Inhalts (Ecken/Indizes) als eigene Adresse.
+      vfModellLaden[pfad] = fetch(pfad + 'auto.json', { cache: 'no-cache' })
+        .then((r) => { if (!r.ok) throw new Error('auto.json ' + r.status); return r.json(); })
+        .then((meta) => fetch(pfad + 'auto.bin?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb, { cache: 'no-cache' })
+          .then((r) => { if (!r.ok) throw new Error('auto.bin ' + r.status); return r.arrayBuffer(); })
+          .then((bin) => [meta, bin]))
+      .then(([meta, bin]) => {
         if (bin.byteLength < meta.indexAb + meta.indizes * 2) throw new Error('auto.bin zu kurz');
         return { meta, ecken: new Float32Array(bin, 0, meta.ecken * 8), indizes: new Uint16Array(bin, meta.indexAb, meta.indizes) };
       }).catch((e) => { vfModellLaden[pfad] = null; throw e; });
