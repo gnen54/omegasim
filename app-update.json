@@ -1,5 +1,5 @@
 {"version":"1.4.67","apk":2,"dateien":[
-{"p":"index.html","h":"ca3149044a762616be3e34e10042ad2d3334b24bcc0ec30b88e10aefa1a73145","g":8244919},
+{"p":"index.html","h":"a97638ba14488cdabd651cd112f75517527543b3459fd9a1191146621f5487d8","g":8248056},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1176,8 +1176,8 @@
 {"p":"img/autos/lynx220/vorschau_violett.jpg","h":"c3c27da1226b406bd3104b78338b51188ae44407d0e4c462ae216cf1a6f6b0b4","g":15334},
 {"p":"img/autos/lynx220/vorschau_weiss.jpg","h":"ff1a8f6be942ae574583757ac2f5567fd6cd9629cfdc18d048c4925306444013","g":16373},
 {"p":"img/autos/manta/LIZENZ.txt","h":"7949a68d045d0abb935112b502bf182bf907fa56eb1d4aa816e6922f4bda4c92","g":243},
-{"p":"img/autos/manta/auto.bin","h":"dd785206b090a45382aa82101cb5c8e08efe4d80d1d69dcaeb3d092689b1e419","g":36889276},
-{"p":"img/autos/manta/auto.json","h":"8a7ef6bc233040f96500128cb04060c8ba895968985566cb9cf7e3967fa4c29e","g":7803},
+{"p":"img/autos/manta/auto.bin","h":"d5445fd2ed4aaf87e3eeb39acf5c4b9c07639cee1364ad521434ab3ab138071b","g":15132422},
+{"p":"img/autos/manta/auto.json","h":"8f5ec4b44956f81f612e43bb63813ce64601f1129723880eb6f888f3cc2e2d0c","g":7858},
 {"p":"img/autos/manta/manta_blau.png","h":"7f31a5ce011c7811beb58cf2417224a3c3946f1bf3b8459b86a79f92649da9d5","g":79},
 {"p":"img/autos/manta/manta_felge.png","h":"fa8c28005f6e2239d88ee73cc8b8e532476fdb04a95ef5003d6930a75515b89f","g":79},
 {"p":"img/autos/manta/manta_gelb.png","h":"d02902f1575cc571b902d3e1e2f5be335979c15fed75dad0aece90dae9840765","g":79},
