@@ -41949,7 +41949,7 @@
         }
       }
       p2.push(pts[i]); n2.push(nrm[i]);
-      bucht.push(pts[i].bucht !== undefined ? pts[i].bucht : (box[k] ? tiefeK(k) * boxBucht(u(i, k)) : 0)); seite.push(box[k] ? seiteK(k) : -1);
+      bucht.push(pts[i].bucht !== undefined ? pts[i].bucht : (box[k] ? tiefeK(k) * boxBucht(u(i, k)) : 0)); seite.push(box[k] ? seiteK(k) : (pts[i].seite || -1));
     }
     // Markierungen als flache Vierecke (Mitte, Laengsrichtung, Laenge, Querrichtung, Breite).
     const marken = [];
@@ -42591,7 +42591,9 @@
   // Randsteine, Boxenbucht und NPCs unveraendert funktionieren. Erzeugt aus Gnen54s DXF (tools ausserhalb).
   const VF_STRECKE_STORE = 'omegasim-vf-strecke';
   const VF_FREIE = { indeq: { name: 'Törnerschleife 2.0', pfad: 'img/strecken/indeq-ring.json' },
-    indeqBruecke: { name: 'Törnerschleife 2.0 mit Brücke', pfad: 'img/strecken/indeq-bruecke.json' } };
+    indeqBruecke: { name: 'Törnerschleife 2.0 mit Brücke', pfad: 'img/strecken/indeq-bruecke.json' },
+    // 21.11. (BESTELLT Gnen54): Renn-Rollstrecke Heckenhoim, 3 x 2 m, nur im Fork
+    heckenhoim: { name: 'Heckenhoim', pfad: 'img/strecken/heckenhoim.json' } };
   function vfFreiWahl() { try { const v = localStorage.getItem(VF_STRECKE_STORE) || ''; return VF_FREIE[v] ? v : ''; } catch (e) { return ''; } }
   const vfFreiCache = {};
   function vfFreiLaden(k) {
@@ -42606,7 +42608,10 @@
       // jenseits der halben Bahn) - die feste Tiefe mit S-Rampe ueberschlug sich in der Kurve vor der
       // Gasse, GEMELDET Gnen54: Boxeneinfahrt "sieht ganz merkwuerdig aus".
       const bp = Array.isArray(d.buchtPkt) ? d.buchtPkt : null;
-      const pts = d.pts.map((q, i) => ({ x: q[0], y: q[1], tile: q[2], z: q[3] || 0, bucht: bp ? (bp[i] || 0) : undefined }));
+      // seite je Punkt (21.11., Heckenhoim): dort liegt die Startlinie mitten an der Boxengasse - die Bucht
+      // laeuft ueber die PIT-Kachel hinaus in die START-Kachel und braucht dort dieselbe Seite.
+      const pts = d.pts.map((q, i) => ({ x: q[0], y: q[1], tile: q[2], z: q[3] || 0, bucht: bp ? (bp[i] || 0) : undefined,
+        seite: bp && bp[i] > 0 ? (d.boxSeite || -1) : undefined }));
       // geschlossen wie trackCenterline: letzter Punkt = erster (sonst fehlt das letzte Stueck Bahn)
       pts.push({ x: pts[0].x, y: pts[0].y, tile: pts[pts.length - 1].tile, z: pts[0].z, bucht: pts[0].bucht });
       // Fahrtrichtung wie trackCenterline: Richtung (sin h, -cos h), h in Grad.
