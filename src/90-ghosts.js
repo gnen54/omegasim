@@ -12894,14 +12894,19 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
   function padDiagText() {
     const alle = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : [];
     const d = padDiag, alt = performance.now() - d.t;
-    const b = (x) => (x && x.type !== 'none' ? x.type + ' ' + x.index : '-');
+    // 22.11. (X05 meldet in Ruhe Vollgas): bei Achsen auch die gelernte Ruhelage und Spanne zeigen.
+    const f2 = (v) => (typeof v === 'number' ? v.toFixed(2) : '?');
+    const b = (x) => (x && x.type !== 'none' ? x.type + ' ' + x.index
+      + (x.type === 'axis' ? ' (Ruhe ' + f2(x.ruhe) + ', ' + f2(x.min) + '..' + f2(x.max) + (x.invert ? ', inv' : '') + ')' : '') : '-');
     const z = (x) => (typeof x === 'number' ? x.toFixed(2) : '-');
     return [
       'Pads: ' + (alle.length ? alle.map((q) => q.index + ' ' + String(q.id).slice(0, 50) + ' [' + (q.mapping || 'roh') + ']').join(' | ') : 'keins'),
       'Takt: ' + (padLoopRunning ? 'laeuft' : 'AUS') + (alt > 500 ? ' (seit ' + Math.round(alt) + ' ms kein Takt!)' : ''),
       'Ausstieg: ' + d.grund,
       'Pad: ' + (d.id ? d.id.slice(0, 60) + ' [' + (d.mapping || 'roh') + ']' : '-'),
-      'Belegung: Gas ' + b(bindings.throttle) + ', Bremse ' + b(bindings.brake) + ', Lenkung ' + b(bindings.steering),
+      'Gas: ' + b(bindings.throttle),
+      'Bremse: ' + b(bindings.brake),
+      'Lenkung: ' + b(bindings.steering),
       'Werte: Gas ' + z(d.gas) + ', Bremse ' + z(d.bremse) + ', Lenkung ' + z(d.lenk),
       'Knoepfe: ' + ((d.knoepfe || []).join(' ') || '-') + '   Achsen: ' + (d.achsen || []).join(' '),
       'Pause: ' + (typeof rennPauseAktiv === 'function' && rennPauseAktiv() ? 'AN' : 'aus')
