@@ -25,10 +25,10 @@
 <body>
 <main>
 <h1>Virtuelles Fahren – Anleitung</h1>
-<div class="stand">Stand: 21.11.2026</div>
+<div class="stand">Stand: 22.11.2026</div>
 
 <nav>
-  <a href="#worum">Worum es geht</a><a href="#garage">Garage</a><a href="#steuerung">Steuerung</a>
+  <a href="#worum">Worum es geht</a><a href="#garage">Garage</a><a href="#gamepad">Gamepad einrichten</a><a href="#steuerung">Steuerung</a>
   <a href="#kameras">Kameras und Spiegel</a><a href="#strecke">Auf der Strecke</a><a href="#box">Box und Tanken</a>
   <a href="#frei">Freie Strecken</a><a href="#tipps">Tipps</a>
 </nav>
@@ -59,6 +59,28 @@
 </table>
 <p>Der Rennmodus (Training, Runden, Endurance, Qualifying, Time Attack, Knockout, Derby) kommt aus den normalen Renneinstellungen von OmegaSim.</p>
 <p><b>Bestzeiten:</b> Unten in der Garage klappst Du <b>Bestzeiten</b> auf. Dort steht je Strecke und Auto Deine beste Runde mit Rundenzahl und Datum.</p>
+
+<h2 id="gamepad">Gamepad einrichten</h2>
+<p>Getestet mit Windows 11 und Chrome; Android (Browser und App) geht genauso. Unter Linux wird das Pad oft zwar erkannt, liefert aber keine richtigen Eingaben – dort lieber Windows oder Android nehmen.</p>
+<p><b>Vorher:</b> Das Gamepad muss im Betriebssystem gekoppelt sein – per Bluetooth oder USB-Kabel, wie bei jedem anderen Gerät (z. B. Windows: <i>Einstellungen → Bluetooth und Geräte</i>, Android: <i>Einstellungen → Verbundene Geräte</i>). Hat das Pad mehrere Modi, den <b>Xbox- bzw. X-Input-Modus</b> wählen. Ohne Kopplung meldet OmegaSim das Pad gar nicht erst.</p>
+<ol>
+  <li><b>Optionen → Controller öffnen</b> (in der App oder im Browser) und einen Knopf am Pad drücken. Der Browser meldet das Pad erst nach der ersten Eingabe. Oben muss dann „Verbunden: …“ mit dem Namen des Pads stehen.</li>
+  <li><b>Jede Taste zuordnen.</b> In der Tabelle bei jeder Aktion auf <b>Neu zuweisen</b> tippen und den Knopf, Trigger oder Stick am Pad betätigen, mit dem Du diese Aktion nutzen willst. Für das virtuelle Fahren auch „Kamera wechseln (virtuell)“ und „Auto zurücksetzen“ belegen – ab Werk sind sie frei.</li>
+  <li><b>Übernehmen</b> unten drücken. Erst dann gilt die neue Belegung. Bis dahin reagiert das Pad auf nichts anderes.</li>
+  <li><b>Preset speichern:</b> oben auf der Seite <b>Speichern unter …</b> und als Namen die Bezeichnung des Gamepads eingeben (z. B. „EasySMX X15“). So lässt sich die Belegung später mit ◀ ▶ wieder holen, auch wenn mehrere Pads im Einsatz sind. Das Preset steckt auch in der Datensicherung (<i>Optionen → Daten sichern</i>) – nach einem Gerätewechsel ist die Belegung damit sofort wieder da.</li>
+  <li><b>Achsen prüfen.</b> Auf derselben Seite zeigen <i>Gas</i>, <i>Bremse</i> und <i>Lenkung</i> live die Werte: Gas und Bremse gehen bis 1, die Lenkung von −1 bis +1.</li>
+  <li><b>Probefahrt:</b> Garage → Losfahren. Reagiert das Auto nicht aufs Pad, während der Fahrt <b>F8</b> drücken (siehe unten).</li>
+</ol>
+<p><b>Pad-Diagnose mit F8</b> (PC mit Tastatur): Die Anzeige zeigt, welche Pads der Browser sieht, ob die Abfrage läuft, wo sie gegebenenfalls aussteigt, die Belegung von Gas, Bremse und Lenkung, die Rohwerte von Knöpfen und Achsen und was am Ende beim Auto ankommt. Kommt das Pad nicht zum Laufen: F8-Anzeige als Screenshot schicken, mit Pad-Name, Betriebssystem und Browser.</p>
+<table>
+  <tr><th>Problem</th><th>Was hilft</th></tr>
+  <tr><td>„kein Controller erkannt“</td><td>Einen Knopf am Pad drücken. Hilft das nicht: Pad aus- und wieder einschalten, Seite neu laden, OmegaSim nur in einem Browserfenster offen haben.</td></tr>
+  <tr><td>„ohne Standardbelegung“</td><td>Pad in den Xbox-/X-Input-Modus schalten oder per USB statt Bluetooth versuchen. Sonst Gas, Bremse und Lenkung unter <i>Neu zuweisen</i> selbst belegen. Das Umsehen mit dem rechten Stick geht nur mit Standardbelegung.</td></tr>
+  <tr><td>Pad steht doppelt in der Liste (Windows)</td><td>Normal: Windows meldet manches Pad zweimal. OmegaSim nimmt automatisch das richtige.</td></tr>
+  <tr><td>Werte bewegen sich, aber Auto fährt nicht</td><td>F8 drücken und die Zeilen <i>Ausstieg</i> und <i>Ausgang</i> ansehen; Screenshot schicken.</td></tr>
+  <tr><td>Pad fällt zwischendurch aus</td><td>Bluetooth-Pads schlafen bei Pause ein. Einen Knopf drücken, Akku prüfen.</td></tr>
+  <tr><td>Unter Linux keine Reaktion</td><td>Bekanntes Problem mit der Einbindung unter Linux. Auf Windows oder Android ausweichen.</td></tr>
+</table>
 
 <h2 id="steuerung">Steuerung</h2>
 <p>Am bequemsten fährst Du mit Gamepad; die Belegung stellst Du in OmegaSim unter der Controller-Belegung ein.</p>
@@ -127,7 +149,7 @@
   <tr><td>Ladebild dauert lange</td><td>Normal bei großen Autos (Bulli, GT3) und langsamer Leitung – einmal geladen, geht es beim nächsten Mal schneller.</td></tr>
   <tr><td>Browser stürzt ab</td><td>Kleineres Auto wählen und melden, mit welchem Auto, welcher Strecke und welchem Browser es passiert.</td></tr>
   <tr><td>Neue Funktion fehlt</td><td>Seite mit <code>?neu=1</code> neu laden.</td></tr>
-  <tr><td>Pad reagiert falsch</td><td>F8 drücken und die Belegung prüfen.</td></tr>
+  <tr><td>Pad reagiert falsch oder gar nicht</td><td>Siehe <a href="#gamepad">Gamepad einrichten</a>; während der Fahrt F8 drücken.</td></tr>
   <tr><td>Auto hängt fest</td><td>Rückwärts fahren oder Zurücksetzen.</td></tr>
 </table>
 <p>Fehler bitte mit Screenshot und kurzer Beschreibung melden (Auto, Strecke, Kamera, was passiert ist).</p>
