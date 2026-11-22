@@ -1,7 +1,8 @@
-"""Heckenhoim (Renn-Rollstrecke, 3 x 2 m, Gnen54 21.11.2026) -> img/strecken/heckenhoim.json.
-Die DXF ist doppelt so gross gezeichnet (6 x 4 m) -> Faktor 0,5. Ablauf wie bei der Toernerschleife
-(ring2_bau / ring2_mitte / ring2_json / bucht_tiefe / boxgasse), hier in einem Skript.
-Fahrtrichtung: auf der linken Geraden nach unten (Boxengasse oben rein, unten raus)."""
+"""Heckenhoim (Renn-Rollstrecke, 3 x 2 m, Gnen54) -> img/strecken/heckenhoim.json.
+DXF seit 22.11.2026: Heckenhoim_V2 aus Thorstens Fusion-Projekt, Basis auf 3 x 2 m korrigiert -> Faktor 1.
+Ablauf wie bei der Toernerschleife (ring2_bau / ring2_mitte / ring2_json / bucht_tiefe / boxgasse), hier in einem Skript.
+Fahrtrichtung (22.11., Thorsten/Startaufstellung im Bild): auf der linken Geraden nach oben, wie der Pfeil
+in der DXF (Boxengasse unten rein, oben raus)."""
 import sys, json, numpy as np, cv2, networkx as nx
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -10,11 +11,11 @@ from scipy.ndimage import distance_transform_edt, uniform_filter1d
 from scipy.spatial import cKDTree
 from skimage.morphology import skeletonize
 
-s, _ = lies(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'heckenhoim.dxf')); s = [P * 0.5 for P in s]
+s, _ = lies(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'heckenhoim.dxf')); s = [P * 1.0 for P in s]
 R = 2.0; X0, Y0, W, H = -1500, -1000, 3000, 2000
-RAHMEN = {0, 2, 3, 12, 14, 15}
-MARKEN = {1, 5, 10, 22, 4, 19, 20, 23}          # kleine Rechtecke an Ein- und Ausfahrt der Gasse
-START_RECHTECK = {11, 17, 18, 21}
+RAHMEN = {0, 1, 2, 12, 13}                       # Rahmen, Diagonalen, Fahrtrichtungspfeil
+MARKEN = {5, 6}                                  # kleine Rechtecke an Ein- und Ausfahrt der Gasse
+START_RECHTECK = {4}
 px = lambda P: np.c_[(P[:, 0] - X0) / R, (Y0 + H - P[:, 1]) / R]
 rc = lambda p: (int(round((Y0 + H - p[1]) / R)), int(round((p[0] - X0) / R)))
 mm = lambda r: np.array([r[1] * R + X0, Y0 + H - r[0] * R])
@@ -50,10 +51,10 @@ zyk = max(nx.cycle_basis(G), key=len)
 M = np.array([mm(pts[i]) for i in zyk])
 # Ordnung entlang des Kreises (cycle_basis liefert die Knoten in Kreisreihenfolge)
 for _ in range(4): M = np.c_[uniform_filter1d(M[:, 0], 21, mode='wrap'), uniform_filter1d(M[:, 1], 21, mode='wrap')]
-# Fahrtrichtung: auf der linken Geraden (x < -1100) nach unten
+# Fahrtrichtung: auf der linken Geraden (x < -1100) nach oben (Pfeil in der DXF)
 links = np.where((M[:, 0] < -1150) & (np.abs(M[:, 1]) < 300))[0]
 dy = np.mean(np.diff(M[links, 1])) if len(links) > 2 else 0
-if dy > 0: M = M[::-1]
+if dy < 0: M = M[::-1]
 breite = 2 * np.median(dt[sk]) * R
 start_mm = np.array([(-1447 + -1111.5) / 2, (126 + 150) / 2.0])
 print('Laenge %.2f m, Breite (Skelett) %.0f mm' % (np.hypot(*np.diff(np.vstack([M, M[:1]]), axis=0).T).sum() / 1000, breite))
@@ -138,7 +139,7 @@ while i < len(E):
     tiles.append('START' if i == 0 else 'STRAIGHT'); tile_of[i:jj] = len(tiles) - 1; i = jj
 versatz = (E.max(0) + E.min(0)) / 2; E = E - versatz
 edv = lambda Q: ed(Q) - versatz
-out = {'name': 'Heckenhoim', 'quelle': 'HeckenhoimVirtuell.dxf (Gnen54), 3,00 x 2,00 m',
+out = {'name': 'Heckenhoim', 'quelle': 'Heckenhoim_V2.dxf (Gnen54/Thorsten), 3,00 x 2,00 m',
        'breiteMm': BREITE, 'kacheln': tiles,
        'pts': [[round(float(a), 2), round(float(b_), 2), int(tl)] for (a, b_), tl in zip(E, tile_of)]}
 Sm = edv(S); step = max(1, len(Sm) // 160)
