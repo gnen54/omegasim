@@ -2139,21 +2139,35 @@
   let vfModellLaden = {};
   function vfModellDaten(pfad) {
     pfad = pfad || vfModellPfad();
-    if (!vfModellLaden[pfad]) {
+    // 22.11. (GEMELDET Gnen54, Android-Tablet: "furchtbar zu fahren" mit Spider, GT3, Bulli, Manta - ruckelig,
+    // nur der Kaefer laeuft): im Grafikmodus Performance die leichte Fassung, die auto.json unter "perf" nennt
+    // (tools/modell_perf.py, 0,1 bis 0,3 Mio. statt bis 2 Mio. Dreiecke). Sie bringt NUR die Geometrie
+    // (teile, ecken, indizes, indexAb); alles andere bleibt aus auto.json. Quality laedt wie bisher auto.bin.
+    const perf = !vfGrafikQual();
+    const schl = pfad + (perf ? '|perf' : '');
+    if (!vfModellLaden[schl]) {
       // 21.11. (GEMELDET Gnen54, Screenshot: Manta "zerfetzt"): auto.json und auto.bin kamen aus
       // verschiedenen Staenden (Browser-/Pages-Cache) - neue Teileliste auf alter Geometrie. Jetzt erst die
       // json frisch holen, dann die bin mit einer Kennung ihres Inhalts (Ecken/Indizes) als eigene Adresse.
-      vfModellLaden[pfad] = fetch(pfad + 'auto.json', { cache: 'no-cache' })
+      vfModellLaden[schl] = fetch(pfad + 'auto.json', { cache: 'no-cache' })
         .then((r) => { if (!r.ok) throw new Error('auto.json ' + r.status); return r.json(); })
-        .then((meta) => fetch(pfad + 'auto.bin?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb, { cache: 'no-cache' })
-          .then((r) => { if (!r.ok) throw new Error('auto.bin ' + r.status); return r.arrayBuffer(); })
+        .then((meta) => {
+          if (!perf || !meta.perf) return [meta, 'auto'];
+          // Fehlt die leichte Fassung oder kommt sie nicht, faehrt das Auto eben mit der vollen.
+          return fetch(pfad + meta.perf + '.json', { cache: 'no-cache' })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((g) => (g && g.teile ? [Object.assign({}, meta, { teile: g.teile, ecken: g.ecken, indizes: g.indizes, indexAb: g.indexAb, lod: g.lod }), meta.perf] : [meta, 'auto']))
+            .catch(() => [meta, 'auto']);
+        })
+        .then(([meta, datei]) => fetch(pfad + datei + '.bin?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb, { cache: 'no-cache' })
+          .then((r) => { if (!r.ok) throw new Error(datei + '.bin ' + r.status); return r.arrayBuffer(); })
           .then((bin) => [meta, bin]))
       .then(([meta, bin]) => {
         if (bin.byteLength < meta.indexAb + meta.indizes * 2) throw new Error('auto.bin zu kurz');
         return { meta, ecken: new Float32Array(bin, 0, meta.ecken * 8), indizes: new Uint16Array(bin, meta.indexAb, meta.indizes) };
-      }).catch((e) => { vfModellLaden[pfad] = null; throw e; });
+      }).catch((e) => { vfModellLaden[schl] = null; throw e; });
     }
-    return vfModellLaden[pfad];
+    return vfModellLaden[schl];
   }
   // Gemeinsamer Rad-Modell-Fallback: die echten Rad-Teile der Vulture V5.R (mit Texturen),
   // damit auch Modelle ohne eigene Rad-Geometrie die gleichen Raeder zeigen.

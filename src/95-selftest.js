@@ -17948,6 +17948,41 @@
     return { ok: !f.length, mass: f.length ? f.join(' | ') : m.name + ': ' + m.teile.length + ' Teile, ' + (daten.indizes.length / 3) + ' Dreiecke, ' + texs.length + ' Texturen' };
   });
 
+  // 22.11. (GEMELDET Gnen54: Spider, GT3, Bulli, Manta auf dem Tablet "furchtbar zu fahren"): Performance laedt
+  // die leichte Fassung (auto.json "perf"), Quality die volle. Geprueft je Auto: beide laden, die leichte hat
+  // deutlich weniger Dreiecke, gueltige Indizes, dieselben Rollen, und Physik/Lichter kommen aus auto.json.
+  stAdd('Virtuell: Performance laedt die leichte Fassung (Spider, GT3, Bulli, Manta), Quality die volle', async () => {
+    if (location.protocol === 'file:') return { skip: true, mass: 'file://, der Browser verbietet das Laden' };
+    const f = [], info = [];
+    const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    try {
+      for (const a of ['spider', 'gt3', 'caravelle', 'manta']) {
+        const pfad = VF_MODELL_PFADE[a];
+        localStorage.setItem(VF_GRAFIK_STORE, 'qual');
+        const voll = await vfModellDaten(pfad);
+        localStorage.setItem(VF_GRAFIK_STORE, 'perf');
+        const leicht = await vfModellDaten(pfad);
+        const nv = voll.indizes.length / 3, nl = leicht.indizes.length / 3;
+        if (!voll.meta.perf) f.push(a + ': auto.json ohne "perf"');
+        if (!(nl < nv * 0.6)) f.push(a + ': leicht ' + nl + ' nicht deutlich unter voll ' + nv);
+        leicht.meta.teile.forEach((t) => {
+          if (t.index0 + t.indizes > leicht.indizes.length) f.push(a + ' ' + t.name + ': Indizes ausserhalb');
+          let mx = 0;
+          for (let i = t.index0; i < t.index0 + t.indizes; i++) mx = Math.max(mx, leicht.indizes[i]);
+          if (mx >= t.ecken) f.push(a + ' ' + t.name + ': Index ' + mx + ' >= ' + t.ecken);
+          if (t.ecke0 + t.ecken > leicht.ecken.length / 8) f.push(a + ' ' + t.name + ': Ecken ausserhalb');
+        });
+        const rollen = (d) => [...new Set(d.meta.teile.map((t) => t.rolle + '/' + (t.achse || '')))].sort().join(',');
+        if (rollen(voll) !== rollen(leicht)) f.push(a + ': Rollen verschieden');
+        if (JSON.stringify(voll.meta.physik) !== JSON.stringify(leicht.meta.physik)) f.push(a + ': Physik nicht aus auto.json');
+        if (JSON.stringify(voll.meta.lichter) !== JSON.stringify(leicht.meta.lichter)) f.push(a + ': Lichter nicht aus auto.json');
+        info.push(a + ' ' + Math.round(nv / 1000) + 'k -> ' + Math.round(nl / 1000) + 'k');
+      }
+    } catch (e) { f.push('Ausnahme: ' + e.message); }
+    finally { if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : info.join(', ') };
+  });
+
   stAdd('Virtuell: NPCs folgen der Mittellinie und drosseln in der Kurve', () => {
     const f = [];
     // Anzahl: nur 0-3, sonst Standard 3.
