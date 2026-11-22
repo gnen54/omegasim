@@ -17955,6 +17955,7 @@
     if (location.protocol === 'file:') return { skip: true, mass: 'file://, der Browser verbietet das Laden' };
     const f = [], info = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    vfMobilErzwungen = false;          // auf dem Handy waere Quality gesperrt - hier geht es um die Dateien
     try {
       for (const a of ['spider', 'gt3', 'caravelle', 'manta']) {
         const pfad = VF_MODELL_PFADE[a];
@@ -17979,8 +17980,24 @@
         info.push(a + ' ' + Math.round(nv / 1000) + 'k -> ' + Math.round(nl / 1000) + 'k');
       }
     } catch (e) { f.push('Ausnahme: ' + e.message); }
-    finally { if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : info.join(', ') };
+  });
+
+  // 22.11. (BESTELLT Gnen54): auf Handy/Tablet nur Performance, Quality mit Hinweis "nur am PC".
+  stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
+    const f = [];
+    const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    try {
+      localStorage.setItem(VF_GRAFIK_STORE, 'qual');
+      vfMobilErzwungen = true;
+      if (vfGrafik() !== 'perf') f.push('mobil trotz gespeichertem Quality nicht Performance');
+      if (vfGrafikQual()) f.push('mobil vfGrafikQual() wahr');
+      vfMobilErzwungen = false;
+      if (vfGrafik() !== 'qual') f.push('am PC wird Quality nicht uebernommen');
+      if (t('Quality nur am PC verfügbar') === '') f.push('Hinweistext leer');
+    } finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'mobil Performance fest, PC frei; dieses Geraet: ' + (vfMobilGeraet() ? 'mobil' : 'PC') };
   });
 
   stAdd('Virtuell: NPCs folgen der Mittellinie und drosseln in der Kurve', () => {

@@ -16194,6 +16194,7 @@
     "Grafik": "Graphics",
     "Performance": "Performance",
     "Quality": "Quality",
+    "Quality nur am PC verfügbar": "Quality only available on PC",
     "GT3": "GT3",
     "Schnell": "Fast",
     "Rückwärtsgang: Ausrollen": "Reverse gear: roll-out",
@@ -19879,6 +19880,7 @@
     "Grafik": "Gráficos",
     "Performance": "Rendimiento",
     "Quality": "Calidad",
+    "Quality nur am PC verfügbar": "Calidad solo disponible en PC",
     "GT3": "GT3",
     "Schnell": "Rápido",
     "Automatischer Kalibrierungslauf": "Recorrido de calibración automático",
@@ -42765,7 +42767,22 @@
   // Licht, Tonemapping, Schatten, Vignette). Performance ist der sichere Standard.
   const VF_GRAFIK_STORE = 'omegasim-vf-grafik';
   const VF_GRAFIK_MODI = [{ id: 'perf', name: 'Performance' }, { id: 'qual', name: 'Quality' }];
+  // 22.11.2026 (BESTELLT Gnen54): auf Handy und Tablet nur Performance - Quality ruckelt dort, und wer es
+  // anwaehlt, soll erfahren warum: "Quality nur am PC verfuegbar". Mobil = die App (Capacitor), Android,
+  // iPhone/iPad (auch iPadOS, das sich als Macintosh mit Touch meldet). vfMobilErzwungen nur fuer den Selbsttest.
+  let vfMobilErzwungen = null;
+  function vfMobilGeraet() {
+    if (vfMobilErzwungen !== null) return vfMobilErzwungen;
+    try {
+      if (window.Capacitor) return true;
+      const ua = navigator.userAgent || '';
+      if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return true;
+      if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
+    } catch (e) { /* unbekannt = PC */ }
+    return false;
+  }
   function vfGrafik() {
+    if (vfMobilGeraet()) return 'perf';
     try { const v = localStorage.getItem(VF_GRAFIK_STORE); return v === 'qual' ? 'qual' : 'perf'; } catch (e) { return 'perf'; }
   }
   function vfGrafikQual() { return vfGrafik() === 'qual'; }
@@ -45206,10 +45223,19 @@
     rechts.appendChild(garWertZeile(t('Handling'), vfHandlingName(hId), () => hWahl(-1), () => hWahl(1)));
     // Grafik: Performance (wie bisher, fuer schwache Handys) oder Quality (Schatten, Tonemapping,
     // besseres Licht, Vignette).
-    const gId = vfGrafik();
-    const gWahl = () => { vfGrafikSetzen(gId === 'perf' ? 'qual' : 'perf'); renderGarage(); };
+    const gId = vfGrafik(), gMobil = vfMobilGeraet();
+    const gWahl = () => {
+      if (gMobil) { vfStartHinweis(t('Quality nur am PC verfügbar')); return; }
+      vfGrafikSetzen(gId === 'perf' ? 'qual' : 'perf'); renderGarage();
+    };
     const grafikZeile = garWertZeile(t('Grafik'), t(vfGrafik() === 'perf' ? 'Performance' : 'Quality'), gWahl, gWahl);
     grafikZeile.querySelector('.gk-l').insertAdjacentHTML('beforeend', ' <span class="wip-tag">WIP</span>');
+    if (gMobil) {
+      const k = document.createElement('small');
+      k.textContent = t('Quality nur am PC verfügbar');
+      k.style.cssText = 'display:block;opacity:.7;font-weight:400';
+      grafikZeile.querySelector('.gk-l').appendChild(k);
+    }
     rechts.appendChild(grafikZeile);
     // Geist: eine Kopie faehrt nach der ersten Runde die aufgezeichnete Linie ab (Standard aus).
     const geistAn = vfGeistAn();
@@ -108476,6 +108502,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     if (location.protocol === 'file:') return { skip: true, mass: 'file://, der Browser verbietet das Laden' };
     const f = [], info = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    vfMobilErzwungen = false;          // auf dem Handy waere Quality gesperrt - hier geht es um die Dateien
     try {
       for (const a of ['spider', 'gt3', 'caravelle', 'manta']) {
         const pfad = VF_MODELL_PFADE[a];
@@ -108500,8 +108527,24 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
         info.push(a + ' ' + Math.round(nv / 1000) + 'k -> ' + Math.round(nl / 1000) + 'k');
       }
     } catch (e) { f.push('Ausnahme: ' + e.message); }
-    finally { if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : info.join(', ') };
+  });
+
+  // 22.11. (BESTELLT Gnen54): auf Handy/Tablet nur Performance, Quality mit Hinweis "nur am PC".
+  stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
+    const f = [];
+    const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    try {
+      localStorage.setItem(VF_GRAFIK_STORE, 'qual');
+      vfMobilErzwungen = true;
+      if (vfGrafik() !== 'perf') f.push('mobil trotz gespeichertem Quality nicht Performance');
+      if (vfGrafikQual()) f.push('mobil vfGrafikQual() wahr');
+      vfMobilErzwungen = false;
+      if (vfGrafik() !== 'qual') f.push('am PC wird Quality nicht uebernommen');
+      if (t('Quality nur am PC verfügbar') === '') f.push('Hinweistext leer');
+    } finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'mobil Performance fest, PC frei; dieses Geraet: ' + (vfMobilGeraet() ? 'mobil' : 'PC') };
   });
 
   stAdd('Virtuell: NPCs folgen der Mittellinie und drosseln in der Kurve', () => {

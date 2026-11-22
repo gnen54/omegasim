@@ -1532,7 +1532,22 @@
   // Licht, Tonemapping, Schatten, Vignette). Performance ist der sichere Standard.
   const VF_GRAFIK_STORE = 'omegasim-vf-grafik';
   const VF_GRAFIK_MODI = [{ id: 'perf', name: 'Performance' }, { id: 'qual', name: 'Quality' }];
+  // 22.11.2026 (BESTELLT Gnen54): auf Handy und Tablet nur Performance - Quality ruckelt dort, und wer es
+  // anwaehlt, soll erfahren warum: "Quality nur am PC verfuegbar". Mobil = die App (Capacitor), Android,
+  // iPhone/iPad (auch iPadOS, das sich als Macintosh mit Touch meldet). vfMobilErzwungen nur fuer den Selbsttest.
+  let vfMobilErzwungen = null;
+  function vfMobilGeraet() {
+    if (vfMobilErzwungen !== null) return vfMobilErzwungen;
+    try {
+      if (window.Capacitor) return true;
+      const ua = navigator.userAgent || '';
+      if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return true;
+      if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
+    } catch (e) { /* unbekannt = PC */ }
+    return false;
+  }
   function vfGrafik() {
+    if (vfMobilGeraet()) return 'perf';
     try { const v = localStorage.getItem(VF_GRAFIK_STORE); return v === 'qual' ? 'qual' : 'perf'; } catch (e) { return 'perf'; }
   }
   function vfGrafikQual() { return vfGrafik() === 'qual'; }
@@ -3973,10 +3988,19 @@
     rechts.appendChild(garWertZeile(t('Handling'), vfHandlingName(hId), () => hWahl(-1), () => hWahl(1)));
     // Grafik: Performance (wie bisher, fuer schwache Handys) oder Quality (Schatten, Tonemapping,
     // besseres Licht, Vignette).
-    const gId = vfGrafik();
-    const gWahl = () => { vfGrafikSetzen(gId === 'perf' ? 'qual' : 'perf'); renderGarage(); };
+    const gId = vfGrafik(), gMobil = vfMobilGeraet();
+    const gWahl = () => {
+      if (gMobil) { vfStartHinweis(t('Quality nur am PC verfügbar')); return; }
+      vfGrafikSetzen(gId === 'perf' ? 'qual' : 'perf'); renderGarage();
+    };
     const grafikZeile = garWertZeile(t('Grafik'), t(vfGrafik() === 'perf' ? 'Performance' : 'Quality'), gWahl, gWahl);
     grafikZeile.querySelector('.gk-l').insertAdjacentHTML('beforeend', ' <span class="wip-tag">WIP</span>');
+    if (gMobil) {
+      const k = document.createElement('small');
+      k.textContent = t('Quality nur am PC verfügbar');
+      k.style.cssText = 'display:block;opacity:.7;font-weight:400';
+      grafikZeile.querySelector('.gk-l').appendChild(k);
+    }
     rechts.appendChild(grafikZeile);
     // Geist: eine Kopie faehrt nach der ersten Runde die aufgezeichnete Linie ab (Standard aus).
     const geistAn = vfGeistAn();
