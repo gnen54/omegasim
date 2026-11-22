@@ -45174,7 +45174,13 @@
       renderGarage();
     };
     if (vfMotorFest()) {
-      const fest = garWertZeile(t('Motorsound'), werte[j].name + ' (' + t('fest zum Auto') + ')', () => {}, () => {});
+      // 22.11. (GEMELDET Gnen54: "Manta zeigt den GT3-Motorsound"): sd_boxer_dunkel und manta400_rec stehen
+      // nicht in der Motorliste der Optionen - die Suche fiel auf "Wie in Optionen (globaler Motor)" zurueck.
+      // Gespielt wurde trotzdem der richtige Klang, nur der Name war falsch.
+      const festNamen = { sd_boxer_dunkel: 'Porsche 911 GT3: Boxer-6, dunkel (Speed Dreams)', manta400_rec: 'Opel Manta 400: Aufnahme (Thorsten)' };
+      const fw = werte.find((w) => w.v === vfMotorFest());
+      const festName = fw ? fw.name : (festNamen[vfMotorFest()] || vfMotorFest());
+      const fest = garWertZeile(t('Motorsound'), festName + ' (' + t('fest zum Auto') + ')', () => {}, () => {});
       fest.querySelectorAll('.gk-w button').forEach((k) => { k.disabled = true; k.style.visibility = 'hidden'; });
       rechts.appendChild(fest);
     } else rechts.appendChild(garWertZeile(t('Motorsound'), werte[j].name, () => wahl(-1), () => wahl(1)));
