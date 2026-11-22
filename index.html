@@ -19275,6 +19275,8 @@
     "Törnerschleife 2.0 (nur virtuell): Streckenlayout von Driftstrecken.de. Schriftliche Freigabe von Driftstrecken.de am 18.11.2026 für OmegaSim, unter Nennung des Urhebers.": "Törnerschleife 2.0 (virtual only): track layout by Driftstrecken.de. Written permission from Driftstrecken.de on 18 Nov 2026 for OmegaSim, with credit to the author.",
     "Porsche 911 GT3: Karosserie „Porsche 911 GT3R 2019“ von Vehicle World (Designerin Revantika). Bisher mündliche Zustimmung, die schriftliche Anfrage vom 15.11.2026 ist noch offen – deshalb vorerst nur in der Testversion.": "Porsche 911 GT3: “Porsche 911 GT3R 2019” body by Vehicle World (designer Revantika). So far verbal consent; the written request of 15 Nov 2026 is still open – so for now only in the test version.",
     "Pad-Diagnose (F8 schließt)": "Pad diagnostics (F8 closes)",
+    "Pad-Diagnose (F8 oder Knopf schließt)": "Pad diagnostics (F8 or button closes)",
+    "Pad-Diagnose": "Pad diagnostics",
     "Außenspiegel (Motorhaube)": "Side mirrors (bonnet camera)",
     "nur virtuell": "virtual only",
     "Gebaute Bahn": "Built track",
@@ -20920,6 +20922,8 @@
     "Törnerschleife 2.0 (nur virtuell): Streckenlayout von Driftstrecken.de. Schriftliche Freigabe von Driftstrecken.de am 18.11.2026 für OmegaSim, unter Nennung des Urhebers.": "Törnerschleife 2.0 (solo virtual): trazado de Driftstrecken.de. Permiso por escrito de Driftstrecken.de del 18.11.2026 para OmegaSim, citando al autor.",
     "Porsche 911 GT3: Karosserie „Porsche 911 GT3R 2019“ von Vehicle World (Designerin Revantika). Bisher mündliche Zustimmung, die schriftliche Anfrage vom 15.11.2026 ist noch offen – deshalb vorerst nur in der Testversion.": "Porsche 911 GT3: carrocería “Porsche 911 GT3R 2019” de Vehicle World (diseñadora Revantika). Por ahora consentimiento verbal; la solicitud escrita del 15/11/2026 sigue pendiente, por eso de momento solo en la versión de prueba.",
     "Pad-Diagnose (F8 schließt)": "Diagnóstico del mando (F8 cierra)",
+    "Pad-Diagnose (F8 oder Knopf schließt)": "Diagnóstico del mando (F8 o botón cierra)",
+    "Pad-Diagnose": "Diagnóstico del mando",
     "Außenspiegel (Motorhaube)": "Retrovisores laterales (cámara del capó)",
     "nur virtuell": "solo virtual",
     "Gebaute Bahn": "Pista construida",
@@ -44910,6 +44914,8 @@
       + '<b class="vf-gang"></b><div class="vf-acc-wert"><b class="vf-rpm"></b>' + lbl('1/min') + '</div></div></div>'
       + '<div class="vf-kachel vf-acc-tank">' + lbl(t('Tank')) + '<b class="vf-tank"></b><i class="vf-tank-bar"><i></i></i></div></div>'
       + '<div class="vf-knoepfe"><button type="button" data-vf="box">' + t('Box') + '</button><button type="button" data-vf="flag">' + t('Gelbe Flagge') + '</button><button type="button" data-vf="licht">' + t('Licht') + '</button><button type="button" data-vf="kam">' + t('Kamera') + '</button><button type="button" data-vf="reset">' + t('Zurücksetzen') + '</button><button type="button" data-vf="touch" hidden>' + t('Steuerung') + '</button>'
+      // 22.11. (BESTELLT Gnen54): Pad-Diagnose auch ohne Tastatur (Tablet, EasySMX X05 meldet nur Gas)
+      + '<button type="button" data-vf="paddiag">' + t('Pad-Diagnose') + '</button>'
       + '<button type="button" data-vf="zu" aria-label="' + t('Beenden') + '">&#10005;</button></div>'
       + '<span class="vf-kamfrei" hidden data-i18n-skip>' + t('Kamera frei') + ' · R3 / V: ' + t('Standard') + ' <span class="wip-tag">WIP</span></span>'
       + '<span class="vf-wip">' + t('Virtuell') + ' <span class="wip-tag">WIP</span></span>'
@@ -45052,6 +45058,7 @@
       else if (b.dataset.vf === 'reset') vfZuruecksetzen();
       else if (b.dataset.vf === 'kam') vfKameraWechseln();
       else if (b.dataset.vf === 'touch') vfTouchUmschalten();
+      else if (b.dataset.vf === 'paddiag') vfPadDiagUmschalten();
       else if (b.dataset.vf === 'box') {
         if (VF.modus === 'derby') showHudToast(t('Derby: kein Boxenstopp'));
         else if (typeof requestPitStop === 'function') { requestPitStop(); if (typeof pitState !== 'undefined' && pitState === 'limited') showHudToast(t('Boxenstopp: anhalten')); }
@@ -45573,7 +45580,7 @@
       if (!el.isConnected || !VF.aktiv) { el.remove(); clearInterval(vfPadDiagIv); return; }
       let code = '-';
       try { code = VF.frei ? VF.frei.name : (VF.tiles || currentTrackTiles || []).length > 1 ? trackToCode(VF.tiles || currentTrackTiles) : '-'; } catch (e) { /* ohne */ }
-      el.textContent = t('Pad-Diagnose (F8 schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-')
+      el.textContent = t('Pad-Diagnose (F8 oder Knopf schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-')
         + '\n' + t('Strecke') + ': ' + code;
     };
     zeichne();

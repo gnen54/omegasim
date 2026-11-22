@@ -3675,6 +3675,8 @@
       + '<b class="vf-gang"></b><div class="vf-acc-wert"><b class="vf-rpm"></b>' + lbl('1/min') + '</div></div></div>'
       + '<div class="vf-kachel vf-acc-tank">' + lbl(t('Tank')) + '<b class="vf-tank"></b><i class="vf-tank-bar"><i></i></i></div></div>'
       + '<div class="vf-knoepfe"><button type="button" data-vf="box">' + t('Box') + '</button><button type="button" data-vf="flag">' + t('Gelbe Flagge') + '</button><button type="button" data-vf="licht">' + t('Licht') + '</button><button type="button" data-vf="kam">' + t('Kamera') + '</button><button type="button" data-vf="reset">' + t('Zurücksetzen') + '</button><button type="button" data-vf="touch" hidden>' + t('Steuerung') + '</button>'
+      // 22.11. (BESTELLT Gnen54): Pad-Diagnose auch ohne Tastatur (Tablet, EasySMX X05 meldet nur Gas)
+      + '<button type="button" data-vf="paddiag">' + t('Pad-Diagnose') + '</button>'
       + '<button type="button" data-vf="zu" aria-label="' + t('Beenden') + '">&#10005;</button></div>'
       + '<span class="vf-kamfrei" hidden data-i18n-skip>' + t('Kamera frei') + ' · R3 / V: ' + t('Standard') + ' <span class="wip-tag">WIP</span></span>'
       + '<span class="vf-wip">' + t('Virtuell') + ' <span class="wip-tag">WIP</span></span>'
@@ -3817,6 +3819,7 @@
       else if (b.dataset.vf === 'reset') vfZuruecksetzen();
       else if (b.dataset.vf === 'kam') vfKameraWechseln();
       else if (b.dataset.vf === 'touch') vfTouchUmschalten();
+      else if (b.dataset.vf === 'paddiag') vfPadDiagUmschalten();
       else if (b.dataset.vf === 'box') {
         if (VF.modus === 'derby') showHudToast(t('Derby: kein Boxenstopp'));
         else if (typeof requestPitStop === 'function') { requestPitStop(); if (typeof pitState !== 'undefined' && pitState === 'limited') showHudToast(t('Boxenstopp: anhalten')); }
@@ -4338,7 +4341,7 @@
       if (!el.isConnected || !VF.aktiv) { el.remove(); clearInterval(vfPadDiagIv); return; }
       let code = '-';
       try { code = VF.frei ? VF.frei.name : (VF.tiles || currentTrackTiles || []).length > 1 ? trackToCode(VF.tiles || currentTrackTiles) : '-'; } catch (e) { /* ohne */ }
-      el.textContent = t('Pad-Diagnose (F8 schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-')
+      el.textContent = t('Pad-Diagnose (F8 oder Knopf schließt)') + '\n' + (typeof padDiagText === 'function' ? padDiagText() : '-')
         + '\n' + t('Strecke') + ': ' + code;
     };
     zeichne();
