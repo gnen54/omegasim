@@ -1459,7 +1459,7 @@
   // gehaengt liesse es sich nur zusammen mit dem Motor leiser stellen, also gar nicht.
   // Der Startwert steht hier UND im Markup - beim Nachziehen muessen beide mit.
   let tyreVolume = 0.35;
-  let ambienceEnabled = true;   // on, but quiet enough to sit under the engine
+  let ambienceEnabled = false;  // 22.11.2026 (Gnen54): ab Werk aus, "furchtbar nervig"; Schalter Optionen > Ton
 
   async function loadAmbience() {
     if (ambience.ready || !audioCtx) return;

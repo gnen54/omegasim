@@ -11777,7 +11777,7 @@
       <div class="opt-row"><div class="opt-label">Blitz bei Gewitter<small>Bei Regen blitzt das Cockpit alle 20 bis 30&nbsp;s kurz auf. Aus: nur der Donner.</small></div>
         <label class="tgl"><input type="checkbox" id="setting-blitz" checked><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Strecken-Ambience<small>Vorbeifahrten, Regen, Donner.</small></div>
-        <label class="tgl"><input type="checkbox" id="amb-enable" checked><span></span></label></div>
+        <label class="tgl"><input type="checkbox" id="amb-enable"><span></span></label></div>
       <div class="opt-row"><div class="opt-label">Streckenlautstärke<small>Absichtlich leise, damit der Motor vorne bleibt.</small></div>
         <div class="opt-slider">
           <button type="button" data-step="-1" aria-label="weniger">&minus;</button>
@@ -62167,7 +62167,7 @@
   // gehaengt liesse es sich nur zusammen mit dem Motor leiser stellen, also gar nicht.
   // Der Startwert steht hier UND im Markup - beim Nachziehen muessen beide mit.
   let tyreVolume = 0.35;
-  let ambienceEnabled = true;   // on, but quiet enough to sit under the engine
+  let ambienceEnabled = false;  // 22.11.2026 (Gnen54): ab Werk aus, "furchtbar nervig"; Schalter Optionen > Ton
 
   async function loadAmbience() {
     if (ambience.ready || !audioCtx) return;
