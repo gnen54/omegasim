@@ -108,7 +108,12 @@ self.addEventListener('fetch', (e) => {
       if (imCache) return imCache;
     }
     try {
-      const antwort = await fetch(req);
+      // TESTFASSUNG: Seite und Verzeichnisse am Server nachfragen, nicht aus dem HTTP-Cache
+      // des Browsers (GitHub Pages erlaubt 10 Minuten) - sonst kam nach einem Push lange die
+      // alte index.html. no-cache fragt mit ETag nach; unveraendert kommt nur ein kurzes 304.
+      const frisch = req.mode === 'navigate' || url.pathname.endsWith('/')
+        || /\.(html|json|webmanifest)$/.test(url.pathname);
+      const antwort = await fetch(frisch ? new Request(req.url, { cache: 'no-cache', credentials: 'same-origin' }) : req);
       // Nur brauchbare Antworten ablegen. Eine 404 zu cachen heisst, den Fehler zu
       // konservieren, bis der Cache abgeraeumt wird.
       if (antwort && antwort.ok && antwort.type === 'basic') {
