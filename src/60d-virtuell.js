@@ -3735,6 +3735,7 @@
     // frueh an die Box". Jetzt jede Fahrt mit der Startfuellung (Renneinstellung "Tank beim Start" bzw. die des
     // Setups), ab Werk voll. Ein Rennen setzt den Tank beim Start ohnehin genauso.
     vfTankFuellen();
+    vfLebenStarten();
     // 21.11. (Luke/Gnen54): die Knopfleiste oben blendet sich nach 4 s Ruhe aus und kommt bei Mausbewegung,
     // Tippen oder Klick zurueck - der Innenspiegel kann so ganz nach oben, und wer ohne Gamepad faehrt,
     // kommt trotzdem an alle Knoepfe.
@@ -4329,6 +4330,52 @@
       localStorage.setItem(VF_ENDE_STORE, JSON.stringify(l.slice(0, 10)));
     } catch (e) { /* egal */ }
   }
+  // 23.11.2026 (GEMELDET Gnen54): die Fahrt war wieder weg, aber OHNE Meldung - virtuellBeenden lief also gar
+  // nicht. Verdacht: Chrome hat die Seite neu geladen (Speicher knapp auf dem Tablet). Darum ein Lebenszeichen:
+  // beim Start gesetzt, alle 2 s aufgefrischt (Dauer, Bilder, Sichtbarkeit, Speicher), beim normalen Ende
+  // geloescht. Steht es beim naechsten Laden der Seite noch da, war es ein unerwarteter Abbruch.
+  const VF_LAEUFT_STORE = 'omegasim-vf-laeuft';
+  let vfLebenUhr = 0;
+  function vfLebenszeichen() {
+    if (!VF.aktiv) return;
+    try {
+      const m = performance && performance.memory;
+      localStorage.setItem(VF_LAEUFT_STORE, JSON.stringify({
+        start: VF.lebenStart, zuletzt: Date.now(), auto: vfAutoWahl(),
+        grafik: vfGrafik(), sichtbar: document.visibilityState,
+        speicherMB: m ? Math.round(m.usedJSHeapSize / 1048576) : null,
+      }));
+    } catch (e) { /* egal */ }
+  }
+  function vfLebenStarten() {
+    VF.lebenStart = Date.now();
+    vfLebenszeichen();
+    clearInterval(vfLebenUhr);
+    vfLebenUhr = setInterval(vfLebenszeichen, 2000);
+  }
+  function vfLebenEnde() {
+    clearInterval(vfLebenUhr); vfLebenUhr = 0;
+    try { localStorage.removeItem(VF_LAEUFT_STORE); } catch (e) { /* egal */ }
+  }
+  // Beim Laden der Seite: lief eine Fahrt und endete nicht normal?
+  function vfAbbruchPruefen() {
+    let a = null;
+    try { a = JSON.parse(localStorage.getItem(VF_LAEUFT_STORE) || 'null'); } catch (e) { a = null; }
+    if (!a || !a.start) return null;
+    try { localStorage.removeItem(VF_LAEUFT_STORE); } catch (e) { /* egal */ }
+    const s = Math.max(0, Math.round(((a.zuletzt || a.start) - a.start) / 1000));
+    const dauer = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + ' min';
+    const grund = t('Letzte Fahrt unerwartet abgebrochen (Seite neu geladen)') + ', ' + dauer
+      + (a.auto ? ', ' + a.auto : '') + (a.grafik ? ', ' + a.grafik : '')
+      + (a.sichtbar && a.sichtbar !== 'visible' ? ', ' + a.sichtbar : '')
+      + (a.speicherMB ? ', ' + a.speicherMB + ' MB' : '');
+    vfEndeMerken(grund);
+    return grund;
+  }
+  setTimeout(() => { const g = vfAbbruchPruefen(); if (g) { try { vfStartHinweis(g); } catch (e) { /* egal */ } } }, 1500);
+  // Wird die Seite waehrend der Fahrt verborgen (anderes Fenster, Bildschirm aus), steht das im Lebenszeichen.
+  document.addEventListener('visibilitychange', () => { if (VF.aktiv) vfLebenszeichen(); });
+
   function virtuellBeenden(grund) {
     VF.frei = undefined;
     vfSpiegelRahmen(false); vfCockpit(false);
@@ -4339,6 +4386,7 @@
       try { wer = ((new Error().stack || '').split('\n')[2] || '').trim().replace(/^at\s+/, '').slice(0, 80); } catch (e) { /* egal */ }
       grund = t('unbekannt') + (wer ? ' (' + wer + ')' : '');
     }
+    vfLebenEnde();
     VF.endeGrund = grund;
     vfEndeMerken(grund);
     setTimeout(() => { try { vfStartHinweis(t('Fahrt beendet') + ': ' + grund); } catch (e) { /* egal */ } }, 250);

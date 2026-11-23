@@ -17748,6 +17748,7 @@
     "Stein grau marmoriert": "Grey marbled stone",
     "Quality nur am PC verfügbar": "Quality only available on PC",
     "Fahrt beendet": "Drive ended",
+    "Letzte Fahrt unerwartet abgebrochen (Seite neu geladen)": "Last drive aborted unexpectedly (page reloaded)",
     "Rennen zu Ende": "Race finished",
     "Knopf Beenden": "Exit button",
     "Escape-Taste": "Escape key",
@@ -20745,6 +20746,7 @@
     "Stein grau marmoriert": "Piedra gris jaspeada",
     "Quality nur am PC verfügbar": "Calidad solo disponible en PC",
     "Fahrt beendet": "Conducción terminada",
+    "Letzte Fahrt unerwartet abgebrochen (Seite neu geladen)": "Última conducción interrumpida inesperadamente (página recargada)",
     "Rennen zu Ende": "Carrera terminada",
     "Knopf Beenden": "Botón Salir",
     "Escape-Taste": "Tecla Escape",
@@ -46882,6 +46884,7 @@
     // frueh an die Box". Jetzt jede Fahrt mit der Startfuellung (Renneinstellung "Tank beim Start" bzw. die des
     // Setups), ab Werk voll. Ein Rennen setzt den Tank beim Start ohnehin genauso.
     vfTankFuellen();
+    vfLebenStarten();
     // 21.11. (Luke/Gnen54): die Knopfleiste oben blendet sich nach 4 s Ruhe aus und kommt bei Mausbewegung,
     // Tippen oder Klick zurueck - der Innenspiegel kann so ganz nach oben, und wer ohne Gamepad faehrt,
     // kommt trotzdem an alle Knoepfe.
@@ -47476,6 +47479,52 @@
       localStorage.setItem(VF_ENDE_STORE, JSON.stringify(l.slice(0, 10)));
     } catch (e) { /* egal */ }
   }
+  // 23.11.2026 (GEMELDET Gnen54): die Fahrt war wieder weg, aber OHNE Meldung - virtuellBeenden lief also gar
+  // nicht. Verdacht: Chrome hat die Seite neu geladen (Speicher knapp auf dem Tablet). Darum ein Lebenszeichen:
+  // beim Start gesetzt, alle 2 s aufgefrischt (Dauer, Bilder, Sichtbarkeit, Speicher), beim normalen Ende
+  // geloescht. Steht es beim naechsten Laden der Seite noch da, war es ein unerwarteter Abbruch.
+  const VF_LAEUFT_STORE = 'omegasim-vf-laeuft';
+  let vfLebenUhr = 0;
+  function vfLebenszeichen() {
+    if (!VF.aktiv) return;
+    try {
+      const m = performance && performance.memory;
+      localStorage.setItem(VF_LAEUFT_STORE, JSON.stringify({
+        start: VF.lebenStart, zuletzt: Date.now(), auto: vfAutoWahl(),
+        grafik: vfGrafik(), sichtbar: document.visibilityState,
+        speicherMB: m ? Math.round(m.usedJSHeapSize / 1048576) : null,
+      }));
+    } catch (e) { /* egal */ }
+  }
+  function vfLebenStarten() {
+    VF.lebenStart = Date.now();
+    vfLebenszeichen();
+    clearInterval(vfLebenUhr);
+    vfLebenUhr = setInterval(vfLebenszeichen, 2000);
+  }
+  function vfLebenEnde() {
+    clearInterval(vfLebenUhr); vfLebenUhr = 0;
+    try { localStorage.removeItem(VF_LAEUFT_STORE); } catch (e) { /* egal */ }
+  }
+  // Beim Laden der Seite: lief eine Fahrt und endete nicht normal?
+  function vfAbbruchPruefen() {
+    let a = null;
+    try { a = JSON.parse(localStorage.getItem(VF_LAEUFT_STORE) || 'null'); } catch (e) { a = null; }
+    if (!a || !a.start) return null;
+    try { localStorage.removeItem(VF_LAEUFT_STORE); } catch (e) { /* egal */ }
+    const s = Math.max(0, Math.round(((a.zuletzt || a.start) - a.start) / 1000));
+    const dauer = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + ' min';
+    const grund = t('Letzte Fahrt unerwartet abgebrochen (Seite neu geladen)') + ', ' + dauer
+      + (a.auto ? ', ' + a.auto : '') + (a.grafik ? ', ' + a.grafik : '')
+      + (a.sichtbar && a.sichtbar !== 'visible' ? ', ' + a.sichtbar : '')
+      + (a.speicherMB ? ', ' + a.speicherMB + ' MB' : '');
+    vfEndeMerken(grund);
+    return grund;
+  }
+  setTimeout(() => { const g = vfAbbruchPruefen(); if (g) { try { vfStartHinweis(g); } catch (e) { /* egal */ } } }, 1500);
+  // Wird die Seite waehrend der Fahrt verborgen (anderes Fenster, Bildschirm aus), steht das im Lebenszeichen.
+  document.addEventListener('visibilitychange', () => { if (VF.aktiv) vfLebenszeichen(); });
+
   function virtuellBeenden(grund) {
     VF.frei = undefined;
     vfSpiegelRahmen(false); vfCockpit(false);
@@ -47486,6 +47535,7 @@
       try { wer = ((new Error().stack || '').split('\n')[2] || '').trim().replace(/^at\s+/, '').slice(0, 80); } catch (e) { /* egal */ }
       grund = t('unbekannt') + (wer ? ' (' + wer + ')' : '');
     }
+    vfLebenEnde();
     VF.endeGrund = grund;
     vfEndeMerken(grund);
     setTimeout(() => { try { vfStartHinweis(t('Fahrt beendet') + ': ' + grund); } catch (e) { /* egal */ } }, 250);
@@ -124752,6 +124802,31 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       if (merkListe === null) localStorage.removeItem(VF_ENDE_STORE); else localStorage.setItem(VF_ENDE_STORE, merkListe);
     }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Zurueck gesperrt, Grund gemerkt, 10 Eintraege' };
+  });
+
+  // 23.11. (GEMELDET Gnen54): Fahrt weg OHNE Meldung - Lebenszeichen erkennt einen Neustart der Seite mitten in der Fahrt.
+  stAdd('Virtuell: Abbruch durch Neuladen der Seite wird erkannt, normales Ende nicht', () => {
+    const f = [];
+    const merkL = localStorage.getItem(VF_LAEUFT_STORE), merkE = localStorage.getItem(VF_ENDE_STORE), merkA = VF.aktiv;
+    try {
+      localStorage.removeItem(VF_ENDE_STORE);
+      VF.aktiv = true; vfLebenStarten();
+      if (!localStorage.getItem(VF_LAEUFT_STORE)) f.push('kein Lebenszeichen beim Start');
+      // "Seite neu geladen": Lebenszeichen steht noch da
+      VF.aktiv = false; clearInterval(vfLebenUhr);
+      const g = vfAbbruchPruefen();
+      if (!g || g.indexOf(t('Letzte Fahrt unerwartet abgebrochen (Seite neu geladen)')) !== 0) f.push('Abbruch nicht erkannt: ' + g);
+      if (localStorage.getItem(VF_LAEUFT_STORE)) f.push('Lebenszeichen nach der Pruefung nicht geloescht');
+      if (!(vfEndeListe()[0] && vfEndeListe()[0].grund === g)) f.push('Abbruch nicht in der Liste');
+      // normales Ende: kein Abbruch
+      VF.aktiv = true; vfLebenStarten(); vfLebenEnde(); VF.aktiv = false;
+      if (vfAbbruchPruefen() !== null) f.push('normales Ende als Abbruch gemeldet');
+    } finally {
+      clearInterval(vfLebenUhr); VF.aktiv = merkA;
+      if (merkL === null) localStorage.removeItem(VF_LAEUFT_STORE); else localStorage.setItem(VF_LAEUFT_STORE, merkL);
+      if (merkE === null) localStorage.removeItem(VF_ENDE_STORE); else localStorage.setItem(VF_ENDE_STORE, merkE);
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Neuladen erkannt, normales Ende nicht' };
   });
 
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {

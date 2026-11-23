@@ -30084,6 +30084,31 @@
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Zurueck gesperrt, Grund gemerkt, 10 Eintraege' };
   });
 
+  // 23.11. (GEMELDET Gnen54): Fahrt weg OHNE Meldung - Lebenszeichen erkennt einen Neustart der Seite mitten in der Fahrt.
+  stAdd('Virtuell: Abbruch durch Neuladen der Seite wird erkannt, normales Ende nicht', () => {
+    const f = [];
+    const merkL = localStorage.getItem(VF_LAEUFT_STORE), merkE = localStorage.getItem(VF_ENDE_STORE), merkA = VF.aktiv;
+    try {
+      localStorage.removeItem(VF_ENDE_STORE);
+      VF.aktiv = true; vfLebenStarten();
+      if (!localStorage.getItem(VF_LAEUFT_STORE)) f.push('kein Lebenszeichen beim Start');
+      // "Seite neu geladen": Lebenszeichen steht noch da
+      VF.aktiv = false; clearInterval(vfLebenUhr);
+      const g = vfAbbruchPruefen();
+      if (!g || g.indexOf(t('Letzte Fahrt unerwartet abgebrochen (Seite neu geladen)')) !== 0) f.push('Abbruch nicht erkannt: ' + g);
+      if (localStorage.getItem(VF_LAEUFT_STORE)) f.push('Lebenszeichen nach der Pruefung nicht geloescht');
+      if (!(vfEndeListe()[0] && vfEndeListe()[0].grund === g)) f.push('Abbruch nicht in der Liste');
+      // normales Ende: kein Abbruch
+      VF.aktiv = true; vfLebenStarten(); vfLebenEnde(); VF.aktiv = false;
+      if (vfAbbruchPruefen() !== null) f.push('normales Ende als Abbruch gemeldet');
+    } finally {
+      clearInterval(vfLebenUhr); VF.aktiv = merkA;
+      if (merkL === null) localStorage.removeItem(VF_LAEUFT_STORE); else localStorage.setItem(VF_LAEUFT_STORE, merkL);
+      if (merkE === null) localStorage.removeItem(VF_ENDE_STORE); else localStorage.setItem(VF_ENDE_STORE, merkE);
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Neuladen erkannt, normales Ende nicht' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);
