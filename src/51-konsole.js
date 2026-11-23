@@ -133,6 +133,12 @@
   // Im Browser dasselbe ueber einen Verlaufseintrag: Zurueck landet auf popstate statt die
   // Seite zu verlassen, und auf dem Startbildschirm geht es wie gewohnt zurueck.
   function omegaZurueck() {
+    // 23.11.2026 (GEMELDET Gnen54): waehrend der virtuellen Fahrt tut die Zurueck-Taste nichts - manches Gamepad
+    // schickt mit B/Zurueck die Android-Zurueck-Taste, und die Fahrt soll nicht aus Versehen enden.
+    if (typeof vfAktiv === 'function' && vfAktiv()) {
+      if (typeof vfStartHinweis === 'function') vfStartHinweis(t('Zurück ist während der Fahrt gesperrt – Beenden mit ✕ oder Esc'));
+      return true;
+    }
     // Raumgestalter offen: die Zurueck-Taste schliesst ihn (v0.9.45, "komme nicht mehr raus").
     if (typeof raumDsOffen === 'function' && raumDsOffen()) { raumDsSchliessen(); return true; }
     if ($('mp-info') && !$('mp-info').hidden && typeof mpiStop === 'function') { mpiStop(); return true; }
@@ -1119,8 +1125,8 @@
           requestRaceStop();
         } else if (typeof vfAktiv === 'function' && vfAktiv()) {
           // Virtuelle Fahrt: Options beendet sie wie Escape (zurueck in die Garage), statt das Menue
-          // unter der 3D-Schicht zu oeffnen.
-          virtuellBeenden();
+          // unter der 3D-Schicht zu oeffnen. Grund mit der Belegung (23.11., Fehlersuche "springt raus").
+          virtuellBeenden(t('Options-Taste am Gamepad') + (window.vfOptionsBelegung ? ' (' + window.vfOptionsBelegung + ')' : ''));
         } else {
           konsoleZumMenue();
         }
@@ -1138,7 +1144,7 @@
     // v1.1.3: waehrend der virtuellen Fahrt (60d-virtuell.js) gehoeren die Tasten dem Fahren; Escape beendet sie.
     // Dieser Zuhoerer laeuft in der Capture-Phase vor allen anderen - ohne diese Zeile oeffnete Escape das Menue.
     if (typeof vfAktiv === 'function' && vfAktiv()) {
-      if (k === 'escape') { e.preventDefault(); e.stopImmediatePropagation(); virtuellBeenden(); }
+      if (k === 'escape') { e.preventDefault(); e.stopImmediatePropagation(); virtuellBeenden(t('Escape-Taste') + ' (' + (e.code || e.keyCode || '?') + ')'); }
       else if (k === 'c' && !e.repeat) { e.preventDefault(); vfKameraWechseln(); }
       return;
     }

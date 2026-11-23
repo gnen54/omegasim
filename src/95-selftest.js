@@ -30061,6 +30061,29 @@
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Tank 12 % -> Startfuellung (voll ' + vfStartTankProzent().toFixed(0) + ' %)' };
   });
 
+  // 23.11. (GEMELDET Gnen54): Fahrt endete "einfach so". Jeder Ausstieg hat einen Grund (gemerkt + gezeigt),
+  // die Zurueck-Taste tut waehrend der Fahrt nichts.
+  stAdd('Virtuell: Ausstieg mit Grund gemerkt, Zurueck-Taste waehrend der Fahrt gesperrt', () => {
+    const f = [];
+    const merkListe = localStorage.getItem(VF_ENDE_STORE), merkAktiv = VF.aktiv;
+    try {
+      VF.aktiv = true;
+      if (omegaZurueck() !== true) f.push('Zurueck nicht abgefangen');
+      if (!VF.aktiv) f.push('Zurueck hat die Fahrt beendet');
+      VF.aktiv = false;
+      localStorage.removeItem(VF_ENDE_STORE);
+      vfEndeMerken('Testgrund');
+      const l = vfEndeListe();
+      if (!(l.length === 1 && l[0].grund === 'Testgrund' && /^\d{4}-/.test(l[0].zeit))) f.push('Grund nicht gemerkt: ' + JSON.stringify(l));
+      for (let i = 0; i < 15; i++) vfEndeMerken('g' + i);
+      if (vfEndeListe().length !== 10) f.push('Liste nicht auf 10 begrenzt');
+    } finally {
+      VF.aktiv = merkAktiv;
+      if (merkListe === null) localStorage.removeItem(VF_ENDE_STORE); else localStorage.setItem(VF_ENDE_STORE, merkListe);
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Zurueck gesperrt, Grund gemerkt, 10 Eintraege' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);

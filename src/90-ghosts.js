@@ -13509,6 +13509,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       // BESTELLT: "X soll pit mode aktivieren (statt OPTIONS) und options 1x ins menü,
       // nochmal zurück zum cockpit." Der Boxenstopp liegt auf Kreuz (flagTasteTick).
       const pitstopNow = readBindingValue(pad, bindings.pitstop) > BUTTON_CAPTURE_THRESHOLD;
+      if (pitstopNow && !prevPitstop) { try { window.vfOptionsBelegung = bindingDescription(bindings.pitstop); } catch (e) { /* egal */ } }
       konsoleOptionsTaste(pitstopNow);
       prevPitstop = pitstopNow;
 

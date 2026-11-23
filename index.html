@@ -17747,6 +17747,16 @@
     "Opel Manta B400 (Gnen54, WIP)": "Opel Manta B400 (Gnen54, WIP)",
     "Stein grau marmoriert": "Grey marbled stone",
     "Quality nur am PC verfügbar": "Quality only available on PC",
+    "Fahrt beendet": "Drive ended",
+    "Rennen zu Ende": "Race finished",
+    "Knopf Beenden": "Exit button",
+    "Escape-Taste": "Escape key",
+    "Grafik verloren (Grafikspeicher)": "Graphics lost (graphics memory)",
+    "Options-Taste am Gamepad": "Options button on the gamepad",
+    "Zurück ist während der Fahrt gesperrt – Beenden mit ✕ oder Esc": "Back is locked while driving – exit with ✕ or Esc",
+    "Challenge zu Ende": "Challenge finished",
+    "Studienfahrt zu Ende": "Study drive finished",
+    "Pause-Menü: Beenden": "Pause menu: Exit",
     "Streckenbestzeit": "Track record",
     "Neue Streckenbestzeit": "New track record",
     "Bestzeiten": "Best times",
@@ -20734,6 +20744,16 @@
     "Opel Manta B400 (Gnen54, WIP)": "Opel Manta B400 (Gnen54, WIP)",
     "Stein grau marmoriert": "Piedra gris jaspeada",
     "Quality nur am PC verfügbar": "Calidad solo disponible en PC",
+    "Fahrt beendet": "Conducción terminada",
+    "Rennen zu Ende": "Carrera terminada",
+    "Knopf Beenden": "Botón Salir",
+    "Escape-Taste": "Tecla Escape",
+    "Grafik verloren (Grafikspeicher)": "Gráficos perdidos (memoria gráfica)",
+    "Options-Taste am Gamepad": "Botón Options del mando",
+    "Zurück ist während der Fahrt gesperrt – Beenden mit ✕ oder Esc": "Atrás está bloqueado durante la conducción – salir con ✕ o Esc",
+    "Challenge zu Ende": "Desafío terminado",
+    "Studienfahrt zu Ende": "Conducción de estudio terminada",
+    "Pause-Menü: Beenden": "Menú de pausa: Salir",
     "Streckenbestzeit": "Récord del circuito",
     "Neue Streckenbestzeit": "Nuevo récord del circuito",
     "Bestzeiten": "Mejores tiempos",
@@ -33192,6 +33212,12 @@
   // Im Browser dasselbe ueber einen Verlaufseintrag: Zurueck landet auf popstate statt die
   // Seite zu verlassen, und auf dem Startbildschirm geht es wie gewohnt zurueck.
   function omegaZurueck() {
+    // 23.11.2026 (GEMELDET Gnen54): waehrend der virtuellen Fahrt tut die Zurueck-Taste nichts - manches Gamepad
+    // schickt mit B/Zurueck die Android-Zurueck-Taste, und die Fahrt soll nicht aus Versehen enden.
+    if (typeof vfAktiv === 'function' && vfAktiv()) {
+      if (typeof vfStartHinweis === 'function') vfStartHinweis(t('Zurück ist während der Fahrt gesperrt – Beenden mit ✕ oder Esc'));
+      return true;
+    }
     // Raumgestalter offen: die Zurueck-Taste schliesst ihn (v0.9.45, "komme nicht mehr raus").
     if (typeof raumDsOffen === 'function' && raumDsOffen()) { raumDsSchliessen(); return true; }
     if ($('mp-info') && !$('mp-info').hidden && typeof mpiStop === 'function') { mpiStop(); return true; }
@@ -34178,8 +34204,8 @@
           requestRaceStop();
         } else if (typeof vfAktiv === 'function' && vfAktiv()) {
           // Virtuelle Fahrt: Options beendet sie wie Escape (zurueck in die Garage), statt das Menue
-          // unter der 3D-Schicht zu oeffnen.
-          virtuellBeenden();
+          // unter der 3D-Schicht zu oeffnen. Grund mit der Belegung (23.11., Fehlersuche "springt raus").
+          virtuellBeenden(t('Options-Taste am Gamepad') + (window.vfOptionsBelegung ? ' (' + window.vfOptionsBelegung + ')' : ''));
         } else {
           konsoleZumMenue();
         }
@@ -34197,7 +34223,7 @@
     // v1.1.3: waehrend der virtuellen Fahrt (60d-virtuell.js) gehoeren die Tasten dem Fahren; Escape beendet sie.
     // Dieser Zuhoerer laeuft in der Capture-Phase vor allen anderen - ohne diese Zeile oeffnete Escape das Menue.
     if (typeof vfAktiv === 'function' && vfAktiv()) {
-      if (k === 'escape') { e.preventDefault(); e.stopImmediatePropagation(); virtuellBeenden(); }
+      if (k === 'escape') { e.preventDefault(); e.stopImmediatePropagation(); virtuellBeenden(t('Escape-Taste') + ' (' + (e.code || e.keyCode || '?') + ')'); }
       else if (k === 'c' && !e.repeat) { e.preventDefault(); vfKameraWechseln(); }
       return;
     }
@@ -45810,7 +45836,7 @@
     const fehlt = vfPflichtGilt() ? Math.max(0, vfPflichtBox() - (VF.boxDurch || 0)) : 0;
     const strafe = fehlt ? ' · ' + t('Pflicht-Boxendurchfahrt fehlt') + ': +' + fehlt * (typeof racePitPenaltyS === 'number' ? racePitPenaltyS : 20) + ' s' : '';
     showHudToast((ergebnis || (t('Rennen beendet') + ': ' + was)) + strafe);
-    rennZeitTimeout(() => { if (VF.aktiv) virtuellBeenden(); }, 1600);
+    rennZeitTimeout(() => { if (VF.aktiv) virtuellBeenden(t('Rennen zu Ende')); }, 1600);
   }
   function vfMalen() {
     const gl = VF.gl, cv = VF.cv;
@@ -46841,7 +46867,7 @@
     cv.addEventListener('webglcontextlost', () => {
       if (!VF.aktiv || VF.cv !== cv) return;
       showHudToast(t('Grafik verloren: virtuelle Fahrt beendet'));
-      virtuellBeenden();
+      virtuellBeenden(t('Grafik verloren (Grafikspeicher)'));
     });
     try {
       VF.prog = vfProgramm(gl);
@@ -46969,7 +46995,7 @@
     schicht.addEventListener('click', (e) => {
       const b = e.target.closest('[data-vf]');
       if (!b) return;
-      if (b.dataset.vf === 'zu') virtuellBeenden();
+      if (b.dataset.vf === 'zu') virtuellBeenden(t('Knopf Beenden'));
       else if (b.dataset.vf === 'reset') vfZuruecksetzen();
       else if (b.dataset.vf === 'kam') vfKameraWechseln();
       else if (b.dataset.vf === 'touch') vfTouchUmschalten();
@@ -47438,11 +47464,31 @@
       }
     } catch (e) { /* ohne Ton weiterfahren */ }
   }
-  function virtuellBeenden() {
+  // 23.11.2026 (GEMELDET Gnen54, Tablet im Browser mit Gamepad): "mitten im Fahren ... springt er mir sofort raus"
+  // in die Garage, ohne Meldung. Jetzt bekommt jeder Ausstieg einen Grund; er erscheint nach dem Beenden kurz unten
+  // ("Fahrt beendet: ...") und die letzten 10 stehen in localStorage VF_ENDE_STORE (F8-Diagnose zeigt sie).
+  // Ohne Grund (unerwarteter Aufrufer) steht der Aufrufer aus dem Stack da.
+  const VF_ENDE_STORE = 'omegasim-vf-ende';
+  function vfEndeListe() { try { return JSON.parse(localStorage.getItem(VF_ENDE_STORE) || '[]') || []; } catch (e) { return []; } }
+  function vfEndeMerken(grund) {
+    try {
+      const l = vfEndeListe(); l.unshift({ zeit: new Date().toISOString().slice(0, 19).replace('T', ' '), grund });
+      localStorage.setItem(VF_ENDE_STORE, JSON.stringify(l.slice(0, 10)));
+    } catch (e) { /* egal */ }
+  }
+  function virtuellBeenden(grund) {
     VF.frei = undefined;
     vfSpiegelRahmen(false); vfCockpit(false);
     rennPauseBeenden();
     if (!VF.aktiv) return;
+    if (!grund) {
+      let wer = '';
+      try { wer = ((new Error().stack || '').split('\n')[2] || '').trim().replace(/^at\s+/, '').slice(0, 80); } catch (e) { /* egal */ }
+      grund = t('unbekannt') + (wer ? ' (' + wer + ')' : '');
+    }
+    VF.endeGrund = grund;
+    vfEndeMerken(grund);
+    setTimeout(() => { try { vfStartHinweis(t('Fahrt beendet') + ': ' + grund); } catch (e) { /* egal */ } }, 250);
     // Laeuft eine Challenge (z. B. die Studienfahrt) mit dem virtuellen Auto, endet sie mit: abgebrochen,
     // nicht gewertet (VF.abbruch sagt das der Studie, 98f-studie.js).
     if (typeof chLauf !== 'undefined' && chLauf) {
@@ -47514,7 +47560,7 @@
     if (!VF.studie && typeof showTab === 'function') showTab('garage');
     VF.studie = false;
   }
-  window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(); } }, true);
+  window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(t('Escape-Taste') + ' (' + (e.code || e.keyCode || '?') + ')'); } }, true);
   // F8: Pad-Diagnose (padDiagText in 90-ghosts.js) - zeigt, ob und wo das Gamepad haengen bleibt.
   let vfPadDiagIv = 0;
   // ---- KNOPFLEISTE ALS PIKTOGRAMME (23.11., aus Luukes 1.6.22 uebernommen, BESTELLT Gnen54: "die neuen Buttons
@@ -58215,7 +58261,7 @@
     }
     chWahl = CH_STUDIE.id; chModus = 'rennen';
     challengeStarten();
-    if (!chLauf && virtuell && typeof virtuellBeenden === 'function') virtuellBeenden();
+    if (!chLauf && virtuell && typeof virtuellBeenden === 'function') virtuellBeenden(t('Challenge zu Ende'));
     if (!chLauf) chSpiegelSetzen(false);
     return !!chLauf;
   }
@@ -82948,6 +82994,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
       // BESTELLT: "X soll pit mode aktivieren (statt OPTIONS) und options 1x ins menü,
       // nochmal zurück zum cockpit." Der Boxenstopp liegt auf Kreuz (flagTasteTick).
       const pitstopNow = readBindingValue(pad, bindings.pitstop) > BUTTON_CAPTURE_THRESHOLD;
+      if (pitstopNow && !prevPitstop) { try { window.vfOptionsBelegung = bindingDescription(bindings.pitstop); } catch (e) { /* egal */ } }
       konsoleOptionsTaste(pitstopNow);
       prevPitstop = pitstopNow;
 
@@ -124684,6 +124731,29 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Tank 12 % -> Startfuellung (voll ' + vfStartTankProzent().toFixed(0) + ' %)' };
   });
 
+  // 23.11. (GEMELDET Gnen54): Fahrt endete "einfach so". Jeder Ausstieg hat einen Grund (gemerkt + gezeigt),
+  // die Zurueck-Taste tut waehrend der Fahrt nichts.
+  stAdd('Virtuell: Ausstieg mit Grund gemerkt, Zurueck-Taste waehrend der Fahrt gesperrt', () => {
+    const f = [];
+    const merkListe = localStorage.getItem(VF_ENDE_STORE), merkAktiv = VF.aktiv;
+    try {
+      VF.aktiv = true;
+      if (omegaZurueck() !== true) f.push('Zurueck nicht abgefangen');
+      if (!VF.aktiv) f.push('Zurueck hat die Fahrt beendet');
+      VF.aktiv = false;
+      localStorage.removeItem(VF_ENDE_STORE);
+      vfEndeMerken('Testgrund');
+      const l = vfEndeListe();
+      if (!(l.length === 1 && l[0].grund === 'Testgrund' && /^\d{4}-/.test(l[0].zeit))) f.push('Grund nicht gemerkt: ' + JSON.stringify(l));
+      for (let i = 0; i < 15; i++) vfEndeMerken('g' + i);
+      if (vfEndeListe().length !== 10) f.push('Liste nicht auf 10 begrenzt');
+    } finally {
+      VF.aktiv = merkAktiv;
+      if (merkListe === null) localStorage.removeItem(VF_ENDE_STORE); else localStorage.setItem(VF_ENDE_STORE, merkListe);
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Zurueck gesperrt, Grund gemerkt, 10 Eintraege' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);
@@ -130125,7 +130195,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     if (virtuell) st.fahrtVirtuell = fahrt; else st.fahrt = fahrt;
     st.fahrtArt = null;
     // Die virtuelle Fahrt endet mit der Challenge (einen Takt spaeter: die Challenge raeumt noch auf).
-    if (virtuell && typeof vfAktiv === 'function' && vfAktiv()) setTimeout(() => { virtuellBeenden(); studieZurueckZeigen(); }, 0);
+    if (virtuell && typeof vfAktiv === 'function' && vfAktiv()) setTimeout(() => { virtuellBeenden(t('Studienfahrt zu Ende')); studieZurueckZeigen(); }, 0);
     if (st.fahrt && st.fahrtVirtuell) { studieZurueckZeigen(); studieAbschliessen(); return; }
     st.schritt = 'fahrt-mehr';
     studieZurueckZeigen();
@@ -130710,7 +130780,7 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
   document.getElementById('renn-pause-ende').onclick = () => {
     rennPauseBeenden();
     if (['countdown', 'racing', 'finishing'].includes(raceState)) requestRaceStop();
-    else if (vfAktiv()) virtuellBeenden();
+    else if (vfAktiv()) virtuellBeenden(t('Pause-Menü: Beenden'));
     else for (const c of garage) if (c.ghost && c.ghost.running) stopGhost(c);
   };
   document.getElementById('race-act-pause').onclick = rennPauseUmschalten;

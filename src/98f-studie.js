@@ -388,7 +388,7 @@
     if (virtuell) st.fahrtVirtuell = fahrt; else st.fahrt = fahrt;
     st.fahrtArt = null;
     // Die virtuelle Fahrt endet mit der Challenge (einen Takt spaeter: die Challenge raeumt noch auf).
-    if (virtuell && typeof vfAktiv === 'function' && vfAktiv()) setTimeout(() => { virtuellBeenden(); studieZurueckZeigen(); }, 0);
+    if (virtuell && typeof vfAktiv === 'function' && vfAktiv()) setTimeout(() => { virtuellBeenden(t('Studienfahrt zu Ende')); studieZurueckZeigen(); }, 0);
     if (st.fahrt && st.fahrtVirtuell) { studieZurueckZeigen(); studieAbschliessen(); return; }
     st.schritt = 'fahrt-mehr';
     studieZurueckZeigen();

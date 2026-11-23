@@ -38,7 +38,7 @@
   document.getElementById('renn-pause-ende').onclick = () => {
     rennPauseBeenden();
     if (['countdown', 'racing', 'finishing'].includes(raceState)) requestRaceStop();
-    else if (vfAktiv()) virtuellBeenden();
+    else if (vfAktiv()) virtuellBeenden(t('Pause-Menü: Beenden'));
     else for (const c of garage) if (c.ghost && c.ghost.running) stopGhost(c);
   };
   document.getElementById('race-act-pause').onclick = rennPauseUmschalten;

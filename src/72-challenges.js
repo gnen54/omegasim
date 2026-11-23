@@ -1352,7 +1352,7 @@
     }
     chWahl = CH_STUDIE.id; chModus = 'rennen';
     challengeStarten();
-    if (!chLauf && virtuell && typeof virtuellBeenden === 'function') virtuellBeenden();
+    if (!chLauf && virtuell && typeof virtuellBeenden === 'function') virtuellBeenden(t('Challenge zu Ende'));
     if (!chLauf) chSpiegelSetzen(false);
     return !!chLauf;
   }

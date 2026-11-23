@@ -2689,7 +2689,7 @@
     const fehlt = vfPflichtGilt() ? Math.max(0, vfPflichtBox() - (VF.boxDurch || 0)) : 0;
     const strafe = fehlt ? ' · ' + t('Pflicht-Boxendurchfahrt fehlt') + ': +' + fehlt * (typeof racePitPenaltyS === 'number' ? racePitPenaltyS : 20) + ' s' : '';
     showHudToast((ergebnis || (t('Rennen beendet') + ': ' + was)) + strafe);
-    rennZeitTimeout(() => { if (VF.aktiv) virtuellBeenden(); }, 1600);
+    rennZeitTimeout(() => { if (VF.aktiv) virtuellBeenden(t('Rennen zu Ende')); }, 1600);
   }
   function vfMalen() {
     const gl = VF.gl, cv = VF.cv;
@@ -3720,7 +3720,7 @@
     cv.addEventListener('webglcontextlost', () => {
       if (!VF.aktiv || VF.cv !== cv) return;
       showHudToast(t('Grafik verloren: virtuelle Fahrt beendet'));
-      virtuellBeenden();
+      virtuellBeenden(t('Grafik verloren (Grafikspeicher)'));
     });
     try {
       VF.prog = vfProgramm(gl);
@@ -3848,7 +3848,7 @@
     schicht.addEventListener('click', (e) => {
       const b = e.target.closest('[data-vf]');
       if (!b) return;
-      if (b.dataset.vf === 'zu') virtuellBeenden();
+      if (b.dataset.vf === 'zu') virtuellBeenden(t('Knopf Beenden'));
       else if (b.dataset.vf === 'reset') vfZuruecksetzen();
       else if (b.dataset.vf === 'kam') vfKameraWechseln();
       else if (b.dataset.vf === 'touch') vfTouchUmschalten();
@@ -4317,11 +4317,31 @@
       }
     } catch (e) { /* ohne Ton weiterfahren */ }
   }
-  function virtuellBeenden() {
+  // 23.11.2026 (GEMELDET Gnen54, Tablet im Browser mit Gamepad): "mitten im Fahren ... springt er mir sofort raus"
+  // in die Garage, ohne Meldung. Jetzt bekommt jeder Ausstieg einen Grund; er erscheint nach dem Beenden kurz unten
+  // ("Fahrt beendet: ...") und die letzten 10 stehen in localStorage VF_ENDE_STORE (F8-Diagnose zeigt sie).
+  // Ohne Grund (unerwarteter Aufrufer) steht der Aufrufer aus dem Stack da.
+  const VF_ENDE_STORE = 'omegasim-vf-ende';
+  function vfEndeListe() { try { return JSON.parse(localStorage.getItem(VF_ENDE_STORE) || '[]') || []; } catch (e) { return []; } }
+  function vfEndeMerken(grund) {
+    try {
+      const l = vfEndeListe(); l.unshift({ zeit: new Date().toISOString().slice(0, 19).replace('T', ' '), grund });
+      localStorage.setItem(VF_ENDE_STORE, JSON.stringify(l.slice(0, 10)));
+    } catch (e) { /* egal */ }
+  }
+  function virtuellBeenden(grund) {
     VF.frei = undefined;
     vfSpiegelRahmen(false); vfCockpit(false);
     rennPauseBeenden();
     if (!VF.aktiv) return;
+    if (!grund) {
+      let wer = '';
+      try { wer = ((new Error().stack || '').split('\n')[2] || '').trim().replace(/^at\s+/, '').slice(0, 80); } catch (e) { /* egal */ }
+      grund = t('unbekannt') + (wer ? ' (' + wer + ')' : '');
+    }
+    VF.endeGrund = grund;
+    vfEndeMerken(grund);
+    setTimeout(() => { try { vfStartHinweis(t('Fahrt beendet') + ': ' + grund); } catch (e) { /* egal */ } }, 250);
     // Laeuft eine Challenge (z. B. die Studienfahrt) mit dem virtuellen Auto, endet sie mit: abgebrochen,
     // nicht gewertet (VF.abbruch sagt das der Studie, 98f-studie.js).
     if (typeof chLauf !== 'undefined' && chLauf) {
@@ -4393,7 +4413,7 @@
     if (!VF.studie && typeof showTab === 'function') showTab('garage');
     VF.studie = false;
   }
-  window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(); } }, true);
+  window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(t('Escape-Taste') + ' (' + (e.code || e.keyCode || '?') + ')'); } }, true);
   // F8: Pad-Diagnose (padDiagText in 90-ghosts.js) - zeigt, ob und wo das Gamepad haengen bleibt.
   let vfPadDiagIv = 0;
   // ---- KNOPFLEISTE ALS PIKTOGRAMME (23.11., aus Luukes 1.6.22 uebernommen, BESTELLT Gnen54: "die neuen Buttons
