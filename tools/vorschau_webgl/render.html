@@ -1,0 +1,97 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Fork (Gnen54, 23.11.2026): Vorschaubilder mit echter 3D-Grafik (WebGL2) statt des Python-Rasterers -
+     dort flimmerten deckungsgleiche Lackschichten (Streifen auf Lack) und doppelte Scheiben zu Flecken.
+     Aufruf: tools/vorschau_webgl/erzeugen.js (siehe dort). -->
+<style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1280" height="720"></canvas>
+<script>
+const W = 1280, H = 720, RAND = 0.09;
+const L = norm([-0.62, 0.55, 0.42]), F = norm([0.55, 0.25, -0.3]), AMB = 0.42;
+function norm(v) { const l = Math.hypot(...v); return v.map((x) => x / l); }
+async function bild(url) { const i = new Image(); i.src = url; await i.decode(); return i; }
+async function zeichne(auto) {
+  const pfad = '../../img/autos/' + auto + '/';
+  const meta = await (await fetch(pfad + 'auto.json', { cache: 'no-cache' })).json();
+  const bin = await (await fetch(pfad + 'auto.bin', { cache: 'no-cache' })).arrayBuffer();
+  const ecken = new Float32Array(bin, 0, meta.ecken * 8);
+  const gl = document.getElementById('c').getContext('webgl2', { antialias: true, preserveDrawingBuffer: true });
+  const vs = `#version 300 es
+  in vec3 p; in vec3 n; in vec2 uv; uniform vec3 sk; uniform vec3 ve; uniform vec4 fr; uniform vec2 tz;
+  out vec3 vn; out vec2 vuv;
+  void main(){ vec3 q = p * sk + ve; vn = n * sign(sk);
+    float sx = fr.x + fr.z * q.z, sy = fr.y - fr.z * q.y;
+    gl_Position = vec4(sx / ${W}.0 * 2.0 - 1.0, 1.0 - sy / ${H}.0 * 2.0, (q.x - tz.x) / (tz.y - tz.x) * 2.0 - 1.0, 1.0); vuv = uv; }`;
+  const fs = `#version 300 es
+  precision highp float; in vec3 vn; in vec2 vuv; uniform sampler2D tx; uniform float glas; out vec4 o;
+  void main(){ vec3 nn = normalize(vn); if (!gl_FrontFacing) nn = -nn;
+    // Kamera schaut entlang +x: Flaechen, die von der Kamera weg zeigen, zweiseitig beleuchten
+    float li = ${AMB} + ${1 - AMB} * (0.78 * max(dot(nn, vec3(${L})), 0.0) + 0.22 * max(dot(nn, vec3(${F})), 0.0));
+    vec4 t = texture(tx, vuv); o = vec4(t.rgb * li, glas > 0.5 ? t.a * 0.85 : 1.0); }`;
+  const sh = (typ, src) => { const s = gl.createShader(typ); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
+  const U = (k) => gl.getUniformLocation(pr, k), A = (k) => gl.getAttribLocation(pr, k);
+  const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, ecken, gl.STATIC_DRAW);
+  const ibo = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(bin, meta.indexAb, meta.indizes), gl.STATIC_DRAW);
+  // Rahmen aus der Karosserie (ohne Raeder), wie tools/vorschau_bilder.py
+  let zmin = 1e9, zmax = -1e9, ymin = 1e9, ymax = -1e9, xmin = 1e9, xmax = -1e9;
+  for (const t of meta.teile) { if (t.gruppe === 'rad') continue;
+    for (let i = t.ecke0; i < t.ecke0 + t.ecken; i++) { const x = ecken[i * 8], y = ecken[i * 8 + 1], z = ecken[i * 8 + 2];
+      if (z < zmin) zmin = z; if (z > zmax) zmax = z; if (y < ymin) ymin = y; if (y > ymax) ymax = y; if (x < xmin) xmin = x; if (x > xmax) xmax = x; } }
+  ymin = Math.min(ymin, 0);
+  const dx = zmax - zmin, dy = ymax - ymin, s = Math.min(W * (1 - 2 * RAND) / dx, H * (1 - 2 * RAND) / dy);
+  gl.uniform4f(U('fr'), (W - s * dx) / 2 - s * zmin, (H - s * dy) / 2 + s * ymax, s, 0);
+  const tz = Math.max(Math.abs(xmin), Math.abs(xmax)) * 1.6 + 1; gl.uniform2f(U('tz'), -tz, tz);
+  const tex = {};
+  for (const t of meta.teile) if (!tex[t.tex]) {
+    const im = await bild(pfad + t.tex); const g = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, g);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); tex[t.tex] = g; }
+  gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.disable(gl.CULL_FACE);
+  const ap = A('p'), an = A('n'), au = A('uv');
+  [ap, an, au].forEach((a) => gl.enableVertexAttribArray(a));
+  // Hauptlack = Textur mit den meisten Karosserie-Dreiecken; andere Karosserie-Teile (Streifen, Lackierung)
+  // liegen oft deckungsgleich darauf: etwas nach vorn schieben (Polygon-Offset), sonst flimmert es fleckig.
+  const zaehl = {}; meta.teile.forEach((t) => { if (t.rolle === 'karosserie') zaehl[t.tex] = (zaehl[t.tex] || 0) + t.indizes; });
+  const haupt = Object.keys(zaehl).sort((a, b) => zaehl[b] - zaehl[a])[0];
+  const teil = (t, sk, ve, glas) => {
+    gl.vertexAttribPointer(ap, 3, gl.FLOAT, false, 32, t.ecke0 * 32);
+    gl.vertexAttribPointer(an, 3, gl.FLOAT, false, 32, t.ecke0 * 32 + 12);
+    gl.vertexAttribPointer(au, 2, gl.FLOAT, false, 32, t.ecke0 * 32 + 24);
+    gl.bindTexture(gl.TEXTURE_2D, tex[t.tex]); gl.uniform1f(U('glas'), glas ? 1 : 0);
+    gl.uniform3f(U('sk'), ...sk); gl.uniform3f(U('ve'), ...ve);
+    gl.drawElements(gl.TRIANGLES, t.indizes, gl.UNSIGNED_SHORT, t.index0 * 2);
+  };
+  const glasR = (t) => t.rolle === 'glas' || t.rolle === 'scheinwerferglas';
+  for (const t of meta.teile) {
+    if (t.gruppe === 'rad' || glasR(t)) continue;
+    const deko = t.tex !== haupt;
+    if (deko) { gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -8); } else gl.disable(gl.POLYGON_OFFSET_FILL);
+    teil(t, [1, 1, 1], [0, 0, 0], false);
+  }
+  gl.disable(gl.POLYGON_OFFSET_FILL);
+  // Raeder wie im Spiel und im Python-Werkzeug: Einheitsrad skaliert und an die Achsen gesetzt.
+  const ph = meta.physik, achs = { vorn: ph.vorderachse, hinten: ph.hinterachse };
+  for (const seite of [-1, 1]) for (const ax of ['vorn', 'hinten']) {
+    const r = ph.reifen[ax];
+    for (const t of meta.teile) { if (t.gruppe !== 'rad' || (t.achse && t.achse !== ax)) continue;
+      teil(t, [seite * r.breite, 2 * r.radius, 2 * r.radius], [seite * r.spur / 2, r.radius, achs[ax]], false); }
+  }
+  // Glas: erst nur die Tiefe (die vorderste Scheibenschicht), dann die Farbe genau dieser Schicht -
+  // sonst ueberlagern sich Innen- und Aussenhaut der Scheibe zu Rauschen.
+  gl.colorMask(false, false, false, false);
+  for (const t of meta.teile) if (glasR(t)) teil(t, [1, 1, 1], [0, 0, 0], true);
+  gl.colorMask(true, true, true, true); gl.depthFunc(gl.EQUAL); gl.depthMask(false);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  for (const t of meta.teile) if (glasR(t)) teil(t, [1, 1, 1], [0, 0, 0], true);
+  gl.finish();
+  // Auf den Verlauf wie tools/vorschau_bilder.py legen und auf 640 x 360 verkleinern (JPEG).
+  const k2 = document.createElement('canvas'); k2.width = 640; k2.height = 360;
+  const c2 = k2.getContext('2d'), v = c2.createLinearGradient(0, 0, 0, 360);
+  v.addColorStop(0, 'rgb(86,92,100)'); v.addColorStop(1, 'rgb(44,48,54)');
+  c2.fillStyle = v; c2.fillRect(0, 0, 640, 360);
+  c2.imageSmoothingQuality = 'high'; c2.drawImage(gl.canvas, 0, 0, 640, 360);
+  return k2.toDataURL('image/jpeg', 0.9);
+}
+window.zeichne = zeichne;
+</script></body></html>

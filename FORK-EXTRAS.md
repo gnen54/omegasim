@@ -27,7 +27,7 @@ Stand: 23.11.2026 (auf Luukes 1.6.22). Vollständige alte Fassung: Zweig `sicher
 | Umgebungston (Ambience) ab Werk aus | `src/80-sound.js`, `id="amb-enable"` ohne checked | `let ambienceEnabled = false` |
 | Freigaben-Liste „Eigene Autos von Gnen54 und die Freigaben“ | `src/00-index.head.html` (Credits) | `Eigene Autos von Gnen54 und die Freigaben` |
 | Testfassung holt Seite/HTML/JSON mit no-cache | `tools/sw.js.in` | `cache: 'no-cache'` |
-| Vorschaubilder ohne Vereinfachung (schärfer) | `img/autos/{caravelle,spider,gt3,manta,kaefer}/vorschau.jpg` | neu zeichnen mit `tools/vorschau_bilder.py`, dabei `REDUZIERE_ZIEL` sehr hoch setzen (nur für den Lauf) |
+| Vorschaubilder mit echter 3D-Grafik (WebGL) | `img/autos/{caravelle,spider,gt3,manta,kaefer}/vorschau.jpg`, Werkzeug `tools/vorschau_webgl/` | `function zeichne(auto)` in `tools/vorschau_webgl/render.html`; neue oder geänderte Modelle damit neu zeichnen (`python3 -m http.server 8790` im Repo, dann `node tools/vorschau_webgl/erzeugen.js <autos>`), NICHT mit `tools/vorschau_bilder.py` (fleckig) |
 | Selbsttests Fork | `src/95-selftest.js` | `Performance laedt die leichte Fassung`, `auf Handy und Tablet nur Performance` |
 | Übersetzungen (EN/ES) aller Fork-Texte | `src/10-ble-explorer.js` | `Stein grau marmoriert`, `Opel Manta B400 (Gnen54, WIP)` |
 
