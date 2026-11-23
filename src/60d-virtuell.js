@@ -2689,7 +2689,71 @@
     const fehlt = vfPflichtGilt() ? Math.max(0, vfPflichtBox() - (VF.boxDurch || 0)) : 0;
     const strafe = fehlt ? ' · ' + t('Pflicht-Boxendurchfahrt fehlt') + ': +' + fehlt * (typeof racePitPenaltyS === 'number' ? racePitPenaltyS : 20) + ' s' : '';
     showHudToast((ergebnis || (t('Rennen beendet') + ': ' + was)) + strafe);
-    rennZeitTimeout(() => { if (VF.aktiv) virtuellBeenden(t('Rennen zu Ende')); }, 1600);
+    // Challenge/Studienfahrt: wie bisher nach 1,6 s zurueck, deren eigene Auswertung uebernimmt.
+    if (typeof chLauf !== 'undefined' && chLauf) {
+      rennZeitTimeout(() => { if (VF.aktiv) virtuellBeenden(t('Rennen zu Ende')); }, 1600);
+      return;
+    }
+    // 23.11.2026 (BESTELLT Gnen54): das Rennende kam als 1,6-s-Meldung und wirkte wie ein Absturz ("springt
+    // raus"). Jetzt bleibt eine Ergebnistafel stehen, bis "Zurueck zur Garage" (Knopf, A am Pad, Enter).
+    vfErgebnisTafel((ergebnis || (t('Rennen beendet') + ': ' + was)) + strafe);
+  }
+  // Text fuer die Garage: Modus und Laenge, wie die virtuelle Fahrt sie benutzt (siehe virtuellStarten).
+  function vfModusText() {
+    const ok = ['laps', 'endurance', 'qualifying', 'practice', 'bestzeit', 'knockout', 'derby'];
+    const m = ok.indexOf(raceMode) >= 0 ? raceMode : 'practice';
+    const md = (typeof RACE_MODES !== 'undefined') ? RACE_MODES[m] : null;
+    const n = Math.max(1, raceLimit || 0);
+    if (m === 'laps') return vfModusName(m) + ' · ' + n + ' ' + t('Runden');
+    if (md && md.timed) return vfModusName(m) + ' · ' + n + ' min';
+    if (m === 'derby') return vfModusName(m) + ' · ' + (raceLimit > 0 ? raceLimit + ' ' + t('Kills') : t('letzter auf der Bahn'));
+    if (m === 'knockout') return vfModusName(m) + ' · ' + t('bis alle Gegner aus sind');
+    return vfModusName(m) + ' · ' + t('ohne Ende');
+  }
+  function vfModusName(m) {
+    const md = (typeof RACE_MODES !== 'undefined') ? RACE_MODES[m] : null;
+    return t(md && md.label ? md.label : m);
+  }
+  function vfErgebnisTafel(text) {
+    if (!VF.schicht || VF.schicht.querySelector('.vf-ergebnis')) return;
+    const s = VF.lebenStart ? Math.max(0, Math.round((Date.now() - VF.lebenStart) / 1000)) : 0;
+    const zeile = (l, w) => '<tr><td style="opacity:.7;padding:2px 14px 2px 0">' + l + '</td><td style="text-align:right;font-weight:700">' + w + '</td></tr>';
+    const d = document.createElement('div');
+    d.className = 'vf-ergebnis';
+    d.setAttribute('data-i18n-skip', '');
+    d.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;min-width:260px;max-width:90vw;'
+      + 'background:rgba(12,14,18,.92);color:#fff;border-radius:12px;padding:18px 22px;box-shadow:0 8px 30px rgba(0,0,0,.5);'
+      + 'font:15px/1.4 system-ui,sans-serif;text-align:center';
+    d.innerHTML = '<div style="font-size:20px;font-weight:800;margin-bottom:4px">' + t('Rennen beendet') + '</div>'
+      + '<div style="margin-bottom:10px">' + text + '</div>'
+      + '<table style="margin:0 auto 14px;border-collapse:collapse">'
+      + zeile(t('Modus'), vfModusName(VF.modus))
+      + zeile(t('Runden'), String(VF.runden || 0))
+      + zeile(t('Beste'), VF.beste != null ? vfZeitAcc(VF.beste, 3) : '–')
+      + zeile(t('Letzte'), VF.letzte != null ? vfZeitAcc(VF.letzte, 3) : '–')
+      + zeile(t('Fahrzeit'), Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + ' min')
+      + '</table><button type="button" class="vf-ergebnis-zu" style="font-size:16px;padding:8px 18px;border-radius:8px;border:0;'
+      + 'background:#2d7ff9;color:#fff;font-weight:700">' + t('Zurück zur Garage') + '</button>'
+      + '<div style="opacity:.6;font-size:12px;margin-top:6px">A / Enter</div>';
+    VF.schicht.appendChild(d);
+    const zu = () => { if (VF.aktiv) virtuellBeenden(t('Rennen zu Ende') + ': ' + text); };
+    d.querySelector('.vf-ergebnis-zu').onclick = zu;
+    // A am Pad (steigende Flanke - wer A beim Rennende haelt, loest nicht sofort aus) und Enter.
+    let vorher = true;
+    const takt = () => {
+      if (!VF.aktiv || !d.isConnected) return;
+      let a = false;
+      try { for (const p of navigator.getGamepads ? navigator.getGamepads() : []) if (p && p.buttons[0] && p.buttons[0].pressed) a = true; } catch (e) { /* egal */ }
+      if (a && !vorher) { zu(); return; }
+      vorher = a;
+      requestAnimationFrame(takt);
+    };
+    requestAnimationFrame(takt);
+    const taste = (e) => {
+      if (!VF.aktiv || !d.isConnected) { window.removeEventListener('keydown', taste, true); return; }
+      if (e.key === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); window.removeEventListener('keydown', taste, true); zu(); }
+    };
+    window.addEventListener('keydown', taste, true);
   }
   function vfMalen() {
     const gl = VF.gl, cv = VF.cv;
@@ -4077,6 +4141,18 @@
       grafikZeile.querySelector('.gk-l').appendChild(k);
     }
     rechts.appendChild(grafikZeile);
+    // 23.11.2026 (BESTELLT Gnen54): Rennmodus und Laenge aus den Renneinstellungen sichtbar machen - sonst
+    // endet ein Runden-/Endurance-Rennen "ueberraschend".
+    { const z = document.createElement('div');
+      z.className = 'opt-row gk-zeile vf-garage-modus';
+      z.innerHTML = '<span class="gk-l"></span><span class="gk-w"><b></b></span>';
+      z.querySelector('.gk-l').textContent = t('Rennmodus');
+      const k = document.createElement('small');
+      k.textContent = t('aus den Renneinstellungen');
+      k.style.cssText = 'display:block;opacity:.7;font-weight:400';
+      z.querySelector('.gk-l').appendChild(k);
+      z.querySelector('b').textContent = vfModusText();
+      rechts.appendChild(z); }
     // Geist: eine Kopie faehrt nach der ersten Runde die aufgezeichnete Linie ab (Standard aus).
     const geistAn = vfGeistAn();
     const geistWahl = () => {

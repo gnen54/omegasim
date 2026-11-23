@@ -30109,6 +30109,34 @@
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Neuladen erkannt, normales Ende nicht' };
   });
 
+  // 23.11. (BESTELLT Gnen54): Rennende mit stehender Ergebnistafel statt 1,6-s-Meldung; Garage zeigt Modus und Laenge.
+  stAdd('Virtuell: Ergebnistafel bleibt nach dem Rennen stehen, Garage zeigt Rennmodus und Laenge', () => {
+    const f = [];
+    const merkM = raceMode, merkL = raceLimit;
+    try {
+      raceMode = 'laps'; raceLimit = 10;
+      if (vfModusText().indexOf('10') < 0) f.push('Runden: ' + vfModusText());
+      raceMode = 'endurance'; raceLimit = 5;
+      if (vfModusText().indexOf('5 min') < 0) f.push('Endurance: ' + vfModusText());
+      raceMode = 'practice'; raceLimit = 0;
+      if (vfModusText().indexOf(t('ohne Ende')) < 0) f.push('Training: ' + vfModusText());
+      // Tafel in einer Attrappe der Fahrschicht
+      const merkS = VF.schicht, merkA = VF.aktiv, merkMod = VF.modus;
+      const sch = document.createElement('div'); document.body.appendChild(sch);
+      try {
+        VF.schicht = sch; VF.aktiv = false; VF.modus = 'laps'; VF.runden = 3;
+        vfErgebnisTafel('Test');
+        const tf = sch.querySelector('.vf-ergebnis');
+        if (!tf) f.push('keine Tafel');
+        else {
+          if (!tf.querySelector('.vf-ergebnis-zu')) f.push('kein Knopf Zurueck');
+          if (tf.textContent.indexOf(vfModusName('laps')) < 0) f.push('Modus fehlt auf der Tafel');
+        }
+      } finally { sch.remove(); VF.schicht = merkS; VF.aktiv = merkA; VF.modus = merkMod; }
+    } finally { raceMode = merkM; raceLimit = merkL; }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Tafel mit Knopf und Modus, Garage: Runden/Endurance/Training' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);
