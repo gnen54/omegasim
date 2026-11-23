@@ -185,11 +185,6 @@
     { id: 'fischgraet', name: 'Fischgrät', art: 'fischgraet', breiteCm: 7, laengeCm: 35, spalten: 16, zeilen: 2,
       ton: [[190, 143, 94], [176, 128, 82], [201, 157, 106], [163, 118, 74], [184, 136, 86]], maser: [122, 82, 48],
       kontrast: 0.42, ringCm: 0.8, poren: 1.0, ast: 0.08, glanz: 0.28 },
-    // BESTELLT (Gnen54, 14.11.2026): ein neutraler Boden ohne Dielen, "nicht komplett eintoenig, so
-    // ein bisschen wie marmoriert", nicht schwarz (die Fahrbahn ist schwarz). Eine nahtlos kachelbare
-    // Flaeche 120 x 60 cm (Atlas 2048 x 1024), ohne Fugen und ohne Spiegeln/Toenen je Stueck.
-    { id: 'stein', name: 'Stein grau marmoriert', art: 'flaeche', breiteCm: 60, laengeCm: 120, spalten: 1, zeilen: 1,
-      ton: [[104, 104, 107]], hell: [130, 130, 133], ader: [70, 70, 75], glanz: 0.34 },
     // v1.5 BESTELLT: "als weitere Bodenart (Standard) den Rasen ... mit Baeumen in der Ferne, damit der Horizont nicht so
     // kahl aussieht". Eigener Rasen (kein Code aus uno-com-escada, das ist PolyForm Noncommercial): nahtlose Fliesen aus
     // Rauschen in drei Lagen und kurzen Halmen, im Dielenraster ohne Fugen gelegt. Baeume: vfBaeumeBauen.
@@ -304,43 +299,6 @@
       if ((k & 16383) === 16383) yield;
     }
   }
-  // Marmorierter Stein, NAHTLOS kachelbar: periodisches Wertrauschen (Gitter modulo Zellenzahl) in
-  // mehreren Oktaven, darauf Adern als |sin| mit ganzzahliger Frequenz je Kachel (auch periodisch),
-  // verzerrt vom Rauschen. Zeilen y0..y1 (in Schritten, damit die Garage im Leerlauf rechnen kann).
-  function vfSteinRauschen(u, v, n, m, s) {
-    const x = u * n, y = v * m, i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j;
-    const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
-    const g = (a, b) => vfHash(((a % n) + n) % n + s, ((b % m) + m) % m + 7 * s);
-    const a0 = g(i, j), a1 = g(i + 1, j), b0 = g(i, j + 1), b1 = g(i + 1, j + 1);
-    return (a0 + (a1 - a0) * sx + (b0 - a0 + (b1 - b0 - a1 + a0) * sx) * sy) * 2 - 1;
-  }
-  function vfSteinTurb(u, v) {
-    let t = 0, a = 0.5;
-    for (let o = 0, n = 4, m = 2; o < 5; o++, n *= 2, m *= 2, a *= 0.5) t += a * vfSteinRauschen(u, v, n, m, 101 * (o + 1));
-    return t;
-  }
-  function vfSteinZeilen(d, AW, AH, y0, y1, P) {
-    const [t0, t1, t2] = P.ton[0], [h0, h1, h2] = P.hell, [a0, a1, a2] = P.ader;
-    for (let y = y0; y < y1; y++) {
-      const v = y / AH;
-      for (let x = 0; x < AW; x++) {
-        const u = x / AW, tb = vfSteinTurb(u, v);
-        // Grobe Wolken (hell/dunkel) und zwei Adernscharen (Frequenzen ganzzahlig je Kachel).
-        const wolke = 0.5 + 0.6 * vfSteinRauschen(u, v, 3, 2, 909) + 0.35 * tb;
-        const a1s = Math.abs(Math.sin(Math.PI * (3 * u + 2 * v) + 5.5 * tb));
-        const a2s = Math.abs(Math.sin(Math.PI * (5 * u - 3 * v) + 7.0 * vfSteinTurb(v, u)));
-        const ader = Math.pow(1 - a1s, 10) * 0.6 + Math.pow(1 - a2s, 14) * 0.35;
-        const hw = Math.max(0, Math.min(1, wolke));
-        let r = t0 + (h0 - t0) * hw, g = t1 + (h1 - t1) * hw, b = t2 + (h2 - t2) * hw;
-        const k = Math.min(1, ader);
-        r += (a0 - r) * k; g += (a1 - g) * k; b += (a2 - b) * k;
-        const korn = 1 + (vfHash(x, y) - 0.5) * 0.05;
-        const i = (y * AW + x) * 4;
-        d[i] = r * korn; d[i + 1] = g * korn; d[i + 2] = b * korn;
-        d[i + 3] = P.glanz * (0.85 + 0.3 * hw) * 255;
-      }
-    }
-  }
   function vfHolzStueck(d, AW, x0, y0, w, h, P, rnd) {
     const ton = P.ton[Math.floor(rnd() * P.ton.length)], j = 1 + (rnd() - 0.5) * 0.08;
     const t0 = ton[0] * j, t1 = ton[1] * j, t2 = ton[2] * j, m0 = P.maser[0], m1 = P.maser[1], m2 = P.maser[2];
@@ -417,14 +375,9 @@
   }
   function* vfBodenBau(P) {
     const AW = VF_ATLAS_B, AH = VF_ATLAS_H, d = new Uint8ClampedArray(AW * AH * 4);
-    const rnd = vfZufall(P.id === 'eiche' ? 1911 : P.id === 'grau' ? 2701 : P.id === 'stein' ? 4409 : P.id === 'rasen' ? 5150 : 3307);
+    const rnd = vfZufall(P.id === 'eiche' ? 1911 : P.id === 'grau' ? 2701 : P.id === 'rasen' ? 5150 : 3307);
     const w = AW / P.spalten, h = AH / P.zeilen, stuecke = [];
-    // Fork (Gnen54 14.11.): nahtlose Flaeche "Stein grau marmoriert" (art 'flaeche'), zeilenweise.
-    if (P.art === 'flaeche') {
-      for (let y = 0; y < AH; y += 64) { vfSteinZeilen(d, AW, AH, y, Math.min(AH, y + 64), P); yield; }
-      stuecke.push([0, 0, 1, 1]);
-    }
-    for (let r = 0; P.art !== 'flaeche' && r < P.zeilen; r++) {
+    for (let r = 0; r < P.zeilen; r++) {
       for (let s = 0; s < P.spalten; s++) {
         if (P.art === 'rasen') yield* vfGrasStueck(d, AW, s * w, r * h, w, h, P, rnd);
         else vfHolzStueck(d, AW, s * w, r * h, w, h, P, rnd);
@@ -1077,15 +1030,7 @@
     const B = art.breiteCm * cm, L = art.laengeCm * cm, rnd = vfZufall(9001 + pts.length);
     const reihen = [];
     let stuecke = 0;
-    if (art.art === 'flaeche') {
-      // Nahtlose Kacheln im Raster, gleiche Lage und Farbe (sonst saehe man die Kanten).
-      const c = [VF_BODEN_HELL, VF_BODEN_HELL, VF_BODEN_HELL];
-      for (let z = z0; z < z1; z += B) {
-        for (let x = x0; x < x1; x += L) {
-          vfViereck(a, [x, y, z, 0, 0], [x + L, y, z, 1, 0], [x + L, y, z + B, 1, 1], [x, y, z + B, 0, 1], c); stuecke++;
-        }
-      }
-    } else if (art.art === 'fischgraet') {
+    if (art.art === 'fischgraet') {
       const r = Math.SQRT1_2, d1 = [r, r], d2 = [-r, r];
       const W = (A, Bb) => [A * d1[0] + Bb * d2[0], A * d1[1] + Bb * d2[1]];
       // Rahmen-Koordinaten der Bodenecken: A = (x + z) r, B = (z - x) r
@@ -1635,9 +1580,7 @@
   // img/autos/v5r/: Modell ohne Innenraum, Rad, Lichtorte und die Fahrzeugdaten aus der .xml. Laengen in
   // Metern, im Auto +x links, +y oben, +z vorn; gezeichnet mal VF_AUTO.L / Laenge (so lang wie der Kasten).
   const VF_AUTO_STORE = 'omegasim-vf-auto';
-  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/', caravelle: 'img/autos/caravelle/',
-    // Fork (Gnen54): Porsche 911 GT3 (Freigabe nur muendlich) und Opel Manta B400 (ohne Freigabe) - nur im Fork, nie in einen PR.
-    gt3: 'img/autos/gt3/', manta: 'img/autos/manta/' };
+  const VF_MODELL_PFADE = { v5r: 'img/autos/v5r/', lynx220: 'img/autos/lynx220/', fmcgt4: 'img/autos/fmcgt4/', boxer96: 'img/autos/boxer96/', kaefer: 'img/autos/kaefer/', spider: 'img/autos/spider/', caravelle: 'img/autos/caravelle/' };
   function vfModellPfad(auto) { return VF_MODELL_PFADE[auto || vfAutoWahl()] || 'img/autos/v5r/'; }
   // v1.5.150: FREIE STRECKEN nur fuer die virtuelle Fahrt (BESTELLT Gnen54: "eine nicht fuer Carrera gedachte
   // Strecke, rein fuer virtuelles Fahren", aus gnen54/omegasim). Die Datei bringt die Mittellinie (Einheiten
@@ -1646,9 +1589,7 @@
   const VF_STRECKE_STORE = 'omegasim-vf-strecke';
   // Aus PR 4 von gnen54: dieselbe Strecke auch mit Bruecke (die Bahn kreuzt sich, Hoehe z je Punkt).
   const VF_FREIE = { indeq: { name: 'Törnerschleife 2.0', pfad: 'img/strecken/indeq-ring.json' },
-    indeqBruecke: { name: 'Törnerschleife 2.0 mit Brücke', pfad: 'img/strecken/indeq-bruecke.json' },
-    // Fork 21.11. (BESTELLT Gnen54): Renn-Rollstrecke Heckenhoim, 3 x 2 m - nur im Fork
-    heckenhoim: { name: 'Heckenhoim', pfad: 'img/strecken/heckenhoim.json' } };
+    indeqBruecke: { name: 'Törnerschleife 2.0 mit Brücke', pfad: 'img/strecken/indeq-bruecke.json' } };
   function vfFreiWahl() { try { const v = localStorage.getItem(VF_STRECKE_STORE) || ''; return VF_FREIE[v] ? v : ''; } catch (e) { return ''; } }
   const vfFreiCache = {};
   function vfFreiLaden(k) {
@@ -1695,35 +1636,6 @@
       if (vor > -0.3 && quer < TRACK_HALF_W && gleich) ende--; else break;
     }
     return ende < n ? pts.slice(0, ende) : pts;
-  }
-  // ---- GEFAHRENE ZEITEN JE STRECKE (Fork, 19.11., BESTELLT Gnen54: "Gefahrene Zeiten pro Strecke speichern")
-  // Je Strecke UND Auto: Bestzeit mit Datum und Zwischenzeiten (fuer das Delta), Rundenzahl und
-  // die letzten zehn Runden. Strecke = Name der freien Strecke oder der Code der gebauten Bahn.
-  const VF_ZEITEN_STORE = 'omegasim-vf-zeiten';
-  function vfZeitenSchluessel() {
-    let s = '-';
-    try { s = VF.frei ? 'frei:' + VF.frei.name : 'bahn:' + trackToCode(VF.tiles); } catch (e) { /* ohne */ }
-    return s + '|' + vfAutoWahl();
-  }
-  function vfZeitenAlle() {
-    try { return JSON.parse(localStorage.getItem(VF_ZEITEN_STORE) || '{}') || {}; } catch (e) { return {}; }
-  }
-  function vfZeitenLaden() {
-    const e = vfZeitenAlle()[vfZeitenSchluessel()];
-    if (e && e.beste > 0) {
-      VF.beste = e.beste; VF.besteSplits = Array.isArray(e.splits) ? e.splits : null;
-      showHudToast(t('Streckenbestzeit') + ': ' + vfZeitAcc(e.beste, 3));
-    }
-  }
-  function vfZeitMerken(ms, splits) {
-    const alle = vfZeitenAlle(), k = vfZeitenSchluessel();
-    const e = alle[k] || (alle[k] = { beste: null, datum: null, runden: 0, letzte: [] });
-    e.runden += 1;
-    e.letzte = [Math.round(ms)].concat(e.letzte || []).slice(0, 10);
-    const neu = !(e.beste > 0) || ms < e.beste;
-    if (neu) { e.beste = Math.round(ms); e.datum = Date.now(); e.splits = splits || null; }
-    try { localStorage.setItem(VF_ZEITEN_STORE, JSON.stringify(alle)); } catch (err) { /* voll */ }
-    return neu && e.runden > 1;
   }
   // ---- PFLICHT-BOXENDURCHFAHRT (aus PR 4 von gnen54: "Zwang Boxengasse anfahren", "Pflicht-Boxendurchfahrt, kein
   // Tanken etc.") ----
@@ -1787,7 +1699,7 @@
   function vfGeistAn() { try { return localStorage.getItem(VF_GEIST_STORE) !== 'aus'; } catch (e) { return true; } }
   // Fester Motorklang fuer die Eigenbauten von Gnen54 (aus PR 4 von gnen54: "der Motorsound soll fest dem Fahrzeug
   // zugeordnet sein, die Anwahl gesperrt"). Die gespeicherte Wahl gilt dort nicht.
-  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', caravelle: 'boxster986', gt3: 'sd_boxer_dunkel', manta: 'manta400_rec' };   // gt3/manta: nur Fork
+  const VF_MOTOR_FEST = { kaefer: 'boxster986', spider: 'listerstorm', caravelle: 'boxster986' };
   function vfMotorFest() { return VF_MOTOR_FEST[vfAutoWahl()] || ''; }
   // Die echte Neigung eines GT1 ist klein (0,5 Grad Rollen bei 1,5 g) und bei Modellgroesse unsichtbar.
   // Der Faktor vergroessert nur den AUSSCHLAG; Federraten, Daempfer und Zeitverhalten bleiben die echten.
@@ -1877,22 +1789,7 @@
   // schwachen Geraeten Effekte ab. Wer Performance gewaehlt hat, behaelt es.
   const VF_GRAFIK_STORE = 'omegasim-vf-grafik';
   const VF_GRAFIK_MODI = [{ id: 'perf', name: 'Performance' }, { id: 'qual', name: 'Quality' }];
-  // 22.11.2026 (BESTELLT Gnen54): auf Handy und Tablet nur Performance - Quality ruckelt dort, und wer es
-  // anwaehlt, soll erfahren warum: "Quality nur am PC verfuegbar". Mobil = die App (Capacitor), Android,
-  // iPhone/iPad (auch iPadOS, das sich als Macintosh mit Touch meldet). vfMobilErzwungen nur fuer den Selbsttest.
-  let vfMobilErzwungen = null;
-  function vfMobilGeraet() {
-    if (vfMobilErzwungen !== null) return vfMobilErzwungen;
-    try {
-      if (window.Capacitor) return true;
-      const ua = navigator.userAgent || '';
-      if (/Android|iPhone|iPad|iPod|Mobile/i.test(ua)) return true;
-      if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
-    } catch (e) { /* unbekannt = PC */ }
-    return false;
-  }
   function vfGrafik() {
-    if (vfMobilGeraet()) return 'perf';   // Fork: Handy/Tablet fest Performance
     try { const v = localStorage.getItem(VF_GRAFIK_STORE); return v === 'perf' ? 'perf' : 'qual'; } catch (e) { return 'qual'; }
   }
   function vfGrafikQual() { return vfGrafik() === 'qual'; }
@@ -2585,35 +2482,16 @@
   let vfModellLaden = {};
   function vfModellDaten(pfad) {
     pfad = pfad || vfModellPfad();
-    // 22.11. (GEMELDET Gnen54, Android-Tablet: "furchtbar zu fahren" mit Spider, GT3, Bulli, Manta - ruckelig,
-    // nur der Kaefer laeuft): im Grafikmodus Performance die leichte Fassung, die auto.json unter "perf" nennt
-    // (tools/modell_perf.py, 0,1 bis 0,3 Mio. statt bis 2 Mio. Dreiecke). Sie bringt NUR die Geometrie
-    // (teile, ecken, indizes, indexAb); alles andere bleibt aus auto.json. Quality laedt wie bisher auto.bin.
-    const perf = !vfGrafikQual();
-    const schl = pfad + (perf ? '|perf' : '');
-    if (!vfModellLaden[schl]) {
-      // 21.11. (GEMELDET Gnen54, Screenshot: Manta "zerfetzt"): auto.json und auto.bin kamen aus
-      // verschiedenen Staenden (Browser-/Pages-Cache) - neue Teileliste auf alter Geometrie. Jetzt erst die
-      // json frisch holen, dann die bin mit einer Kennung ihres Inhalts (Ecken/Indizes) als eigene Adresse.
-      vfModellLaden[schl] = fetch(pfad + 'auto.json', { cache: 'no-cache' })
-        .then((r) => { if (!r.ok) throw new Error('auto.json ' + r.status); return r.json(); })
-        .then((meta) => {
-          if (!perf || !meta.perf) return [meta, 'auto'];
-          // Fehlt die leichte Fassung oder kommt sie nicht, faehrt das Auto eben mit der vollen.
-          return fetch(pfad + meta.perf + '.json', { cache: 'no-cache' })
-            .then((r) => (r.ok ? r.json() : null))
-            .then((g) => (g && g.teile ? [Object.assign({}, meta, { teile: g.teile, ecken: g.ecken, indizes: g.indizes, indexAb: g.indexAb, lod: g.lod }), meta.perf] : [meta, 'auto']))
-            .catch(() => [meta, 'auto']);
-        })
-        .then(([meta, datei]) => fetch(pfad + datei + '.bin?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb, { cache: 'no-cache' })
-          .then((r) => { if (!r.ok) throw new Error(datei + '.bin ' + r.status); return r.arrayBuffer(); })
-          .then((bin) => [meta, bin]))
-      .then(([meta, bin]) => {
+    if (!vfModellLaden[pfad]) {
+      vfModellLaden[pfad] = Promise.all([
+        fetch(pfad + 'auto.json').then((r) => { if (!r.ok) throw new Error('auto.json ' + r.status); return r.json(); }),
+        fetch(pfad + 'auto.bin').then((r) => { if (!r.ok) throw new Error('auto.bin ' + r.status); return r.arrayBuffer(); }),
+      ]).then(([meta, bin]) => {
         if (bin.byteLength < meta.indexAb + meta.indizes * 2) throw new Error('auto.bin zu kurz');
         return { meta, ecken: new Float32Array(bin, 0, meta.ecken * 8), indizes: new Uint16Array(bin, meta.indexAb, meta.indizes) };
-      }).catch((e) => { vfModellLaden[schl] = null; throw e; });
+      }).catch((e) => { vfModellLaden[pfad] = null; throw e; });
     }
-    return vfModellLaden[schl];
+    return vfModellLaden[pfad];
   }
   // Gemeinsamer Rad-Modell-Fallback: die echten Rad-Teile der Vulture V5.R (mit Texturen),
   // damit auch Modelle ohne eigene Rad-Geometrie die gleichen Raeder zeigen.
@@ -2796,8 +2674,7 @@
       // Delta (HUD): die Zwischenzeiten der besten Runde je Punkt der Mittellinie.
       const best = VF.beste === null || VF.letzte < VF.beste;
       if (best) { VF.beste = VF.letzte; VF.besteSplits = VF.splits; }
-      // Fork: Bestzeit je Strecke und Auto dauerhaft merken (Bestenliste in der Garage).
-      if (vfZeitMerken(VF.letzte, VF.splits)) showHudToast(t('Neue Streckenbestzeit') + ': ' + vfZeitAcc(VF.letzte, 3));
+      if (typeof vfForkRunde === 'function') vfForkRunde();   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
       vfGeistRunde(best);
       // Rundenrennen: nach der Ziel-Lap ist Schluss.
       VF.runden = (VF.runden || 0) + 1;
@@ -3544,10 +3421,8 @@
   // Lage der Spiegel in Bildpunkten der Leinwand (x, y von unten links, Breite, Hoehe), rein fuer den Selbsttest.
   function vfSpiegelRechtecke(w, h, auto, dpr) {
     if (auto !== 'spider') {
-      // Fork (Gnen54, 23.11.: "nicht mehr so hoch"): Groesse wie im Fork bis 22.11. - 30 % der Bildbreite,
-      // Hoehe 27 % der Spiegelbreite (Luukes 1.6.22: breiter und nur halb so hoch).
-      const sw = Math.round(Math.min(w * 0.3, h * 0.9));
-      const sh = Math.round(Math.max(16 * (dpr || 1), sw * 0.27));
+      const sw = Math.round(Math.min(w * 0.36, h * 1.1));
+      const sh = Math.round(Math.max(16 * (dpr || 1), Math.min(h * 0.085, sw * 0.18)));
       return [{ art: 'innen', q: [Math.round((w - sw) / 2), h - sh, sw, sh] }];
     }
     const sw = Math.round(Math.min(w * 0.17, h * 0.34) * 0.8), sh = Math.round(sw * 0.6);
@@ -3845,9 +3720,7 @@
   // Motorhaube oder nahe Verfolgerkamera." R3 (bzw. die Lichthupen-Belegung) oder C schaltet weiter:
   // Verfolger -> nah -> Motorhaube -> Verfolger. Nachgefuehrt nach der ZEIT (nicht je Bild): auf einem
   // langsamen Handy lief die Kamera vorher bei weniger Bildern spuerbar hinterher.
-  // Fork (Gnen54 16.11.): "Seitennahe Kamera" zwischen naher Verfolgerkamera und Motorhaube.
-  const VF_KAMERAS = [{ id: 'verfolger', name: 'Verfolgerkamera' }, { id: 'nah', name: 'Nahe Verfolgerkamera' },
-                      { id: 'naeher', name: 'Seitennahe Kamera' }, { id: 'haube', name: 'Motorhaube' },
+  const VF_KAMERAS = [{ id: 'verfolger', name: 'Verfolgerkamera' }, { id: 'nah', name: 'Nahe Verfolgerkamera' }, { id: 'haube', name: 'Motorhaube' },
                       { id: 'oben', name: 'Von oben (Start/Ziel)' },
                       { id: 'fahrer', name: 'Fahrer am Rand', wip: true },
                       { id: 'tv', name: 'TV-Kamera', wip: true }];
@@ -4132,25 +4005,17 @@
       VF.kam = null;
       return { auge, ziel: [VF.x, 0, VF.y], oben, fov: 62, nah: 0.5 };
     }
-    const nah = id === 'nah', naeher = id === 'naeher';
-    // naeher: Zwischenstufe knapp hinter dem Heck und etwas ueber dem Dach (Auto 9,6 lang, 2,4 hoch) -
-    // man sieht die Details des Autos, beim Kreisen auch von der Seite, und noch genug Fahrbahn davor.
-    const hinten = naeher ? 6.5 : (nah ? 9 : 15), hoehe = naeher ? 2.8 : (nah ? 3.8 : 8), tau = naeher ? 0.06 : (nah ? 0.08 : 0.15);
+    if (id === 'naeher' && typeof vfForkKameraNaeher === 'function') return vfForkKameraNaeher(fx, fz, dt, art, D);   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
+    const nah = id === 'nah';
+    const hinten = nah ? 9 : 15, hoehe = nah ? 3.8 : 8, tau = nah ? 0.08 : 0.15;
     // Gedreht kreist der SOLL-Ort um das Auto; die Nachfuehrung (tau) bleibt dieselbe.
-    const zh = naeher ? 1.6 : (nah ? 2.0 : 1.4), vor = naeher ? 7 : (nah ? 8 : 12);
+    const zh = nah ? 2.0 : 1.4, vor = nah ? 8 : 12;
     const k = vfDrehAnwenden({ auge: [VF.x - fx * hinten, hoehe, VF.y - fz * hinten], ziel: [VF.x + fx * vor, zh, VF.y + fz * vor] },
       art, D, VF.x, zh, VF.y);
-    if (naeher && D && D.g) {
-      // Seitennah: je weiter zur Seite / nach vorn geschwenkt, desto naeher ans Auto (bis 25 % naeher
-      // ab 90 Grad) - von schraeg vorn sieht man die Details, von hinten bleibt die Fahrbahn im Blick.
-      const g = Math.abs(Math.atan2(Math.sin(D.g), Math.cos(D.g)));
-      const f = 1 - 0.25 * Math.min(1, g / (Math.PI / 2));
-      k.auge = [VF.x + (k.auge[0] - VF.x) * f, zh + (k.auge[1] - zh) * f, VF.y + (k.auge[2] - VF.y) * f];
-    }
     const soll = k.auge;
     const a = 1 - Math.exp(-Math.max(0, dt) / tau);
     VF.kam = VF.kam ? VF.kam.map((q, i) => q + (soll[i] - q) * a) : soll;
-    return { auge: VF.kam, ziel: k.ziel, fov: naeher ? 62 : (nah ? 58 : 54), nah: naeher ? 0.3 : 0.5 };
+    return { auge: VF.kam, ziel: k.ziel, fov: nah ? 58 : 54, nah: 0.5 };
   }
   // v1.5.84 BESTELLT: "Ghostcar sollte wie das ausgewählte Auto aussehen". Dasselbe Modell mit derselben Lackfarbe,
   // durchscheinend (VF_GEIST_ALPHA), ohne Licht, Bodenschatten und Federung. Zwei Durchgaenge: erst nur die Tiefe, dann
@@ -4351,11 +4216,9 @@
     });
     // 4. Scheiben und Scheinwerferglas (durchscheinend, getoent)
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
-    // Fork (Gnen54, Bulli): sitzt die Kamera IM Auto (VW Caravelle: Onboard-Kamera hinter der Frontscheibe), nur ein
-    // Hauch Glas - sonst ist das Bild durch die Toenung fast schwarz (in Luukes 1.6.22 weggefallen, GEMELDET 23.11.).
-    const innen = auge && Math.hypot(auge[0] - x, auge[2] - y) < d.laenge * s * 0.45 && auge[1] < d.hoehe * s;
+    const glasInnen = typeof vfForkGlasInnen === 'function' && vfForkGlasInnen(auge, x, y, d, s);   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
     for (const t of M.glasTeile) {
-      if (t.rolle === 'glas') { setze(aufbau, VF_GLAS_TINT, 0, innen ? 0.12 : 0.86, 0, 1, 0, innen ? 0.2 : 1); teil(t); }
+      if (t.rolle === 'glas') { setze(aufbau, VF_GLAS_TINT, 0, glasInnen ? 0.12 : 0.86, 0, 1, 0, glasInnen ? 0.2 : 1); teil(t); }
       else { setze(aufbau, VF_WEISS, licht ? 0.6 : 0, 0.9, 1, 1, 0, 0.5); teil(t); }
     }
     // 5. Leuchten: Lichtpunkte (zur Kamera gedreht) und vorn der Lichtkegel auf der Bahn
@@ -4991,7 +4854,7 @@
     Object.assign(VF, { x: VF.pts[start].x, y: VF.pts[start].y, h: VF.pts[start].heading, idx: start, zaehler: 0, kachel: -2,
                         abseits: false, letzt: 0, kam: null, rundeAb: 0, letzte: null, beste: null, aktiv: true,
                         startX: VF.pts[start].x, startY: VF.pts[start].y, startH: VF.pts[start].heading });
-    vfZeitenLaden();   // Fork: gespeicherte Streckenbestzeit (Delta im HUD)
+    if (typeof vfForkStart === 'function') vfForkStart();   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
     vfNpcStarten(gl, start);
     physEngine.state.speedKmh = 0;
     // Ladebild (siehe vfLadeSchritt): ab hier zaehlt die Ladezeit.
@@ -5085,7 +4948,7 @@
   // Standard ist der Vulture V5.R (wie das Auto); "Wie in Optionen" folgt dem globalen Ton (sentinel).
   function vfMotorGewaehlt() {
     if (vfMotorFest()) return vfMotorFest();
-    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', caravelle: 'boxster986', gt3: 'sd_boxer_dunkel', manta: 'manta400_rec' })[vfAutoWahl()] || 'sd_v5r';
+    const def = ({ v5r: 'sd_v5r', lynx220: 'sd_lynx', fmcgt4: 'sd_fmc', boxer96: 'sd_boxer', kaefer: 'boxster986', spider: 'listerstorm', caravelle: 'boxster986' })[vfAutoWahl()] || 'sd_v5r';
     try { const v = localStorage.getItem(VF_MOTOR_STORE); return v === null ? def : v; } catch (e) { return def; }
   }
   function vfMotorZiel() { const g = vfMotorGewaehlt(); if (g && g !== VF_MOTOR_GLOBAL) return g; return $('sound-profile') ? $('sound-profile').value : ''; }
@@ -5130,12 +4993,7 @@
     };
     if (vfMotorFest()) {
       // Eigenbau von Gnen54: Motorklang fest zum Auto, die Pfeile sind gesperrt.
-      // Fork 22.11. (GEMELDET Gnen54: "Manta zeigt den GT3-Motorsound"): sd_boxer_dunkel und manta400_rec stehen nicht
-      // in der Motorliste der Optionen - ohne eigenen Namen zeigte die Zeile den globalen Motor.
-      const festNamen = { sd_boxer_dunkel: 'Porsche 911 GT3: Boxer-6, dunkel (Speed Dreams)', manta400_rec: 'Opel Manta 400: Aufnahme (Thorsten)' };
-      const fw = werte.find((w) => w.v === vfMotorFest());
-      const festName = fw ? fw.name : (festNamen[vfMotorFest()] || vfMotorFest());
-      const fest = garWertZeile(t('Motorsound'), festName + ' (' + t('fest zum Auto') + ')', () => {}, () => {});
+      const fest = garWertZeile(t('Motorsound'), (typeof vfForkFestName === 'function' ? vfForkFestName(werte, j) : werte[j].name) + ' (' + t('fest zum Auto') + ')', () => {}, () => {});   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
       fest.dataset.vfMotorFest = '1';
       fest.querySelectorAll('button').forEach((k) => { k.disabled = true; k.style.visibility = 'hidden'; });
       rechts.appendChild(fest);
@@ -5150,11 +5008,8 @@
                    { v: 'spider', name: t('Spider NG1 (Gnen54, WIP)') },
                    // v1.5.150: Eigenbau von Gnen54 auf der Vehicle-World-Karosserie (schriftliche Freigabe),
                    // siehe img/autos/caravelle/LIZENZ.txt. WIP: Fahrdaten geschaetzt.
-                   { v: 'caravelle', name: t('VW Caravelle Oettinger (Gnen54, WIP)') },
-                   // Fork: Porsche 911 GT3 (Gnen54) auf Vehicle-World-Karosserie (Freigabe nur muendlich) - nur Testversion
-                   { v: 'gt3', name: t('Porsche 911 GT3 (Gnen54, WIP)') },
-                   // Fork: Opel Manta B400 (Gnen54, fuer einen Freund) - KEINE Freigabe: nur im Fork, nie in einen PR
-                   { v: 'manta', name: t('Opel Manta B400 (Gnen54, WIP)') }];
+                   { v: 'caravelle', name: t('VW Caravelle Oettinger (Gnen54, WIP)') }];
+    if (typeof vfForkAutos === 'function') vfForkAutos(autos);   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
     const ja = Math.max(0, autos.findIndex((a) => a.v === vfAutoWahl()));
     const autoWahl = (dd) => {
       try { localStorage.setItem(VF_AUTO_STORE, autos[(ja + dd + autos.length) % autos.length].v); } catch (e) { /* egal */ }
@@ -5241,17 +5096,11 @@
     rechts.appendChild(garWertZeile(t('Handling'), vfHandlingName(hId), () => hWahl(-1), () => hWahl(1)));
     // Grafik: Performance (wie bisher, fuer schwache Handys) oder Quality (Schatten, Tonemapping,
     // besseres Licht, Vignette).
-    // Fork 22.11. (BESTELLT Gnen54): auf Handy und Tablet nur Performance, mit Hinweis "Quality nur am PC verfuegbar".
-    const gId = vfGrafik(), gMobil = vfMobilGeraet();
-    const gWahl = () => { if (gMobil) return; vfGrafikSetzen(gId === 'perf' ? 'qual' : 'perf'); renderGarage(); };
+    const gId = vfGrafik();
+    const gWahl = () => { vfGrafikSetzen(gId === 'perf' ? 'qual' : 'perf'); renderGarage(); };
     const grafikZeile = garWertZeile(t('Grafik'), t(vfGrafik() === 'perf' ? 'Performance' : 'Quality'), gWahl, gWahl);
     grafikZeile.querySelector('.gk-l').insertAdjacentHTML('beforeend', ' <span class="wip-tag">WIP</span>');
-    if (gMobil) {
-      const k = document.createElement('small');
-      k.textContent = t('Quality nur am PC verfügbar');
-      k.style.cssText = 'display:block;opacity:.7;font-weight:400';
-      grafikZeile.querySelector('.gk-l').appendChild(k);
-    }
+    if (typeof vfForkGrafikZeile === 'function') vfForkGrafikZeile(grafikZeile);   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
     rechts.appendChild(grafikZeile);
     // v1.5 (WIP): Tageszeit (Farbstimmung), in Performance und Quality.
     const tzA = VF_TAGESZEITEN.indexOf(vfTageszeit());
@@ -5354,55 +5203,10 @@
     z.classList.add('vf-los-zeile');
     z.appendChild(hilfe);
     rechts.appendChild(z);
-    rechts.appendChild(vfBestenliste(autos));   // Fork: Bestzeiten je Strecke und Auto
+    if (typeof vfForkGarageEnde === 'function') vfForkGarageEnde(rechts, autos);   // Fork-Einhaengepunkt (98z-fork-gnen54.js)
   }
   // Anleitung als Fenster ueber der Garage (aus PR 4 von gnen54: "moechte ich gleich wieder an den Punkt zum virtuellen
   // Fahren zurueckkommen") statt eines neuen Tabs: x oben rechts, Esc oder ein Klick daneben schliesst.
-  // Bestenliste in der Garage (21.11., BESTELLT Gnen54): je Strecke und Auto die gespeicherte Bestzeit
-  // (vfZeitMerken), Rundenzahl und Datum. Zugeklappt, damit die Garage kurz bleibt.
-  function vfBestenliste(autos) {
-    const box = document.createElement('details');
-    box.className = 'vf-bestenliste';
-    box.dataset.vf = 'bestenliste';
-    const sum = document.createElement('summary');
-    sum.textContent = t('Bestzeiten');
-    box.appendChild(sum);
-    const alle = vfZeitenAlle();
-    let jetztBahn = '';
-    // Nur lesen: vfTilesWaehlen() setzte ohne Strecke die Ersatzbahn (Nebenwirkung beim blossen Anzeigen der Garage).
-    try { if (currentTrackTiles && currentTrackTiles.length >= 3) jetztBahn = trackToCode(currentTrackTiles); } catch (e) { /* ohne */ }
-    const zeilen = Object.keys(alle).filter((k) => alle[k] && alle[k].beste > 0).map((k) => {
-      const e = alle[k], tr = k.lastIndexOf('|'), ort = k.slice(0, tr), auto = k.slice(tr + 1);
-      let strecke = ort;
-      if (ort.indexOf('frei:') === 0) strecke = ort.slice(5);
-      else if (ort.indexOf('bahn:') === 0) strecke = t('Gebaute Bahn') + (ort.slice(5) === jetztBahn ? ' (' + t('aktuell') + ')' : ' ' + ort.slice(5, 11));
-      const a = autos.find((x) => x.v === auto);
-      return { strecke, auto: a ? a.name : auto, beste: e.beste, runden: e.runden || 0, datum: e.datum };
-    }).sort((x, y) => x.strecke.localeCompare(y.strecke) || x.beste - y.beste);
-    if (!zeilen.length) {
-      const p = document.createElement('p');
-      p.className = 'muted';
-      p.textContent = t('Noch keine Bestzeiten');
-      box.appendChild(p);
-      return box;
-    }
-    const tab = document.createElement('table');
-    tab.className = 'vf-besten-tab';
-    tab.style.cssText = 'width:100%;border-collapse:collapse;font-size:0.9em';
-    const kopf = tab.insertRow();
-    [t('Strecke'), t('Auto'), t('Bestzeit'), t('Runden'), t('Datum')].forEach((h) => {
-      const th = document.createElement('th'); th.textContent = h; th.style.textAlign = 'left'; kopf.appendChild(th);
-    });
-    let spr = 'de';
-    try { spr = (typeof lang === 'string' && lang) || 'de'; } catch (e) { /* de */ }
-    zeilen.forEach((z) => {
-      const r = tab.insertRow();
-      [z.strecke, z.auto, vfZeitAcc(z.beste, 3), String(z.runden), z.datum ? new Date(z.datum).toLocaleDateString(spr) : '–']
-        .forEach((w) => { const c = r.insertCell(); c.textContent = w; c.style.padding = '2px 6px 2px 0'; });
-    });
-    box.appendChild(tab);
-    return box;
-  }
   function vfHilfeZeigen() {
     if (document.querySelector('.vf-hilfe-fenster')) return null;
     const hg = document.createElement('div');
