@@ -3,9 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OmegaSim: Virtuelles Fahren, Anleitung</title>
-<!-- Anleitung zum virtuellen Fahren, aus PR 4 von gnen54 uebernommen und auf den Stand der App gebracht.
-     In der App als Fenster ueber der Garage geoeffnet (Knopf "?" neben "Losfahren"). -->
+<title>OmegaSim – Virtuelles Fahren: Anleitung</title>
 <style>
   :root { --bg: #0e131b; --karte: #161d28; --linie: #26303f; --text: #e8ecf2; --leise: #9aa6b6; --akzent: #19a7e0; }
   * { box-sizing: border-box; }
@@ -26,8 +24,8 @@
 </head>
 <body>
 <main>
-<h1>Virtuelles Fahren: Anleitung</h1>
-<div class="stand">Stand: 23.11.2026</div>
+<h1>Virtuelles Fahren – Anleitung</h1>
+<div class="stand">Stand: 22.11.2026</div>
 
 <nav>
   <a href="#worum">Worum es geht</a><a href="#garage">Garage</a><a href="#gamepad">Gamepad einrichten</a><a href="#steuerung">Steuerung</a>
@@ -36,38 +34,33 @@
 </nav>
 
 <h2 id="worum">Worum es geht</h2>
-<p>Mit dem virtuellen Fahren fährst Du Deine gebaute Carrera-Bahn oder eine freie Strecke am Bildschirm, mit Gamepad, Tastatur oder Touch, ganz ohne echtes Auto. Zeiten, Box und Tanken funktionieren wie auf der echten Bahn.</p>
+<p>Mit dem virtuellen Fahren fährst Du Deine gebaute Carrera-Bahn oder eine freie Strecke am Bildschirm – mit Gamepad, Tastatur oder Touch, ganz ohne echtes Auto. Zeiten, Box und Tanken funktionieren wie auf der echten Bahn.</p>
 <ul>
   <li><b>Was Du brauchst:</b> einen aktuellen Browser (Chrome, Firefox, Safari, auch iOS) und am besten ein Gamepad.</li>
-  <li><b>Wo es läuft:</b> in OmegaSim über die Garage (Virtuell).</li>
+  <li><b>Wo es läuft:</b> in OmegaSim über die Garage.</li>
   <li><b>Tipp:</b> Nach einem Update die Seite mit <code>?neu=1</code> laden, dann ist die neue Version sicher drin.</li>
 </ul>
 
 <h2 id="garage">Die Garage</h2>
-<p>In der Garage stellst Du alles ein, dann startet <b>Losfahren</b> die Fahrt. Mit den Pfeilen links und rechts schaltest Du jede Zeile durch. Was mit <b>WIP</b> markiert ist, ist noch in Arbeit.</p>
+<p>In der Garage stellst Du alles ein, dann startet <b>Losfahren</b> die Fahrt. Mit den Pfeilen links und rechts schaltest Du jede Zeile durch.</p>
 <table>
   <tr><th>Einstellung</th><th>Was sie bewirkt</th></tr>
-  <tr><td>Motorsound</td><td>Der Klang des Motors. Bei Käfer, Spider und VW Caravelle gehört er fest zum Auto.</td></tr>
-  <tr><td>Auto</td><td>Vulture V5.R, Lynx 220, FMC GT4, Boxer 96, Käfer 1303 RS, Spider NG1 und VW Caravelle (Bulli).</td></tr>
-  <tr><td>Lackfarbe</td><td>Farbe der Karosserie oder die Originalfarbe des Modells.</td></tr>
-  <tr><td>Boden</td><td>Untergrund rund um die Bahn, z. B. Eiche, Laminat, Fischgrät oder Rasen. Freie Strecken liegen immer auf Rasen.</td></tr>
-  <tr><td>Strecke</td><td>Deine gebaute Bahn oder eine freie Strecke (nur virtuell): Törnerschleife 2.0 mit oder ohne Brücke.</td></tr>
-  <tr><td>Fahrtrichtung</td><td>Normal oder Gegenrichtung: dieselbe Strecke andersherum, mit Ziellinie, Sektoren und Boxengasse.</td></tr>
+  <tr><td>Auto</td><td>Käfer 1303 RS, Spider NG1, VW Caravelle (Bulli) u. a. Der Motorsound gehört fest zum Auto.</td></tr>
+  <tr><td>Strecke</td><td>Deine gebaute Bahn oder eine freie Strecke (nur virtuell, z. B. Törnerschleife 2.0).</td></tr>
+  <tr><td>Boden</td><td>Untergrund rund um die Bahn, z. B. Eiche, Laminat, Stein oder Rasen.</td></tr>
   <tr><td>Schaltung</td><td>Automatik oder Manuell.</td></tr>
-  <tr><td>Handling</td><td>Fahrgefühl: GT3, Schnell oder LibreCorsa GT3.</td></tr>
-  <tr><td>Grafik</td><td>Performance (flüssiger) oder Quality (schöner, mit echten Schatten). Auf schwachen Geräten schaltet eine Bildraten-Wache Effekte von selbst ab.</td></tr>
-  <tr><td>Tageszeit</td><td>Mittag, Morgen oder Abend.</td></tr>
-  <tr><td>Geist folgt meiner Linie</td><td>Eine durchsichtige Kopie fährt Deine beste Runde mit.</td></tr>
-  <tr><td>Rückspiegel (Motorhaube)</td><td>In der Kamera Motorhaube ein schmaler Rückspiegel ganz oben am Bildrand (Spider: zwei kleine Außenspiegel).</td></tr>
-  <tr><td>Kein Tempoverlust neben der Bahn</td><td>An heißt: neben der Strecke wirst Du nicht gebremst (zum Üben).</td></tr>
-  <tr><td>NPCs</td><td>Anzahl computergesteuerter Gegner (Aus bis 3).</td></tr>
-  <tr><td>Pflicht-Boxendurchfahrt</td><td>Wie oft Du im Rennen durch die Boxengasse musst (Aus, 1, 2 oder 3).</td></tr>
+  <tr><td>Handling</td><td>Fahrgefühl: GT3, Schnell, Gran Hybrismo oder Assetto Carrera.</td></tr>
+  <tr><td>Grafik</td><td>Performance (flüssiger, leichtere Automodelle) oder Quality (schöner, mit echten Schatten und vollen Modellen). Quality gibt es nur am PC – auf Handy und Tablet ist Performance fest eingestellt.</td></tr>
+  <tr><td>Außenspiegel (Motorhaube)</td><td>Spiegel in der Motorhauben-Kamera an oder aus.</td></tr>
+  <tr><td>Pflicht-Boxendurchfahrt</td><td>Wie oft Du im Rennen durch die Box musst (Aus, 1, 2 …).</td></tr>
+  <tr><td>Kein Tempoverlust neben der Bahn</td><td>An = neben der Strecke wirst Du nicht gebremst (zum Üben).</td></tr>
+  <tr><td>NPCs</td><td>Anzahl computergesteuerter Gegner (Aus bis mehrere).</td></tr>
   <tr><td>Neigung sichtbar</td><td>Wie stark sich das Auto in Kurven sichtbar neigt.</td></tr>
 </table>
 <p>Der Rennmodus (Training, Runden, Endurance, Qualifying, Time Attack, Knockout, Derby) kommt aus den normalen Renneinstellungen von OmegaSim.</p>
+<p><b>Bestzeiten:</b> Unten in der Garage klappst Du <b>Bestzeiten</b> auf. Dort steht je Strecke und Auto Deine beste Runde mit Rundenzahl und Datum.</p>
 
 <h2 id="gamepad">Gamepad einrichten</h2>
-<!-- aus gnen54s testversion (22.11.2026: c31e556, 37c84fd, 1e17a54) -->
 <p>Getestet mit Windows 11 und Chrome; Android (Browser und App) geht genauso. Unter Linux wird das Pad oft zwar erkannt, liefert aber keine richtigen Eingaben – dort lieber Windows oder Android nehmen.</p>
 <p><b>Vorher:</b> Das Gamepad muss im Betriebssystem gekoppelt sein – per Bluetooth oder USB-Kabel, wie bei jedem anderen Gerät (z. B. Windows: <i>Einstellungen → Bluetooth und Geräte</i>, Android: <i>Einstellungen → Verbundene Geräte</i>). Hat das Pad mehrere Modi, den <b>Xbox- bzw. X-Input-Modus</b> wählen. Ohne Kopplung meldet OmegaSim das Pad gar nicht erst.</p>
 <ol>
@@ -97,71 +90,70 @@
 <p>Am bequemsten fährst Du mit Gamepad; die Belegung stellst Du in OmegaSim unter der Controller-Belegung ein.</p>
 <table>
   <tr><th>Aktion</th><th>Gamepad (ab Werk)</th><th>Tastatur</th></tr>
-  <tr><td>Gas / Bremse</td><td>Trigger rechts / links</td><td>Pfeil hoch / runter</td></tr>
-  <tr><td>Lenken</td><td>linker Stick</td><td>Pfeil links / rechts</td></tr>
-  <tr><td>Hoch- / Runterschalten</td><td>Kreis / Viereck</td><td>I / K</td></tr>
-  <tr><td>Licht an/aus</td><td>Dreieck (Licht-Taste)</td><td>Knopf Licht</td></tr>
-  <tr><td>Lichthupe</td><td>R3 (rechten Stick drücken)</td><td>L</td></tr>
-  <tr><td>Box</td><td>Kreuz kurz tippen</td><td>Knopf Box</td></tr>
-  <tr><td>Gelbe Flagge</td><td>Kreuz 1 s halten</td><td>Knopf Gelbe Flagge</td></tr>
-  <tr><td>Kamera wechseln</td><td>eigene Taste „Kamera wechseln (virtuell)“, ab Werk unbelegt</td><td>C oder Knopf Kamera</td></tr>
+  <tr><td>Gas / Bremse</td><td>Trigger rechts / links</td><td>Pfeil hoch / runter oder W / S</td></tr>
+  <tr><td>Lenken</td><td>linker Stick</td><td>Pfeil links / rechts oder A / D</td></tr>
+  <tr><td>Hoch- / Runterschalten</td><td>Kreis / Viereck</td><td>–</td></tr>
+  <tr><td>Licht an/aus</td><td>laut Belegung</td><td>Knopf LICHT</td></tr>
+  <tr><td>Lichthupe</td><td>R3 (rechten Stick drücken)</td><td>–</td></tr>
+  <tr><td>Kamera wechseln</td><td>eigene Taste „Kamera wechseln (virtuell)“, ab Werk unbelegt</td><td>Knopf KAMERA</td></tr>
   <tr><td>Umsehen</td><td>rechter Stick</td><td>T / F / G / H, V = zurück</td></tr>
-  <tr><td>Auto zurücksetzen</td><td>„Auto zurücksetzen“, ab Werk unbelegt</td><td>Knopf Zurücksetzen</td></tr>
-  <tr><td>Fahrt beenden</td><td></td><td>Esc oder ×</td></tr>
+  <tr><td>Auto zurücksetzen</td><td>„Auto zurücksetzen“, ab Werk unbelegt</td><td>Knopf ZURÜCKSETZEN</td></tr>
+  <tr><td>Fahrt beenden</td><td>–</td><td>Esc oder ×</td></tr>
 </table>
 <ul>
-  <li><b>Knöpfe oben rechts:</b> Box, Gelbe Flagge, Licht, Wetter, Kamera, Zurücksetzen und Beenden sind kleine Symbole. Der Knopf ganz rechts blendet alle ein und aus.</li>
-  <li><b>Rückwärtsgang (Automatik):</b> Im Stand runterschalten, dann fährt Gas rückwärts. Anhalten, Gas loslassen, wieder Gas geben: schon fährst Du vorwärts.</li>
-  <li><b>Android-Gamepads:</b> Manche Pads melden die Trigger in Ruhe halb gedrückt. OmegaSim lernt diese Ruhe von selbst; ein Trigger lässt sich auch nach vorn gedrückt belegen.</li>
-  <li><b>Festgefahren?</b> Kurz rückwärts fahren oder Zurücksetzen.</li>
+  <li><b>Rückwärtsgang (Automatik):</b> Im Stand runterschalten, dann fährt Gas rückwärts. Anhalten, Gas loslassen, wieder Gas geben – schon fährst Du vorwärts.</li>
+  <li><b>Festgefahren?</b> Kurz rückwärts fahren oder Zurücksetzen. Das Zurücksetzen braucht einen Moment.</li>
+  <li><b>Pad-Test:</b> F8 zeigt während der Fahrt, welche Tasten und Achsen das Pad meldet.</li>
 </ul>
 
 <h2 id="kameras">Kameras und Spiegel</h2>
 <p>Die Kamerataste schaltet der Reihe nach durch diese Ansichten:</p>
 <ol>
-  <li>Verfolgerkamera</li><li>Nahe Verfolgerkamera</li><li>Motorhaube (Onboard)</li><li>Von oben (Start/Ziel)</li><li>Fahrer am Rand (WIP)</li><li>TV-Kamera (WIP)</li>
+  <li>Verfolgerkamera</li><li>Nahe Verfolgerkamera</li><li>Seitennahe Kamera</li><li>Motorhaube (Onboard)</li><li>Von oben (Start/Ziel)</li>
 </ol>
 <ul>
-  <li><b>Rückspiegel:</b> In der Kamera Motorhaube zeigt ein schmaler Streifen ganz oben am Bildrand, was hinter Dir passiert, sobald in der Garage „Rückspiegel (Motorhaube)“ an ist.</li>
-  <li><b>Spider:</b> Der offene Spider hat statt dessen zwei kleine Außenspiegel links und rechts.</li>
-  <li><b>Umsehen:</b> Mit dem rechten Stick drehst Du den Blick. Beim deutlichen Umsehen verschwinden die Spiegel, damit nichts die Sicht verdeckt.</li>
+  <li><b>Innenspiegel:</b> In der Motorhauben-Kamera zeigt ein Rückspiegel oben in der Bildmitte, was hinter Dir passiert. Das gilt für alle Autos außer dem offenen Spider, sobald in der Garage „Außenspiegel (Motorhaube)“ an ist.</li>
+  <li><b>Spider:</b> Er hat kleine Außenspiegel links und rechts.</li>
+  <li><b>Umsehen:</b> Mit dem rechten Stick drehst Du den Kopf; nach dem Loslassen schwenkt der Blick von selbst zurück. Beim Umsehen verschwinden Spiegel und Armaturenbrett, damit nichts die Sicht verdeckt.</li>
 </ul>
 
 <h2 id="strecke">Auf der Strecke</h2>
 <ol>
-  <li><b>Laden:</b> Solange Klänge, Texturen und Autos laden, siehst Du ein Ladebild mit Fortschrittsbalken. Bei einer Carrera-Bahn baut sich unten links die Strecke Stück für Stück auf. Große Autos brauchen ein paar Sekunden.</li>
+  <li><b>Laden:</b> Erst siehst Du die ganze Strecke von oben mit „Fahrzeuge werden geladen … 2/4“. Große Autos brauchen ein paar Sekunden; solange steht alles.</li>
+  <li><b>Start:</b> Im Training geht es sofort los. Im Rennen leuchten fünf rote Lichter nacheinander auf – wenn alle ausgehen, ist Start.</li>
   <li><b>Erste Überfahrt:</b> Das erste Mal über Start/Ziel startet nur die Uhr, ohne Ansage.</li>
-  <li><b>Runden:</b> Ab dann zählt jede Runde mit Zeit und Ansage an der Ziellinie. Rückwärts oder vor und zurück über die Linie zählt nicht.</li>
+  <li><b>Runden:</b> Ab dann zählt jede Runde mit Zeit und Ansage. Rückwärts oder vor und zurück über die Linie zählt nicht.</li>
 </ol>
-<p><b>Strecke und Rand:</b> Auf den freien Strecken markiert eine schmale weiße Linie die Fahrbahnkante. Dahinter liegt ein Streifen Asphalt, der rumpelt wie der Carrera-Randstein. Erst dahinter bist Du neben der Strecke: Das Auto wird gebremst, das Pad vibriert, und eine Runde über die Linie zählt dann nicht.</p>
+<p><b>Strecke und Rand:</b> Die schmale weiße Linie markiert die Fahrbahnkante. Dahinter liegt ein Streifen Asphalt, der rumpelt wie der Carrera-Randstein. Erst dahinter bist Du neben der Strecke: Das Auto wird gebremst, das Pad vibriert, und eine Runde über die Linie zählt dann nicht.</p>
 
 <h2 id="box">Box und Tanken</h2>
-<p>Hat die Strecke eine Boxengasse, wird nur dort getankt und repariert.</p>
+<p>Getankt wird nur in der Boxengasse, und zwar zwischen den beiden fein gestrichelten Querlinien.</p>
 <ol>
   <li>In die Boxengasse einbiegen (Ein- und Ausfahrt sind mit einer gestrichelten Kante markiert).</li>
-  <li>In der Gasse anhalten (auf den freien Strecken zwischen den beiden fein gestrichelten Querlinien) und die Bremse halten.</li>
-  <li>Die Box-Taste drücken (oder den Knopf Box): der Tank füllt sich.</li>
+  <li>Zwischen den gestrichelten Querlinien anhalten und die Bremse halten.</li>
+  <li>Die Box-Taste drücken (oder den Knopf BOX) – der Tank füllt sich.</li>
   <li>Bremse los, Gas, durch die Ausfahrt zurück auf die Strecke.</li>
 </ol>
-<p><b>Pflicht-Boxendurchfahrt:</b> Ist sie in der Garage eingestellt, zeigt die Zeitentafel z. B. „Box 1/2“. Im Rennen nach Runden oder auf Zeit (Endurance) kostet jede fehlende Durchfahrt die Strafzeit aus den Renneinstellungen.</p>
-<p><b>Hinweis:</b> Wer auf der Strecke statt in der Gasse anhält, bekommt den Hinweis „In die Boxengasse fahren“.</p>
+<p><b>Pflicht-Boxendurchfahrt:</b> Ist sie in der Garage eingestellt, zeigt die Zeitentafel z. B. „Box 1/2“. Im Rennen nach Runden oder auf Zeit (Endurance) zählt das Ergebnis erst, wenn alle Pflichtdurchfahrten erledigt sind.</p>
+<p><b>Hinweis:</b> Wer vor der ersten Linie steht, kann nicht tanken – einfach ein Stück vorrollen.</p>
 
 <h2 id="frei">Die freien Strecken</h2>
-<p>Neben Deiner gebauten Bahn gibt es zwei Strecken nur für das virtuelle Fahren, beide nach dem Layout von <a href="https://driftstrecken.de" target="_blank" rel="noopener">Driftstrecken.de</a> (3,60 × 1,80 m, mit Freigabe), aufgebaut von Gnen54.</p>
+<p>Neben Deiner gebauten Bahn gibt es zwei Strecken nur für das virtuelle Fahren, beide nach dem Layout von <a href="https://driftstrecken.de" target="_blank" rel="noopener">Driftstrecken.de</a> (3,60 × 1,80 m, mit Freigabe).</p>
 <table>
   <tr><th>Strecke</th><th>Besonderheit</th></tr>
   <tr><td>Törnerschleife 2.0</td><td>flach, Boxengasse an der Start/Ziel-Geraden</td></tr>
-  <tr><td>Törnerschleife 2.0 mit Brücke</td><td>die Strecke kreuzt sich über eine Brücke</td></tr>
+  <tr><td>Törnerschleife 2.0 mit Brücke</td><td>Strecke kreuzt sich über eine Brücke; ruhige Gerade nach Start/Ziel</td></tr>
 </table>
-<p>Beide haben eine echte Boxengasse mit Steg zur Strecke, Ein- und Ausfahrt sowie den markierten Tankbereich.</p>
+<p>Beide haben eine echte Boxengasse mit Steg (Kerb) zur Strecke, Ein- und Ausfahrt sowie den markierten Tankbereich.</p>
 
 <h2 id="tipps">Tipps und Fehlersuche</h2>
 <table>
   <tr><th>Problem</th><th>Was hilft</th></tr>
-  <tr><td>Bild ruckelt</td><td>Garage: Grafik auf Performance, weniger NPCs, Rückspiegel aus.</td></tr>
-  <tr><td>Ladebild dauert lange</td><td>Normal bei großen Autos wie dem Bulli und langsamer Leitung. Einmal geladen, geht es beim nächsten Mal schneller.</td></tr>
+  <tr><td>Bild ruckelt</td><td>Garage: Grafik auf Performance, weniger NPCs, kleineres Auto (Käfer, Spider).</td></tr>
+  <tr><td>Ladebild dauert lange</td><td>Normal bei großen Autos (Bulli, GT3) und langsamer Leitung – einmal geladen, geht es beim nächsten Mal schneller.</td></tr>
+  <tr><td>Browser stürzt ab</td><td>Kleineres Auto wählen und melden, mit welchem Auto, welcher Strecke und welchem Browser es passiert.</td></tr>
   <tr><td>Neue Funktion fehlt</td><td>Seite mit <code>?neu=1</code> neu laden.</td></tr>
-  <tr><td>Pad reagiert falsch</td><td>Controller-Belegung in OmegaSim prüfen und die Taste neu zuweisen.</td></tr>
+  <tr><td>Pad reagiert falsch oder gar nicht</td><td>Siehe <a href="#gamepad">Gamepad einrichten</a>; während der Fahrt die Pad-Diagnose öffnen.</td></tr>
   <tr><td>Auto hängt fest</td><td>Rückwärts fahren oder Zurücksetzen.</td></tr>
 </table>
 <p>Fehler bitte mit Screenshot und kurzer Beschreibung melden (Auto, Strecke, Kamera, was passiert ist).</p>

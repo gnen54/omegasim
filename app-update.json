@@ -1,5 +1,5 @@
 {"version":"1.6.22","apk":2,"dateien":[
-{"p":"index.html","h":"c797867e1e8e93ba77782dbc05fd31df607338dd4307aec0f6096ba72fc372dd","g":8979046},
+{"p":"index.html","h":"8763c86ba6f3f4f74d25cf74bfb540963738f2e311d5179801391bf865544b09","g":8814035},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1068,7 +1068,7 @@
 {"p":"audio/zufallsevent_teile_weg_de.ogg","h":"05a9309586e43235d61596b06c5da83167124965130a428d6da0eaa7ec6dc4be","g":12763},
 {"p":"audio/zufallsevent_teile_weg_en.ogg","h":"f71be52c41e1e07803ec83eca9615185eeb2361ef5119f930749ab6c1d6c8e2c","g":12648},
 {"p":"audio/zufallsevents.json","h":"e046bc658900db007273e31c4fa168b8ec3e21e107c7221c9461b03d8a633d13","g":20718},
-{"p":"hilfe/virtuelles-fahren.html","h":"58d4b84d69627777798716070f7da9fdb0c4ec2c543cb0d95050c868257cfbc4","g":16035},
+{"p":"hilfe/virtuelles-fahren.html","h":"abfdd965f9bf1342354ca6be8fb452ff314abd9e2446767989e7ee1900cc1bef","g":15174},
 {"p":"icons/icon-192.png","h":"6b3d7ce0550d3e4c2376756e4d94798e86873f7035419ba203c6ed5ec0972c2b","g":50465},
 {"p":"icons/icon-512.png","h":"6dd2018815bcb390117d49b3471804bcf522b3aa6d934cc1854788a9390d023d","g":257596},
 {"p":"icons/icon-maskable-512.png","h":"9fff86206da8c6d721e1c0a8899aadebeda8c96832b6a8c774306ac04cbbdfca","g":179701},
