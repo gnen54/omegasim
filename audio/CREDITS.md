@@ -40,7 +40,7 @@ Die Dateien `audio/sd_toro_*.ogg` und `audio/sd_backfire_0.ogg` sind aus dieser 
 Drehzahlband, Schubband gedaempft, Lautstaerke angeglichen; `tools/sd_engines.py`) und
 stehen damit ebenfalls unter der Free Art License 1.3. Das Original liegt in den
 Spieldaten von Speed Dreams 2.4 (https://www.speed-dreams.net). Der Code von OmegaSim
-bleibt MIT; die Klangdateien werden nur mitgeliefert und geladen.
+steht unter der GNU AGPL (Version 3 oder neuer); die Klangdateien werden nur mitgeliefert und geladen.
 
 ### Vulture V5.R (GPL-2.0 oder spaeter) — seit v1.1.9
 
@@ -50,7 +50,7 @@ bleibt MIT; die Klangdateien werden nur mitgeliefert und geladen.
 
 Gerechnet wie die anderen mit `tools/sd_engines.py <Ordner des Autos> sd_v5r`. Das Auto selbst (Modell,
 Texturen, Fahrzeugdaten) liegt umgewandelt in `img/autos/v5r/` mit eigener `LIZENZ.txt`
-(`tools/sd_auto.py`). Der Code von OmegaSim bleibt MIT.
+(`tools/sd_auto.py`). Der Code von OmegaSim steht unter der GNU AGPL (Version 3 oder neuer).
 
 ### Boxer 96 dunkel (GPL-2.0 oder spaeter) — fuer den Porsche 911 GT3 von Gnen54, 17.11.2026
 
@@ -532,14 +532,14 @@ gewaehlten Fahrzeugkennung; keine Beteiligung oder Unterstuetzung der Hersteller
 ## Tiefer Schaltklang (v1.2.24)
 
 `shift_up_tief.ogg` und `shift_down_tief.ogg` erzeugt `tools/shift_tief.py`: der synthetische
-Schaltschlag `paddle_shift()` aus `tools/engine_fx.py` (eigene Rechnung, MIT wie OmegaSim) plus
+Schaltschlag `paddle_shift()` aus `tools/engine_fx.py` (eigene Rechnung, AGPL wie OmegaSim) plus
 12 ms später der Auspuffknall `sd_backfire_0.ogg` (Speed Dreams, **Free Art License 1.3**, siehe
 oben). Die bisherigen `shift_up.ogg` / `shift_down.ogg` bleiben für den Schalter „Schaltklang: alt“.
 
 ## Mustang v2 (`mustang2v_*.ogg`)
 
 Aus einer eigenen Aufnahme des Autors (Video eines Ford Mustang GT3, nicht Teil des Repos,
-`photos/` ist ausgeschlossen) geschnitten. Lizenz wie OmegaSim (MIT).
+`photos/` ist ausgeschlossen) geschnitten. Lizenz wie OmegaSim (AGPL-3.0-or-later).
 
 ## Tutorial-Stimme (v1.3.15, erweitert v1.3.31)
 

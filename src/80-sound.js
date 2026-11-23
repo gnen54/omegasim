@@ -3106,7 +3106,14 @@
     const pst = physEngine.state;
     const pacQuietsch = physEngine.config.pacejka
       ? Math.max(pst.pacNutzV || 0, pst.pacNutzH || 0) * 0.8 : 0;
-    setTyreSqueal(Math.max(pst.latUse || 0, pacQuietsch));
+    // v1.5.155: In der virtuellen Fahrt treibt der echte Schraeglauf der Achsen (vfDynamik) das
+    // Reifenquietschen - physEngine.state.vfNutzung, 0..~1, 1 = am Scheitel der Reifenkurve
+    // (max. Seitenkraft), darueber rutscht die Achse (Unter-/Uebersteuern). Der Eingabe-basierte
+    // latUse des Einspurmodells faengt das Rutschen nicht und wuerde auch bei normalem Kurven
+    // faden quietschen. Ausserhalb der virtuellen Fahrt bleibt alles wie bisher.
+    const vfAktivJetzt = typeof vfAktiv === 'function' && vfAktiv();
+    const vfNutzung = vfAktivJetzt && pst ? (pst.vfNutzung || 0) : -1;
+    setTyreSqueal(vfNutzung >= 0 ? vfNutzung : Math.max(pst.latUse || 0, pacQuietsch));
     // Neben der Bahn: nur auf der Bahn messbar (Schiene meldet 0xff), lauter mit dem Tempo.
     const neben = typeof trackMode !== 'undefined' && trackMode === 'on'
       && typeof abseitsJetzt === 'function' && abseitsJetzt();
