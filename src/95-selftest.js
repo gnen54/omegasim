@@ -27699,7 +27699,9 @@
     else {
       const q = innen[0].q;
       if (q[1] + q[3] !== H) f.push('Innenspiegel nicht am oberen Rand');
-      if (q[3] > H * 0.1) f.push('Innenspiegel ' + q[3] + ' px hoch (kein schmaler Streifen)');
+      // Fork (Gnen54 23.11.): Hoehe wie im Fork bis 22.11. (27 % der Spiegelbreite, bei 1280 x 720 rund 104 px), nicht Luukes Streifen.
+      if (q[3] > H * 0.16) f.push('Innenspiegel ' + q[3] + ' px hoch (zu hoch)');
+      if (Math.abs(q[3] - Math.round(q[2] * 0.27)) > 1) f.push('Innenspiegel nicht im Fork-Seitenverhaeltnis');
       if (Math.abs(q[0] + q[2] / 2 - W / 2) > 1) f.push('Innenspiegel nicht mittig');
     }
     const sp = vfSpiegelRechtecke(W, H, 'spider', 1);
@@ -27722,7 +27724,7 @@
           else {
             const r = e.getBoundingClientRect(), c = VF.cv.getBoundingClientRect();
             if (Math.abs(r.top - c.top) > 2) f.push('Spiegel ' + Math.round(r.top - c.top) + ' px unter dem Rand');
-            if (!(r.height < c.height * 0.12)) f.push('Spiegel ' + Math.round(r.height) + ' px hoch');
+            if (!(r.height < c.height * 0.16)) f.push('Spiegel ' + Math.round(r.height) + ' px hoch');
             if (VF.schicht.querySelectorAll('.vf-spiegel').length !== 1) f.push('mehr als ein Spiegel');
           }
           VF.kamera = 'verfolger'; vfMalen();

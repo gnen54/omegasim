@@ -3544,8 +3544,10 @@
   // Lage der Spiegel in Bildpunkten der Leinwand (x, y von unten links, Breite, Hoehe), rein fuer den Selbsttest.
   function vfSpiegelRechtecke(w, h, auto, dpr) {
     if (auto !== 'spider') {
-      const sw = Math.round(Math.min(w * 0.36, h * 1.1));
-      const sh = Math.round(Math.max(16 * (dpr || 1), Math.min(h * 0.085, sw * 0.18)));
+      // Fork (Gnen54, 23.11.: "nicht mehr so hoch"): Groesse wie im Fork bis 22.11. - 30 % der Bildbreite,
+      // Hoehe 27 % der Spiegelbreite (Luukes 1.6.22: breiter und nur halb so hoch).
+      const sw = Math.round(Math.min(w * 0.3, h * 0.9));
+      const sh = Math.round(Math.max(16 * (dpr || 1), sw * 0.27));
       return [{ art: 'innen', q: [Math.round((w - sw) / 2), h - sh, sw, sh] }];
     }
     const sw = Math.round(Math.min(w * 0.17, h * 0.34) * 0.8), sh = Math.round(sw * 0.6);
@@ -4349,8 +4351,11 @@
     });
     // 4. Scheiben und Scheinwerferglas (durchscheinend, getoent)
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+    // Fork (Gnen54, Bulli): sitzt die Kamera IM Auto (VW Caravelle: Onboard-Kamera hinter der Frontscheibe), nur ein
+    // Hauch Glas - sonst ist das Bild durch die Toenung fast schwarz (in Luukes 1.6.22 weggefallen, GEMELDET 23.11.).
+    const innen = auge && Math.hypot(auge[0] - x, auge[2] - y) < d.laenge * s * 0.45 && auge[1] < d.hoehe * s;
     for (const t of M.glasTeile) {
-      if (t.rolle === 'glas') { setze(aufbau, VF_GLAS_TINT, 0, 0.86, 0, 1, 0, 1); teil(t); }
+      if (t.rolle === 'glas') { setze(aufbau, VF_GLAS_TINT, 0, innen ? 0.12 : 0.86, 0, 1, 0, innen ? 0.2 : 1); teil(t); }
       else { setze(aufbau, VF_WEISS, licht ? 0.6 : 0, 0.9, 1, 1, 0, 0.5); teil(t); }
     }
     // 5. Leuchten: Lichtpunkte (zur Kamera gedreht) und vorn der Lichtkegel auf der Bahn
