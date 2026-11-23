@@ -1,0 +1,10 @@
+Porsche 911 GT3 – Aufbau von Gnen54 (OmegaSim CAD) auf Basis einer Karosserie von Vehicle World.
+Grundform: „Porsche 911 GT3R 2019 (1/24) bedruckbare Karosserie“ von Vehicle World (Designerin Revantika).
+Die schriftliche Freigabe von Vehicle World gilt bisher nur für den Caravelle-Bus; für den GT3 liegt eine
+mündliche Zustimmung vor, die schriftliche Anfrage (15.11.2026) wartet auf Bestätigung –
+dieses Modell ist vorerst nur für die Testversion gedacht, nicht für einen öffentlichen Pull-Request.
+Eigene Teile (Heckflügel, Diffusor, Scheiben, Leuchten, Reifen, Felgen, Farben, Fahrzeugdaten): Gnen54, CC BY 4.0.
+Lackierung angelehnt an einen GT3 eines Schweizer Rennteams, ohne Sponsorenlogos.
+Umgewandelt für die virtuelle Fahrt: ×50 auf Originalgröße, reduziert; Scheiben in die Öffnungen eingepasst.
+Chassis vom Spider NG1 (Carrera-HYBRID-Chassis).
+Fahrwerk nach Spider NG1 (auf 1250 kg umgerechnet), Motor nach Boxer 96 (Speed Dreams, geschätzt), Motorklang sd_boxer.

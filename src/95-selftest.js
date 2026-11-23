@@ -5523,6 +5523,50 @@
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
   });
 
+  // ---- Akku kritisch: bei 6 % "Session abbrechen, Box anfahren!" ----
+  //
+  // BESTELLT: "Bei Unterschreiten der 5 % Schwelle eine Ansage generieren: Session
+  // abbrechen, Box anfahren!" - auf 6 % angehoben, weil die Autos bei 0 % schon stehen. Geprueft: faellt einmal je Auto, nicht doppelt mit der
+  // 25-%-Meldung, bleibt unter der Hysterese still, nach dem Laden wieder scharf; mit einem
+  // Auto ohne Namen, mit mehreren mit Namen; auch der alte Einzelwert-Weg.
+  stAdd('Ansagen: Akku kritisch bei 6 % (Session abbrechen, Box anfahren)', () => {
+    if (!window.OMEGA_TEST || !OMEGA_TEST.ansagenFolge) {
+      return { skip: true, mass: 'ansagenFolge nicht vorhanden' };
+    }
+    const schlecht = [];
+    const satz = /Session abbrechen, Box anfahren!|Abort session, box now!/;
+    const a = { blinking: true }, b = { blinking: true };
+    const eins = (v) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
+                           batteries: [{ car: a, label: 'Alpha', value: v }] });
+    const r1 = OMEGA_TEST.ansagenFolge([eins(0.30), eins(0.12), eins(0.06), eins(0.00), eins(0.12),
+                                        eins(0.06), eins(0.50), eins(0.06)]);
+    const f1 = r1.folge.map((x) => x.fiel.join(','));
+    const soll1 = ['', 'battery', 'batterycrit', '', '', '', '', 'batterycrit'];
+    if (f1.join('|') !== soll1.join('|')) schlecht.push('ein Auto: ' + f1.map((x) => x || '-').join(' '));
+    const krit1 = r1.gesagt.filter((s) => satz.test(s));
+    if (krit1.length !== 2) schlecht.push(krit1.length + ' kritische Saetze statt 2');
+    if (krit1.some((s) => /Alpha/.test(s))) schlecht.push('ein Auto: Name mitgesagt');
+    // Gesagt: 25-%-Meldung bei 12 %, dann zweimal kritisch (die 25-%-Meldung nach dem Laden
+    // faellt nicht, weil die kritische sie still mitsperrt).
+    if (r1.gesagt.length !== 3) schlecht.push('gesagt: ' + r1.gesagt.join(' ; '));
+    // Zwei Autos: der Name gehoert dazu, und die 25-%-Meldung des anderen bleibt eigen.
+    const zwei = (va, vb) => ({ health: 1, fuel: 1, tyre: 1, rain: false,
+      batteries: [{ car: a, label: 'Alpha', value: va }, { car: b, label: 'Beta', value: vb }] });
+    const r2 = OMEGA_TEST.ansagenFolge([zwei(0.50, 0.50), zwei(0.03, 0.20)]);
+    const f2 = r2.folge.map((x) => x.fiel.join(','));
+    if (f2[1] !== 'batterycrit,battery') schlecht.push('zwei Autos: ' + f2[1]);
+    if (!r2.gesagt.some((s) => /Alpha/.test(s) && satz.test(s))) schlecht.push('zwei Autos: Name fehlt');
+    // Einzelwert (alter Aufrufer).
+    const r3 = OMEGA_TEST.ansagenFolge([
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.50 },
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.03 },
+      { health: 1, fuel: 1, tyre: 1, rain: false, battery: 0.02 }]);
+    const f3 = r3.folge.map((x) => x.fiel.join(','));
+    if (f3.join('|') !== '|batterycrit|') schlecht.push('Einzelwert: ' + f3.map((x) => x || '-').join(' '));
+    return { ok: !schlecht.length, mass: schlecht.length ? schlecht.join(' | ')
+      : 'faellt bei 6 % (nicht bei 12 %), einmal je Entladung, nicht doppelt mit 25 %, Name nur bei mehreren Autos, Einzelwert ok' };
+  });
+
   // ---- Und die fuenf Schalter schalten wirklich ab ----
   //
   // Die Gegenprobe zum Test darueber: mit allen Kaestchen AUS darf keine einzige Meldung
@@ -5624,14 +5668,22 @@
       man = await fetch('audio/voice.json', { cache: 'reload' }).then((r) => r.json());
     } catch (e) { return { skip: true, mass: 'Manifest nicht ladbar: ' + e.message }; }
     const erwartet = ['damage', 'fuel', 'tyre', 'rainstart', 'rainstop', 'battery'];
+    // 'batterycrit' (Akku < 5 %) darf fehlen: die Aufnahme braucht die Windows-Stimmen von
+    // tools/voice_synth.py. Bis dahin spricht die Live-Stimme. Ist sie da, dann vollstaendig.
+    const freiwillig = ['batterycrit'];
     const schlecht = [];
+    for (const k of freiwillig) {
+      if (man[k] && !(man[k].de && man[k].en)) schlecht.push(k + ': nicht beide Sprachen');
+    }
     for (const k of erwartet) {
       if (!man[k]) { schlecht.push(k + ' fehlt ganz'); continue; }
       for (const spr of ['de', 'en']) {
         if (!man[k][spr]) schlecht.push(k + '/' + spr + ' fehlt');
       }
     }
-    for (const k of Object.keys(man)) if (erwartet.indexOf(k) < 0) schlecht.push(k + ' unerwartet im Manifest');
+    for (const k of Object.keys(man)) {
+      if (erwartet.indexOf(k) < 0 && freiwillig.indexOf(k) < 0) schlecht.push(k + ' unerwartet im Manifest');
+    }
     return { ok: schlecht.length === 0,
              mass: erwartet.length + ' Meldungen x 2 Sprachen geprueft'
                    + (schlecht.length ? ' || ' + schlecht.join('; ') : '') };
@@ -17872,6 +17924,58 @@
     const texs = [...new Set(m.teile.map((t) => t.tex))];
     for (const x of texs) { const r = await fetch(vfModellPfad() + x, { method: 'HEAD' }).catch(() => null); if (!r || !r.ok) f.push('Textur fehlt: ' + x); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : m.name + ': ' + m.teile.length + ' Teile, ' + (daten.indizes.length / 3) + ' Dreiecke, ' + texs.length + ' Texturen' };
+  });
+
+  // 22.11. (GEMELDET Gnen54: Spider, GT3, Bulli, Manta auf dem Tablet "furchtbar zu fahren"): Performance laedt
+  // die leichte Fassung (auto.json "perf"), Quality die volle. Geprueft je Auto: beide laden, die leichte hat
+  // deutlich weniger Dreiecke, gueltige Indizes, dieselben Rollen, und Physik/Lichter kommen aus auto.json.
+  stAdd('Virtuell: Performance laedt die leichte Fassung (Spider, GT3, Bulli, Manta), Quality die volle', async () => {
+    if (location.protocol === 'file:') return { skip: true, mass: 'file://, der Browser verbietet das Laden' };
+    const f = [], info = [];
+    const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    vfMobilErzwungen = false;          // auf dem Handy waere Quality gesperrt - hier geht es um die Dateien
+    try {
+      for (const a of ['spider', 'gt3', 'caravelle', 'manta']) {
+        const pfad = VF_MODELL_PFADE[a];
+        localStorage.setItem(VF_GRAFIK_STORE, 'qual');
+        const voll = await vfModellDaten(pfad);
+        localStorage.setItem(VF_GRAFIK_STORE, 'perf');
+        const leicht = await vfModellDaten(pfad);
+        const nv = voll.indizes.length / 3, nl = leicht.indizes.length / 3;
+        if (!voll.meta.perf) f.push(a + ': auto.json ohne "perf"');
+        if (!(nl < nv * 0.6)) f.push(a + ': leicht ' + nl + ' nicht deutlich unter voll ' + nv);
+        leicht.meta.teile.forEach((t) => {
+          if (t.index0 + t.indizes > leicht.indizes.length) f.push(a + ' ' + t.name + ': Indizes ausserhalb');
+          let mx = 0;
+          for (let i = t.index0; i < t.index0 + t.indizes; i++) mx = Math.max(mx, leicht.indizes[i]);
+          if (mx >= t.ecken) f.push(a + ' ' + t.name + ': Index ' + mx + ' >= ' + t.ecken);
+          if (t.ecke0 + t.ecken > leicht.ecken.length / 8) f.push(a + ' ' + t.name + ': Ecken ausserhalb');
+        });
+        const rollen = (d) => [...new Set(d.meta.teile.map((t) => t.rolle + '/' + (t.achse || '')))].sort().join(',');
+        if (rollen(voll) !== rollen(leicht)) f.push(a + ': Rollen verschieden');
+        if (JSON.stringify(voll.meta.physik) !== JSON.stringify(leicht.meta.physik)) f.push(a + ': Physik nicht aus auto.json');
+        if (JSON.stringify(voll.meta.lichter) !== JSON.stringify(leicht.meta.lichter)) f.push(a + ': Lichter nicht aus auto.json');
+        info.push(a + ' ' + Math.round(nv / 1000) + 'k -> ' + Math.round(nl / 1000) + 'k');
+      }
+    } catch (e) { f.push('Ausnahme: ' + e.message); }
+    finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : info.join(', ') };
+  });
+
+  // 22.11. (BESTELLT Gnen54): auf Handy/Tablet nur Performance, Quality mit Hinweis "nur am PC".
+  stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
+    const f = [];
+    const merk = localStorage.getItem(VF_GRAFIK_STORE);
+    try {
+      localStorage.setItem(VF_GRAFIK_STORE, 'qual');
+      vfMobilErzwungen = true;
+      if (vfGrafik() !== 'perf') f.push('mobil trotz gespeichertem Quality nicht Performance');
+      if (vfGrafikQual()) f.push('mobil vfGrafikQual() wahr');
+      vfMobilErzwungen = false;
+      if (vfGrafik() !== 'qual') f.push('am PC wird Quality nicht uebernommen');
+      if (t('Quality nur am PC verfügbar') === '') f.push('Hinweistext leer');
+    } finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'mobil Performance fest, PC frei; dieses Geraet: ' + (vfMobilGeraet() ? 'mobil' : 'PC') };
   });
 
   stAdd('Virtuell: NPCs folgen der Mittellinie und drosseln in der Kurve', () => {

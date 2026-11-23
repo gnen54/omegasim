@@ -52,6 +52,12 @@ Gerechnet wie die anderen mit `tools/sd_engines.py <Ordner des Autos> sd_v5r`. D
 Texturen, Fahrzeugdaten) liegt umgewandelt in `img/autos/v5r/` mit eigener `LIZENZ.txt`
 (`tools/sd_auto.py`). Der Code von OmegaSim steht unter der GNU AGPL (Version 3 oder neuer).
 
+### Boxer 96 dunkel (GPL-2.0 oder spaeter) — fuer den Porsche 911 GT3 von Gnen54, 17.11.2026
+
+`audio/sd_boxer_dunkel_*.ogg` sind aus `sd_boxer_*.ogg` (Speed Dreams `sc-boxer-96.wav`, Speed-Dreams-Team,
+**GNU GPL, Version 2 oder spaeter**) gerechnet: um den Faktor 0,84 tiefer gestimmt, Hoehen ab 2,6 kHz gedaempft,
+Bass +3 dB (ffmpeg, Schleifen nahtlos aus der dreifach wiederholten Schleife geschnitten).
+
 Nicht verwendet: `v6_raw.wav` und `rotary2.wav` (als "CC-BY" aus YouTube-Videos
 angegeben, Rechte unklar), `skid_metal.wav` (ohne Lizenzangabe) und die uebrigen
 aelteren Fahrzeugklaenge der Spieldaten.
@@ -202,6 +208,8 @@ BESTELLT: "motorsounds: ford tudor slantback 1937 und vw käfer 1300 (herbie)."
 | `fordtudor37` | Ford Tudor Slantback 1937 | 3,6-l-Flathead-V8 (221 ci), 90 Grad, Cross-Plane, ~85 PS, ~3800/min | 1-5-4-8-6-3-7-2, Haelften (dieselbe Folge wie `cross_plane_v8()`) |
 | `kaefer1300` | VW Kaefer 1300 | 1,3-l-Boxer-4, luftgekuehlt, ~40 PS, ~4200/min | 1-4-3-2, Haelften (VW-Zaehlung: 1/2 eine Bank, 3/4 die andere) |
 | `boxster986` | Porsche Boxster 986 | 2,5-l-Boxer-6, Saugmotor, ~204 PS, Begrenzer ~6900/min | 1-6-2-4-3-5, Haelften |
+| `manta400` | Opel Manta 400 Gruppe B | 2,4-l-Reihen-4, 16V, Saugmotor, ~275 PS, Begrenzer ~8000/min | 1-3-4-2, Reihe |
+| `manta400_rec` | Opel Manta 400 (Aufnahme) | Saubere Aufnahme eines Freundes von Gnen54 (20.11.2026), Ausschnitte auf feste Zündfrequenz geglättet (tools/manta_rec2.py), nur im Fork | 1-3-4-2, Reihe |
 
 **Beide sind als WIP gekennzeichnet, und zwar staerker als die bisherigen WIP-Eintraege
 oben.** Bei jenen war zumindest die Geometrie (Zylinderzahl, Zuendfolge, Bankaufteilung)

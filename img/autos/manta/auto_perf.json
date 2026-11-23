@@ -1,0 +1,182 @@
+{
+ "lod": "Performance-Fassung: 282345 statt 1461244 Dreiecke (tools/modell_perf.py, Quadrik)",
+ "ecken": 215186,
+ "indizes": 847035,
+ "indexAb": 6885952,
+ "teile": [
+  {
+   "name": "Karosserie 1",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_weiss.png",
+   "ecke0": 0,
+   "ecken": 65535,
+   "index0": 0,
+   "indizes": 289770
+  },
+  {
+   "name": "Karosserie 2",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_weiss.png",
+   "ecke0": 65535,
+   "ecken": 48588,
+   "index0": 289770,
+   "indizes": 186249
+  },
+  {
+   "name": "Gelbe Lackierung",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_gelb.png",
+   "ecke0": 114123,
+   "ecken": 8175,
+   "index0": 476019,
+   "indizes": 35463
+  },
+  {
+   "name": "Schwarzer Streifen",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_schwarz.png",
+   "ecke0": 122298,
+   "ecken": 7685,
+   "index0": 511482,
+   "indizes": 30762
+  },
+  {
+   "name": "Silbergraue Lackierung",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_grau.png",
+   "ecke0": 129983,
+   "ecken": 8347,
+   "index0": 542244,
+   "indizes": 33723
+  },
+  {
+   "name": "Frontspoiler",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_weiss.png",
+   "ecke0": 138330,
+   "ecken": 2151,
+   "index0": 575967,
+   "indizes": 6858
+  },
+  {
+   "name": "Heckschürze",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_weiss.png",
+   "ecke0": 140481,
+   "ecken": 1936,
+   "index0": 582825,
+   "indizes": 6240
+  },
+  {
+   "name": "Seitenschweller",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_weiss.png",
+   "ecke0": 142417,
+   "ecken": 10837,
+   "index0": 589065,
+   "indizes": 49428
+  },
+  {
+   "name": "Diffusor",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_schwarz.png",
+   "ecke0": 153254,
+   "ecken": 16634,
+   "index0": 638493,
+   "indizes": 54411
+  },
+  {
+   "name": "Scheiben",
+   "rolle": "glas",
+   "gruppe": "auto",
+   "tex": "manta_glas.png",
+   "ecke0": 169888,
+   "ecken": 4679,
+   "index0": 692904,
+   "indizes": 24888
+  },
+  {
+   "name": "Scheinwerfer",
+   "rolle": "scheinwerfer",
+   "gruppe": "auto",
+   "tex": "manta_reflektor.png",
+   "ecke0": 174567,
+   "ecken": 7067,
+   "index0": 717792,
+   "indizes": 21984
+  },
+  {
+   "name": "Rücklichter",
+   "rolle": "ruecklicht",
+   "gruppe": "auto",
+   "tex": "manta_ruecklicht.png",
+   "ecke0": 181634,
+   "ecken": 7749,
+   "index0": 739776,
+   "indizes": 28704
+  },
+  {
+   "name": "Chassis",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "manta_schwarz.png",
+   "ecke0": 189383,
+   "ecken": 3623,
+   "index0": 768480,
+   "indizes": 11514
+  },
+  {
+   "name": "Reifen vorn",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "manta_reifen.png",
+   "achse": "vorn",
+   "ecke0": 193006,
+   "ecken": 7388,
+   "index0": 779994,
+   "indizes": 17997
+  },
+  {
+   "name": "Felge vorn",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "manta_felge.png",
+   "achse": "vorn",
+   "ecke0": 200394,
+   "ecken": 6309,
+   "index0": 797991,
+   "indizes": 18000
+  },
+  {
+   "name": "Reifen hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "manta_reifen.png",
+   "achse": "hinten",
+   "ecke0": 206703,
+   "ecken": 2708,
+   "index0": 815991,
+   "indizes": 13044
+  },
+  {
+   "name": "Felge hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "manta_felge.png",
+   "achse": "hinten",
+   "ecke0": 209411,
+   "ecken": 5775,
+   "index0": 829035,
+   "indizes": 18000
+  }
+ ]
+}

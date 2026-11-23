@@ -2004,6 +2004,52 @@
   "idleRpm": 2000,
   "limiterRpm": 8500
  },
+ "sd_boxer_dunkel": {
+  "label": "Boxer 96 dunkel (Porsche 911 GT3 von Gnen54)",
+  "cylinders": 6,
+  "source": "Aufnahme aus Speed Dreams 2.4 (data/cars/models/sc-boxer-96/sc-boxer-96.wav): Speed-Dreams-Team (sc-boxer-96), GPL-2.0-or-later; fuer Gnen54s GT3 um den Faktor 0,84 tiefer gestimmt, Hoehen ab 2,6 kHz gedaempft, Bass +3 dB (ffmpeg, 17.11.2026)",
+  "crackle": 0.4,
+  "turbo": false,
+  "loops": {
+   "idle": {
+    "file": "sd_boxer_dunkel_idle.ogg",
+    "baseRpm": 2000,
+    "firingHz": 84.0,
+    "seconds": 3.6565,
+    "load": 1.0
+   },
+   "low": {
+    "file": "sd_boxer_dunkel_low.ogg",
+    "baseRpm": 3240,
+    "firingHz": 136.1,
+    "seconds": 2.2571,
+    "load": 1.0
+   },
+   "mid": {
+    "file": "sd_boxer_dunkel_mid.ogg",
+    "baseRpm": 5248,
+    "firingHz": 220.4,
+    "seconds": 1.3935,
+    "load": 1.0
+   },
+   "high": {
+    "file": "sd_boxer_dunkel_high.ogg",
+    "baseRpm": 8500,
+    "firingHz": 357.0,
+    "seconds": 0.8603,
+    "load": 1.0
+   },
+   "over": {
+    "file": "sd_boxer_dunkel_over.ogg",
+    "baseRpm": 5248,
+    "firingHz": 220.4,
+    "seconds": 1.3935,
+    "load": 0.0
+   }
+  },
+  "idleRpm": 2000,
+  "limiterRpm": 8500
+ },
  "boxster986": {
   "label": "Porsche Boxster 986 (2,5 l Boxer-6, Saugmotor) [WIP]",
   "cylinders": 6,
@@ -2049,5 +2095,104 @@
   },
   "idleRpm": 850,
   "limiterRpm": 6900
+ },
+ "manta400": {
+  "label": "Opel Manta 400 Gruppe B (2,4 l Reihen-4, 16V, Saugmotor) [WIP]",
+  "cylinders": 4,
+  "source": "vollst\u00e4ndig synthetisiert (Modell nach engine-sim, MIT)",
+  "crackle": 0.55,
+  "turbo": false,
+  "loops": {
+   "idle": {
+    "file": "manta400_idle.ogg",
+    "baseRpm": 1000,
+    "firingHz": 33.3,
+    "seconds": 2.04,
+    "load": 1.0
+   },
+   "low": {
+    "file": "manta400_low.ogg",
+    "baseRpm": 1495,
+    "firingHz": 49.8,
+    "seconds": 2.0067,
+    "load": 1.0
+   },
+   "low2": {
+    "file": "manta400_low2.ogg",
+    "baseRpm": 2236,
+    "firingHz": 74.5,
+    "seconds": 1.9857,
+    "load": 1.0
+   },
+   "low3": {
+    "file": "manta400_low3.ogg",
+    "baseRpm": 3344,
+    "firingHz": 111.5,
+    "seconds": 2.0096,
+    "load": 1.0
+   },
+   "mid": {
+    "file": "manta400_mid.ogg",
+    "baseRpm": 5000,
+    "firingHz": 166.7,
+    "seconds": 1.992,
+    "load": 1.0
+   },
+   "high": {
+    "file": "manta400_high.ogg",
+    "baseRpm": 7600,
+    "firingHz": 253.3,
+    "seconds": 2.0053,
+    "load": 1.0
+   },
+   "over": {
+    "file": "manta400_over.ogg",
+    "baseRpm": 5000,
+    "firingHz": 166.7,
+    "seconds": 1.992,
+    "load": 0.0
+   }
+  },
+  "idleRpm": 1000,
+  "limiterRpm": 8000
+ },
+ "manta400_rec": {
+  "label": "Opel Manta 400 (Aufnahme)",
+  "cylinders": 4,
+  "source": "Saubere Aufnahme eines Freundes von Gnen54 (20.11.2026), Ausschnitte auf feste Zuendfrequenz geglaettet; nur im Fork gnen54/omegasim",
+  "crackle": 0.55,
+  "turbo": false,
+  "idleRpm": 2262,
+  "limiterRpm": 8000,
+  "loops": {
+   "idle": {
+    "file": "manta400_rec_idle.ogg",
+    "baseRpm": 4350,
+    "firingHz": 145.0,
+    "seconds": 0.4997,
+    "load": 1.0
+   },
+   "mid": {
+    "file": "manta400_rec_mid.ogg",
+    "baseRpm": 5340,
+    "firingHz": 178.0,
+    "seconds": 0.541,
+    "load": 1.0
+   },
+   "high": {
+    "file": "manta400_rec_high.ogg",
+    "baseRpm": 6840,
+    "firingHz": 228.0,
+    "seconds": 1.0088,
+    "load": 1.0
+   },
+   "over": {
+    "file": "manta400_rec_over.ogg",
+    "baseRpm": 3660,
+    "firingHz": 122.0,
+    "seconds": 0.4123,
+    "load": 0.0
+   }
+  }
  }
 }

@@ -1,0 +1,501 @@
+{
+ "name": "Porsche 911 GT3 (Gnen54)",
+ "kennung": "gt3",
+ "quelle": "Karosserie von Vehicle World (Designerin Revantika), Aufbau und Anbauteile von Gnen54, 1:50 für das Carrera-HYBRID-Chassis, ×50 auf Originalgröße",
+ "lizenz": "siehe LIZENZ.txt",
+ "koordinaten": "m; +x links, +y oben, +z vorn",
+ "ecken": 1407990,
+ "indizes": 6070482,
+ "indexAb": 45055680,
+ "schritt": 32,
+ "schatten": "shadow.png",
+ "lichter": {
+  "front": [
+   [
+    0.634,
+    0.731,
+    1.763,
+    0.16
+   ],
+   [
+    -0.634,
+    0.731,
+    1.763,
+    0.16
+   ]
+  ],
+  "rueck": [
+   [
+    0.458,
+    0.754,
+    -2.411,
+    0.045
+   ],
+   [
+    0.572,
+    0.752,
+    -2.33,
+    0.045
+   ],
+   [
+    0.688,
+    0.741,
+    -2.202,
+    0.045
+   ],
+   [
+    -0.458,
+    0.754,
+    -2.411,
+    0.045
+   ],
+   [
+    -0.572,
+    0.752,
+    -2.33,
+    0.045
+   ],
+   [
+    -0.688,
+    0.741,
+    -2.202,
+    0.045
+   ]
+  ],
+  "brems": [
+   [
+    0.458,
+    0.754,
+    -2.411,
+    0.05
+   ],
+   [
+    0.572,
+    0.752,
+    -2.33,
+    0.05
+   ],
+   [
+    0.688,
+    0.741,
+    -2.202,
+    0.05
+   ],
+   [
+    -0.458,
+    0.754,
+    -2.411,
+    0.05
+   ],
+   [
+    -0.572,
+    0.752,
+    -2.33,
+    0.05
+   ],
+   [
+    -0.688,
+    0.741,
+    -2.202,
+    0.05
+   ]
+  ]
+ },
+ "haube": {
+  "vor": 0.6,
+  "hoch": 1.12
+ },
+ "teile": [
+  {
+   "name": "Karosserie 1",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 0,
+   "ecken": 49824,
+   "index0": 0,
+   "indizes": 246060
+  },
+  {
+   "name": "Karosserie 2",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 49824,
+   "ecken": 53195,
+   "index0": 246060,
+   "indizes": 245817
+  },
+  {
+   "name": "Karosserie 3",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 103019,
+   "ecken": 56741,
+   "index0": 491877,
+   "indizes": 241257
+  },
+  {
+   "name": "Karosserie 4",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 159760,
+   "ecken": 51222,
+   "index0": 733134,
+   "indizes": 233598
+  },
+  {
+   "name": "Karosserie 5",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 210982,
+   "ecken": 63224,
+   "index0": 966732,
+   "indizes": 236100
+  },
+  {
+   "name": "Karosserie 6",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 274206,
+   "ecken": 56901,
+   "index0": 1202832,
+   "indizes": 246753
+  },
+  {
+   "name": "Karosserie 7",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 331107,
+   "ecken": 55512,
+   "index0": 1449585,
+   "indizes": 246582
+  },
+  {
+   "name": "Karosserie 8",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 386619,
+   "ecken": 53918,
+   "index0": 1696167,
+   "indizes": 244818
+  },
+  {
+   "name": "Karosserie 9",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 440537,
+   "ecken": 53576,
+   "index0": 1940985,
+   "indizes": 245526
+  },
+  {
+   "name": "Karosserie 10",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 494113,
+   "ecken": 55178,
+   "index0": 2186511,
+   "indizes": 245001
+  },
+  {
+   "name": "Karosserie 11",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 549291,
+   "ecken": 56794,
+   "index0": 2431512,
+   "indizes": 243279
+  },
+  {
+   "name": "Karosserie 12",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 606085,
+   "ecken": 57219,
+   "index0": 2674791,
+   "indizes": 246777
+  },
+  {
+   "name": "Karosserie 13",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 663304,
+   "ecken": 59679,
+   "index0": 2921568,
+   "indizes": 245835
+  },
+  {
+   "name": "Karosserie 14",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 722983,
+   "ecken": 64607,
+   "index0": 3167403,
+   "indizes": 184863
+  },
+  {
+   "name": "Karosserie 15",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 787590,
+   "ecken": 60252,
+   "index0": 3352266,
+   "indizes": 231576
+  },
+  {
+   "name": "Karosserie 16",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 847842,
+   "ecken": 54564,
+   "index0": 3583842,
+   "indizes": 246888
+  },
+  {
+   "name": "Karosserie 17",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_weiss.png",
+   "ecke0": 902406,
+   "ecken": 47909,
+   "index0": 3830730,
+   "indizes": 246894
+  },
+  {
+   "name": "Rote Lackierung 1",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_rot.png",
+   "ecke0": 950315,
+   "ecken": 60658,
+   "index0": 4077624,
+   "indizes": 262272
+  },
+  {
+   "name": "Rote Lackierung 2",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_rot.png",
+   "ecke0": 1010973,
+   "ecken": 58579,
+   "index0": 4339896,
+   "indizes": 263328
+  },
+  {
+   "name": "Rote Lackierung 3",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_rot.png",
+   "ecke0": 1069552,
+   "ecken": 60524,
+   "index0": 4603224,
+   "indizes": 262302
+  },
+  {
+   "name": "Heckflügel 1",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_schwarz.png",
+   "ecke0": 1130076,
+   "ecken": 33063,
+   "index0": 4865526,
+   "indizes": 175809
+  },
+  {
+   "name": "Heckflügel 2",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_schwarz.png",
+   "ecke0": 1163139,
+   "ecken": 34393,
+   "index0": 5041335,
+   "indizes": 175971
+  },
+  {
+   "name": "Diffusor 1",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_schwarz.png",
+   "ecke0": 1197532,
+   "ecken": 34919,
+   "index0": 5217306,
+   "indizes": 169443
+  },
+  {
+   "name": "Diffusor 2",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_schwarz.png",
+   "ecke0": 1232451,
+   "ecken": 29505,
+   "index0": 5386749,
+   "indizes": 135201
+  },
+  {
+   "name": "Chassis",
+   "rolle": "karosserie",
+   "gruppe": "auto",
+   "tex": "gt3_schwarz.png",
+   "ecke0": 1261956,
+   "ecken": 4634,
+   "index0": 5521950,
+   "indizes": 13338
+  },
+  {
+   "name": "Reifen vorn",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "gt3_reifen.png",
+   "achse": "vorn",
+   "ecke0": 1266590,
+   "ecken": 55692,
+   "index0": 5535288,
+   "indizes": 162927
+  },
+  {
+   "name": "Felge vorn",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "gt3_felge.png",
+   "achse": "vorn",
+   "ecke0": 1322282,
+   "ecken": 27782,
+   "index0": 5698215,
+   "indizes": 88998
+  },
+  {
+   "name": "Reifen hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "gt3_reifen.png",
+   "achse": "hinten",
+   "ecke0": 1350064,
+   "ecken": 2708,
+   "index0": 5787213,
+   "indizes": 13044
+  },
+  {
+   "name": "Felge hinten",
+   "rolle": "rad",
+   "gruppe": "rad",
+   "tex": "gt3_felge.png",
+   "achse": "hinten",
+   "ecke0": 1352772,
+   "ecken": 25234,
+   "index0": 5800257,
+   "indizes": 89163
+  },
+  {
+   "name": "Rücklichter",
+   "rolle": "ruecklicht",
+   "gruppe": "auto",
+   "tex": "gt3_ruecklicht.png",
+   "ecke0": 1378006,
+   "ecken": 2984,
+   "index0": 5889420,
+   "indizes": 18039
+  },
+  {
+   "name": "Scheinwerfer",
+   "rolle": "scheinwerfer",
+   "gruppe": "auto",
+   "tex": "gt3_reflektor.png",
+   "ecke0": 1380990,
+   "ecken": 8342,
+   "index0": 5907459,
+   "indizes": 52065
+  },
+  {
+   "name": "Scheinwerferglas",
+   "rolle": "scheinwerferglas",
+   "gruppe": "auto",
+   "tex": "gt3_scheinwerfer.png",
+   "ecke0": 1389332,
+   "ecken": 8342,
+   "index0": 5959524,
+   "indizes": 52065
+  },
+  {
+   "name": "Scheiben",
+   "rolle": "glas",
+   "gruppe": "auto",
+   "tex": "gt3_glas.png",
+   "ecke0": 1397674,
+   "ecken": 10316,
+   "index0": 6011589,
+   "indizes": 58893
+  }
+ ],
+ "physik": {
+  "masse": 1250.0,
+  "schwerpunktHoehe": 0.3,
+  "radstand": 2.515,
+  "a": 1.4084,
+  "b": 1.1066,
+  "vorderachse": 1.0375,
+  "hinterachse": -1.4775,
+  "laenge": 4.847,
+  "breite": 2.001,
+  "hoehe": 1.383,
+  "massenVerteilung": 0.85,
+  "lenkGrad": 21.0,
+  "bremsVorn": 0.58,
+  "cx": 0.4,
+  "stirnflaeche": 2.0,
+  "auftriebVorn": 0.42,
+  "auftriebHinten": 0.46,
+  "fluegelVorn": 0.2,
+  "fluegelHinten": 0.45,
+  "leerlauf": 2000.0,
+  "begrenzer": 8500.0,
+  "reifen": {
+   "vorn": {
+    "radius": 0.325,
+    "breite": 0.28,
+    "spur": 1.62,
+    "bodenfreiheit": 0.0,
+    "mu": 1.25
+   },
+   "hinten": {
+    "radius": 0.35000000000000003,
+    "breite": 0.405,
+    "spur": 1.525,
+    "bodenfreiheit": 0.0,
+    "mu": 1.25
+   }
+  },
+  "feder": {
+   "vorn": {
+    "k": 194444.0,
+    "druck": 17361.0,
+    "zug": 26389.0,
+    "weg": 0.09,
+    "stab": 83333.0
+   },
+   "hinten": {
+    "k": 159722.0,
+    "druck": 12500.0,
+    "zug": 23611.0,
+    "weg": 0.09,
+    "stab": 30556.0
+   }
+  },
+  "gefedert": 1150.0
+ },
+ "perf": "auto_perf"
+}
