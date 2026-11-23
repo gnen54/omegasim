@@ -30040,6 +30040,27 @@
     finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : info.join(', ') };
   });
+  // 23.11. (GEMELDET Gnen54): neue virtuelle Fahrt startete mit dem Tankstand der letzten.
+  stAdd('Virtuell: jede neue Fahrt startet mit der Startfuellung (ab Werk voll)', () => {
+    const f = [];
+    const merkFuel = fuel, merkStart = raceFuelStartL;
+    try {
+      raceFuelStartL = FUEL_TANK_LITERS;
+      fuel = 12; vfTankFuellen();
+      const sollVoll = vfStartTankProzent();
+      if (Math.abs(fuel - sollVoll) > 0.01) f.push('Tank nicht auf Startfuellung: ' + fuel.toFixed(1) + ' %');
+      if (typeof setupStartTankL !== 'function' || setupStartTankL() === FUEL_TANK_LITERS) {
+        if (Math.abs(fuel - 100) > 0.01) f.push('ab Werk nicht voll: ' + fuel.toFixed(1) + ' %');
+      }
+      const halb = Math.round(FUEL_TANK_LITERS / 2);
+      raceFuelStartL = halb;
+      fuel = 12; vfTankFuellen();
+      const soll = (typeof setupStartTankL === 'function' ? setupStartTankL() : halb) / FUEL_TANK_LITERS * 100;
+      if (Math.abs(fuel - soll) > 0.01) f.push('Startfuellung nicht uebernommen: ' + fuel.toFixed(1) + ' statt ' + soll.toFixed(1) + ' %');
+    } finally { fuel = merkFuel; raceFuelStartL = merkStart; }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Tank 12 % -> Startfuellung (voll ' + vfStartTankProzent().toFixed(0) + ' %)' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);

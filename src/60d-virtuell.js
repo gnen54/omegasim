@@ -3656,6 +3656,15 @@
     document.body.appendChild(d);
     setTimeout(() => d.remove(), 4000);
   }
+  function vfStartTankProzent() {
+    const l = typeof setupStartTankL === 'function' ? setupStartTankL() : raceFuelStartL;
+    return Number.isFinite(l) && l > 0 ? Math.max(0, Math.min(100, l / FUEL_TANK_LITERS * 100)) : 100;
+  }
+  function vfTankFuellen() {
+    fuel = vfStartTankProzent();
+    if (typeof updateDamageFuelUI === 'function') { try { updateDamageFuelUI(); } catch (e) { /* egal */ } }
+  }
+
   function virtuellStarten(opts) {
     opts = opts || {};
     if (VF.aktiv) return false;
@@ -3722,6 +3731,10 @@
     document.body.classList.add('vf-an');
     gl.enable(gl.DEPTH_TEST);
     VF.gl = gl; VF.cv = cv; VF.schicht = schicht; VF.hud = schicht.querySelector('.vf-hud');
+    // 23.11.2026 (GEMELDET Gnen54): eine neue virtuelle Fahrt startete mit dem Tankstand der letzten - "relativ
+    // frueh an die Box". Jetzt jede Fahrt mit der Startfuellung (Renneinstellung "Tank beim Start" bzw. die des
+    // Setups), ab Werk voll. Ein Rennen setzt den Tank beim Start ohnehin genauso.
+    vfTankFuellen();
     // 21.11. (Luke/Gnen54): die Knopfleiste oben blendet sich nach 4 s Ruhe aus und kommt bei Mausbewegung,
     // Tippen oder Klick zurueck - der Innenspiegel kann so ganz nach oben, und wer ohne Gamepad faehrt,
     // kommt trotzdem an alle Knoepfe.

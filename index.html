@@ -46777,6 +46777,15 @@
     document.body.appendChild(d);
     setTimeout(() => d.remove(), 4000);
   }
+  function vfStartTankProzent() {
+    const l = typeof setupStartTankL === 'function' ? setupStartTankL() : raceFuelStartL;
+    return Number.isFinite(l) && l > 0 ? Math.max(0, Math.min(100, l / FUEL_TANK_LITERS * 100)) : 100;
+  }
+  function vfTankFuellen() {
+    fuel = vfStartTankProzent();
+    if (typeof updateDamageFuelUI === 'function') { try { updateDamageFuelUI(); } catch (e) { /* egal */ } }
+  }
+
   function virtuellStarten(opts) {
     opts = opts || {};
     if (VF.aktiv) return false;
@@ -46843,6 +46852,10 @@
     document.body.classList.add('vf-an');
     gl.enable(gl.DEPTH_TEST);
     VF.gl = gl; VF.cv = cv; VF.schicht = schicht; VF.hud = schicht.querySelector('.vf-hud');
+    // 23.11.2026 (GEMELDET Gnen54): eine neue virtuelle Fahrt startete mit dem Tankstand der letzten - "relativ
+    // frueh an die Box". Jetzt jede Fahrt mit der Startfuellung (Renneinstellung "Tank beim Start" bzw. die des
+    // Setups), ab Werk voll. Ein Rennen setzt den Tank beim Start ohnehin genauso.
+    vfTankFuellen();
     // 21.11. (Luke/Gnen54): die Knopfleiste oben blendet sich nach 4 s Ruhe aus und kommt bei Mausbewegung,
     // Tippen oder Klick zurueck - der Innenspiegel kann so ganz nach oben, und wer ohne Gamepad faehrt,
     // kommt trotzdem an alle Knoepfe.
@@ -124650,6 +124663,27 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
     finally { vfMobilErzwungen = null; if (merk === null) localStorage.removeItem(VF_GRAFIK_STORE); else localStorage.setItem(VF_GRAFIK_STORE, merk); }
     return { ok: !f.length, mass: f.length ? f.join(' | ') : info.join(', ') };
   });
+  // 23.11. (GEMELDET Gnen54): neue virtuelle Fahrt startete mit dem Tankstand der letzten.
+  stAdd('Virtuell: jede neue Fahrt startet mit der Startfuellung (ab Werk voll)', () => {
+    const f = [];
+    const merkFuel = fuel, merkStart = raceFuelStartL;
+    try {
+      raceFuelStartL = FUEL_TANK_LITERS;
+      fuel = 12; vfTankFuellen();
+      const sollVoll = vfStartTankProzent();
+      if (Math.abs(fuel - sollVoll) > 0.01) f.push('Tank nicht auf Startfuellung: ' + fuel.toFixed(1) + ' %');
+      if (typeof setupStartTankL !== 'function' || setupStartTankL() === FUEL_TANK_LITERS) {
+        if (Math.abs(fuel - 100) > 0.01) f.push('ab Werk nicht voll: ' + fuel.toFixed(1) + ' %');
+      }
+      const halb = Math.round(FUEL_TANK_LITERS / 2);
+      raceFuelStartL = halb;
+      fuel = 12; vfTankFuellen();
+      const soll = (typeof setupStartTankL === 'function' ? setupStartTankL() : halb) / FUEL_TANK_LITERS * 100;
+      if (Math.abs(fuel - soll) > 0.01) f.push('Startfuellung nicht uebernommen: ' + fuel.toFixed(1) + ' statt ' + soll.toFixed(1) + ' %');
+    } finally { fuel = merkFuel; raceFuelStartL = merkStart; }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Tank 12 % -> Startfuellung (voll ' + vfStartTankProzent().toFixed(0) + ' %)' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);
