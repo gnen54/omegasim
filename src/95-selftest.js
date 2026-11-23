@@ -29944,6 +29944,27 @@
   }));
 
   // ---- Fork gnen54: Selbsttests des virtuellen Fahrens aus der Fork-Fassung (Stand 22.11.) ----
+  // 23.11. (BESTELLT Gnen54): Vorschaubild und Lackfarbe in der Garage; umgefaerbt wird nur der Grundlack.
+  stAdd('Virtuell (Fork 23.11.): Garage zeigt Vorschaubild und 9 Farbpunkte, Lackfarbe wird gespeichert', () => {
+    const f = [], merkA = localStorage.getItem(VF_AUTO_STORE), merkL = localStorage.getItem(VF_LACK_STORE);
+    try {
+      localStorage.setItem(VF_AUTO_STORE, 'gt3'); vfLackSetzen('');
+      const d = document.createElement('div'); document.body.appendChild(d);
+      vfGarageOptionen(d);
+      const img = d.querySelector('.vf-vorschau-bild'), pkt = d.querySelectorAll('.vf-lack');
+      if (!img || img.getAttribute('src') !== 'img/autos/gt3/vorschau.jpg') f.push('Vorschaubild fehlt/falsch: ' + (img && img.getAttribute('src')));
+      if (pkt.length !== VF_LACK_FARBEN.length || pkt.length !== 9) f.push(pkt.length + ' Farbpunkte');
+      if (pkt[2]) pkt[2].click();
+      if (vfLack() !== VF_LACK_FARBEN[2].v) f.push('Klick setzt die Farbe nicht: ' + vfLack());
+      d.remove();
+      localStorage.setItem(VF_LACK_STORE, '#123456');
+      if (vfLack() !== '') f.push('unbekannte Farbe nicht auf Original');
+    } finally {
+      if (merkA === null) localStorage.removeItem(VF_AUTO_STORE); else localStorage.setItem(VF_AUTO_STORE, merkA);
+      if (merkL === null) localStorage.removeItem(VF_LACK_STORE); else localStorage.setItem(VF_LACK_STORE, merkL);
+    }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Bild, 9 Punkte, Klick speichert, Unbekanntes = Original' };
+  });
   stAdd('Fahrgefuehl v1.3.5: virtuelles Fahren - Reifentemperatur im Gleichgewicht, Abtrieb, zwei Profile', () => {
     const f = [];
     // Zuegig fahren (40 m/s, 7 m/s^2) bringt die Reifen ins Fenster, Dauerangriff ueberhitzt, Bummeln kuehlt.

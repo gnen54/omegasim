@@ -5,7 +5,7 @@ Testfassung (Zweig `testversion`) vorhanden sein. Günter entwickelt das virtuel
 im Fork (keine PRs an Luuke mehr); Ziel ist eine Fassung, die am **PC** gut aussieht und gut fährt.
 Hat Luuke etwas selbst geändert oder weggelassen, gilt in der Testfassung die Fork-Lösung.
 
-Stand: 23.11.2026 (auf Luukes 1.6.22). Ältere Fassung: Zweig `sicherung-testversion-1.4.67`.
+Stand: 23.11.2026 (auf Luukes 1.6.22). Garagen-Menü (Garage: links „Virtuell fahren“, rechts die Einstellungen; Kachel „Virtuell fahren“ im FAHREN-Menü) ist Luukes allgemeiner Garagen-Code (90-ghosts.js, 51-konsole.js) und bleibt von ihm. Ältere Fassung: Zweig `sicherung-testversion-1.4.67`.
 
 ## Aufbau: das virtuelle Fahren ist ganz unseres (seit 23.11.2026)
 
@@ -44,6 +44,7 @@ Stand: 23.11.2026 (auf Luukes 1.6.22). Ältere Fassung: Zweig `sicherung-testver
 | Seitennahe Kamera | `src/60d-virtuell.js` | `id: 'naeher'`, `naeher = id === 'naeher'` |
 | Leichte Modelle für Performance (auto.json "perf") | `src/60d-virtuell.js`, `img/autos/*/auto_perf.*` | `meta.perf`, `"perf": "auto_perf"` |
 | Handy/Tablet nur Performance, Hinweis „Quality nur am PC verfügbar“ | `src/60d-virtuell.js` | `function vfMobilGeraet`, `Quality nur am PC verfügbar` |
+| Garage: Vorschaubild des Autos + Lackfarbe mit 9 Farbpunkten (nach Luukes v1.5.10, 23.11.; nur der Grundlack wird umgefärbt, Streifen bleiben) | `src/60d-virtuell.js` (VF_LACK_FARBEN, Shader-Uniform `lack`, `M.hauptLack`), Selbsttest am Ende von 95 | `const VF_LACK_FARBEN`, `const hauptLack`, `mix(tint, pow(tint, vec3(2.2)), lack)`, `Fork 23.11.): Garage zeigt Vorschaubild` |
 | Bulli: Scheiben von innen fast klar (Onboard-Kamera) | `src/60d-virtuell.js` | `innen ? 0.12 : 0.86` |
 | Innenspiegel, Außenspiegel (Spider), Armaturenbrett-Cockpit wie im Fork | `src/60d-virtuell.js` | `function vfInnenspiegelMalen`, `function vfCockpit(` |
 | Umgebungston (Ambience) ab Werk aus | `src/80-sound.js`, `id="amb-enable"` ohne checked | `let ambienceEnabled = false` |
