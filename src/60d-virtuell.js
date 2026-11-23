@@ -3697,10 +3697,7 @@
       + '<div class="vf-acc-werte"><div class="vf-acc-wert"><b class="vf-tempo"></b>' + lbl('km/h') + '</div>'
       + '<b class="vf-gang"></b><div class="vf-acc-wert"><b class="vf-rpm"></b>' + lbl('1/min') + '</div></div></div>'
       + '<div class="vf-kachel vf-acc-tank">' + lbl(t('Tank')) + '<b class="vf-tank"></b><i class="vf-tank-bar"><i></i></i></div></div>'
-      + '<div class="vf-knoepfe"><button type="button" data-vf="box">' + t('Box') + '</button><button type="button" data-vf="flag">' + t('Gelbe Flagge') + '</button><button type="button" data-vf="licht">' + t('Licht') + '</button><button type="button" data-vf="kam">' + t('Kamera') + '</button><button type="button" data-vf="reset">' + t('Zurücksetzen') + '</button><button type="button" data-vf="touch" hidden>' + t('Steuerung') + '</button>'
-      // 22.11. (BESTELLT Gnen54): Pad-Diagnose auch ohne Tastatur (Tablet, EasySMX X05 meldet nur Gas)
-      + '<button type="button" data-vf="paddiag">' + t('Pad-Diagnose') + '</button>'
-      + '<button type="button" data-vf="zu" aria-label="' + t('Beenden') + '">&#10005;</button></div>'
+      + vfKnopfLeisteHtml()
       + '<span class="vf-kamfrei" hidden data-i18n-skip>' + t('Kamera frei') + ' · R3 / V: ' + t('Standard') + ' <span class="wip-tag">WIP</span></span>'
       + '<span class="vf-wip">' + t('Virtuell') + ' <span class="wip-tag">WIP</span></span>'
       + '<div class="vf-touch" hidden><div class="vf-touch-lenk"><div class="vf-touch-knauf"></div><span class="vf-touch-hinweis">' + t('Lenken') + '</span></div>'
@@ -3843,6 +3840,7 @@
       else if (b.dataset.vf === 'kam') vfKameraWechseln();
       else if (b.dataset.vf === 'touch') vfTouchUmschalten();
       else if (b.dataset.vf === 'paddiag') vfPadDiagUmschalten();
+      else if (b.dataset.vf === 'leiste') vfLeisteUmschalten();
       else if (b.dataset.vf === 'box') {
         if (VF.modus === 'derby') showHudToast(t('Derby: kein Boxenstopp'));
         else if (typeof requestPitStop === 'function') { requestPitStop(); if (typeof pitState !== 'undefined' && pitState === 'limited') showHudToast(t('Boxenstopp: anhalten')); }
@@ -4385,6 +4383,50 @@
   window.addEventListener('keydown', (e) => { if (VF.aktiv && e.key === 'Escape') { e.stopImmediatePropagation(); virtuellBeenden(); } }, true);
   // F8: Pad-Diagnose (padDiagText in 90-ghosts.js) - zeigt, ob und wo das Gamepad haengen bleibt.
   let vfPadDiagIv = 0;
+  // ---- KNOPFLEISTE ALS PIKTOGRAMME (23.11., aus Luukes 1.6.22 uebernommen, BESTELLT Gnen54: "die neuen Buttons
+  // vom Luke ... das Ganze wird kleiner und es sieht auch besser aus") ----
+  // Box, Gelbe Flagge, Licht, Kamera, Pad-Diagnose, Zuruecksetzen, Steuerung (nur Touch) und Beenden als kleine Symbole
+  // (Inline-SVG, Name als title und aria-label). Ganz rechts "leiste": blendet alle anderen aus und ein, die Wahl bleibt
+  // fuer die naechste Fahrt. Ohne Luukes Wetter-Knopf (das Fork-Fahren hat keine Wetter-Umschaltung). Das Ausblenden
+  // nach 4 s Ruhe (Fork, 21.11.) bleibt zusaetzlich.
+  const VF_LEISTE_STORE = 'omegasim-vf-leiste';
+  const VF_IKONEN = {
+    box: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+    flag: '<path d="M5 21V4"/><path class="vf-ikon-fuell" d="M5 4h12l-2.5 4 2.5 4H5"/>',
+    licht: '<path class="vf-ikon-fuell" d="M11 6a6 6 0 0 0 0 12z"/><path d="M15 8h6M15 12h6M15 16h6"/>',
+    wetter: '<path d="M7 15a4 4 0 0 1 .4-8 5 5 0 0 1 9.6 1.4A3.4 3.4 0 0 1 17 15z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/>',
+    // v1.6.20: Pad-Diagnose (aus gnen54s testversion): ein Gamepad.
+    paddiag: '<path d="M6 9h12a3 3 0 0 1 3 3l-1 5a2 2 0 0 1-3.4 1L15 16H9l-1.6 2A2 2 0 0 1 4 17l-1-5a3 3 0 0 1 3-3z"/><path d="M8 12v3M6.5 13.5h3"/><circle cx="16.5" cy="12.5" r="1"/>',
+    kam: '<rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
+    reset: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/>',
+    touch: '<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11M12 10V8.5a1.5 1.5 0 0 1 3 0V11M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-5-2.7l-2.2-2.7a1.5 1.5 0 0 1 2.4-1.8L9 16"/>',
+    zu: '<path d="M6 6l12 12M18 6L6 18"/>',
+    leiste: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  };
+  function vfIkon(id) { return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + VF_IKONEN[id] + '</svg>'; }
+  function vfLeisteZu() { try { return localStorage.getItem(VF_LEISTE_STORE) === 'zu'; } catch (e) { return false; } }
+  function vfKnopfLeisteHtml() {
+    const a = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const k = (id, titel, extra) => '<button type="button" class="vf-ikon" data-vf="' + id + '" title="' + a(titel) + '" aria-label="' + a(titel) + '"'
+      + (extra || '') + '>' + vfIkon(id) + '</button>';
+    const zu = vfLeisteZu();
+    return '<div class="vf-knoepfe' + (zu ? ' vf-knoepfe-zu' : '') + '" role="toolbar" aria-label="' + a(t('Knöpfe der virtuellen Fahrt')) + '">'
+      + k('box', t('Box')) + k('flag', t('Gelbe Flagge')) + k('licht', t('Licht')) + k('kam', t('Kamera')) + k('paddiag', t('Pad-Diagnose'))
+      + k('reset', t('Zurücksetzen')) + k('touch', t('Steuerung'), ' hidden') + k('zu', t('Beenden'))
+      + k('leiste', t(zu ? 'Knöpfe einblenden' : 'Knöpfe ausblenden'), ' aria-pressed="' + (zu ? 'true' : 'false') + '"')
+      + '</div>';
+  }
+  // zu: true = ausblenden, false = einblenden, undefined = umschalten.
+  function vfLeisteUmschalten(zu) {
+    const L = VF.schicht ? VF.schicht.querySelector('.vf-knoepfe') : null;
+    if (!L) return;
+    if (zu === undefined) zu = !L.classList.contains('vf-knoepfe-zu');
+    L.classList.toggle('vf-knoepfe-zu', zu);
+    const b = L.querySelector('[data-vf="leiste"]');
+    if (b) { const ti = t(zu ? 'Knöpfe einblenden' : 'Knöpfe ausblenden'); b.title = ti; b.setAttribute('aria-label', ti); b.setAttribute('aria-pressed', zu ? 'true' : 'false'); }
+    try { localStorage.setItem(VF_LEISTE_STORE, zu ? 'zu' : 'auf'); } catch (e) { /* egal */ }
+  }
+
   function vfPadDiagUmschalten() {
     let el = document.getElementById('vf-pad-diag');
     if (el) { el.remove(); clearInterval(vfPadDiagIv); return; }

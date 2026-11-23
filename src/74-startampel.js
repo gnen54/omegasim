@@ -103,7 +103,7 @@
   let ampelLetzter = '', ampelFehler = '';
   // Erkennungszeichen der Fassung: so sieht man am Tablet sofort, ob die neue Version geladen ist
   // (die Programmversion 1.0.36 aendert sich bei Testfassungen nicht).
-  const AMPEL_STAND = '23.11.-c';
+  const AMPEL_STAND = '23.11.-d';
   function ampelStatusZeigen(text) {
     const s = $('ampel-status');
     let zeile = text || (ampelVerbunden()

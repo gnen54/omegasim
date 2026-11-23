@@ -29944,6 +29944,22 @@
   }));
 
   // ---- Fork gnen54: Selbsttests des virtuellen Fahrens aus der Fork-Fassung (Stand 22.11.) ----
+  // 23.11. (BESTELLT Gnen54): Knopfleiste als Piktogramme wie bei Luuke, ohne Wetter, mit Pad-Diagnose.
+  stAdd('Virtuell (Fork 23.11.): Knopfleiste als Piktogramme, ein Knopf blendet alle aus und ein', () => {
+    const f = [], merk = localStorage.getItem(VF_LEISTE_STORE);
+    try {
+      localStorage.removeItem(VF_LEISTE_STORE);
+      const d = document.createElement('div'); d.innerHTML = vfKnopfLeisteHtml();
+      const ids = [...d.querySelectorAll('button.vf-ikon')].map((b) => b.dataset.vf).join(',');
+      if (ids !== 'box,flag,licht,kam,paddiag,reset,touch,zu,leiste') f.push('Knoepfe: ' + ids);
+      if (d.querySelector('[data-vf="wetter"]')) f.push('Wetter-Knopf ohne Wetter-Umschaltung');
+      if ([...d.querySelectorAll('button.vf-ikon')].some((b) => !b.querySelector('svg') || !b.getAttribute('aria-label'))) f.push('Knopf ohne Symbol oder Namen');
+      localStorage.setItem(VF_LEISTE_STORE, 'zu');
+      d.innerHTML = vfKnopfLeisteHtml();
+      if (!d.querySelector('.vf-knoepfe-zu')) f.push('gespeichertes Ausblenden nicht uebernommen');
+    } finally { if (merk === null) localStorage.removeItem(VF_LEISTE_STORE); else localStorage.setItem(VF_LEISTE_STORE, merk); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : '9 Knoepfe (Steuerung nur bei Touch), Ausblenden bleibt gespeichert' };
+  });
   // 23.11. (BESTELLT Gnen54): Vorschaubild und Lackfarbe in der Garage; umgefaerbt wird nur der Grundlack.
   stAdd('Virtuell (Fork 23.11.): Garage zeigt Vorschaubild und 9 Farbpunkte, Lackfarbe wird gespeichert', () => {
     const f = [], merkA = localStorage.getItem(VF_AUTO_STORE), merkL = localStorage.getItem(VF_LACK_STORE);
