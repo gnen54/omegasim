@@ -30137,6 +30137,25 @@
     return { ok: !f.length, mass: f.length ? f.join(' | ') : 'Tafel mit Knopf und Modus, Garage: Runden/Endurance/Training' };
   });
 
+  // 25.11. (BESTELLT Gnen54): Startaufstellung auf dem Heckenhoim (V3) - Klammern und fuenf Plaetze, Pole zuerst.
+  stAdd('Virtuell: Heckenhoim hat die Startaufstellung (15 Linien, 5 Plaetze, Pole vorn)', async () => {
+    if (location.protocol === 'file:') return { skip: true, mass: 'file://, der Browser verbietet das Laden' };
+    const f = [];
+    try {
+      const d = await vfFreiLaden('heckenhoim');
+      const g = d && d.gitter;
+      if (!g) f.push('kein gitter');
+      else {
+        if (g.linien.length !== 15) f.push('Linien ' + g.linien.length);
+        if (g.plaetze.length !== 5) f.push('Plaetze ' + g.plaetze.length);
+        // Pole am naechsten hinter der Startlinie: Abstand zum Startpunkt (Index 0) steigt mit dem Platz
+        const p0 = d.pts[0], ab = g.plaetze.map((p) => Math.hypot(p[0] - p0.x, p[1] - p0.y));
+        for (let i = 1; i < ab.length; i++) if (!(ab[i] > ab[i - 1])) f.push('Reihenfolge bei Platz ' + (i + 1));
+      }
+    } catch (e) { f.push('Ausnahme: ' + e.message); }
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : '15 Linien, 5 Plaetze, Pole vorn' };
+  });
+
   stAdd('Virtuell: auf Handy und Tablet nur Performance, am PC Quality waehlbar', () => {
     const f = [];
     const merk = localStorage.getItem(VF_GRAFIK_STORE);

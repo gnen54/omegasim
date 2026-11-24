@@ -957,6 +957,11 @@
     }
     // Boxenmarkierungen: flach knapp ueber der Fahrbahn, Randstein-Textur an der hellen Wandspalte.
     const um = 4 / VF_RAND_B;
+    // Startaufstellung einer freien Strecke (25.11., BESTELLT Gnen54: "Markierung fuer die Startaufstellung
+    // auf dem virtuellen Heckenhoim"): weisse Klammern, Linien aus der DXF.
+    if (VF.frei && VF.frei.gitter && Array.isArray(VF.frei.gitter.linien)) {
+      for (const l of VF.frei.gitter.linien) vfBand(rand, [[l[0], l[1]], [l[2], l[3]]], (VF.frei.gitter.b || 0.3) / 2, 0.013, um, [1, 1, 1]);
+    }
     for (const mk of fein.marken) {
       if (mk.band) { vfBand(rand, mk.band, mk.b / 2, 0.012, um, mk.c); continue; }
       const ex = mk.e[0] * mk.l / 2, ey = mk.e[1] * mk.l / 2, qx = mk.q[0] * mk.b / 2, qy = mk.q[1] * mk.b / 2, y = 0.012;
@@ -1400,7 +1405,10 @@
         const m = pts.length - 1, a = pts[(i - 1 + m) % m], c = pts[(i + 1) % m];
         p.heading = Math.atan2(c.x - a.x, -(c.y - a.y)) * 180 / Math.PI;
       });
-      vfFreiCache[k] = { name: d.name, tiles, pts };
+      // gitter (25.11., Heckenhoim V3): Startplatz-Klammern aus der DXF - Linien zum Zeichnen, Startplaetze
+      // (Pole zuerst) fuer Spieler und NPCs.
+      const gitter = d.gitter && Array.isArray(d.gitter.plaetze) && d.gitter.plaetze.length ? d.gitter : null;
+      vfFreiCache[k] = { name: d.name, tiles, pts, gitter };
       return vfFreiCache[k];
     });
   }
@@ -1501,6 +1509,19 @@
   // v1.3.94 Startaufstellung: ein Feld hinter der Startlinie, zwei Reihen (links/rechts), Abstand
   // zwischen den Reihen. Die Autos spawnen direkt auf ihren Startplaetzen statt verstreut.
   const VF_GRID_REIHE = Math.max(2, Math.round((typeof TRACK_SAMPLES_PER_TILE !== 'undefined' ? TRACK_SAMPLES_PER_TILE : 8) * 1.5));
+  // Startplatz i der freien Strecke (Pole = 0): naechster Mittellinienpunkt und seitlicher Versatz dazu
+  // (wie npc.offset: Lauf = Punkt + Normale * Versatz). null ohne Startaufstellung oder Platz.
+  function vfGitterPlatz(i) {
+    const g = VF.frei && VF.frei.gitter, p = g && g.plaetze[i];
+    if (!p || !VF.pts || !VF.nrm) return null;
+    let best = 0, bd = Infinity;
+    for (let j = 0; j < VF.pts.length; j++) { const d = Math.hypot(VF.pts[j].x - p[0], VF.pts[j].y - p[1]); if (d < bd) { bd = d; best = j; } }
+    // Liegt der naechste Punkt vor dem Platz, den davor nehmen - sonst steht der NPC ueber der Klammer.
+    const m = VF.pts.length, nx = VF.pts[(best + 1) % m], tx = nx.x - VF.pts[best].x, ty = nx.y - VF.pts[best].y;
+    if ((p[0] - VF.pts[best].x) * tx + (p[1] - VF.pts[best].y) * ty < 0) best = (best - 1 + m) % m;
+    const q = VF.pts[best], n = VF.nrm[best];
+    return { idx: best, x: p[0], y: p[1], offset: (p[0] - q.x) * n.x + (p[1] - q.y) * n.y };
+  }
   function vfGridKachel(start, reihe) {
     return ((start - reihe * VF_GRID_REIHE) % VF.pts.length + VF.pts.length) % VF.pts.length;
   }
@@ -1797,10 +1818,12 @@
       const auto = pool[k];
       // Startaufstellung: Zeile 1 hinter der Startlinie (k=0,1), Zeile 2 (k=2,3), ...; links/rechts.
       const reihe = Math.floor((k + 1) / 2);
-      const startIdx = vfGridKachel(start, reihe);
+      // Freie Strecke mit Startaufstellung: NPC k auf Platz k+1 (hinter dem Spieler auf der Pole).
+      const platz = vfGitterPlatz(k + 1);
+      const startIdx = platz ? platz.idx : vfGridKachel(start, reihe);
       const npc = {
         auto, modell: null, P: null, idx: startIdx, s: null, kmh: 0, motor: vfNpcMotor(), bahn: null,
-        offset: (k % 2 === 0) ? 3.0 : -3.0,
+        offset: platz ? platz.offset : (k % 2 === 0) ? 3.0 : -3.0,
         faktor: 0.97 + 0.03 * k,
         x: 0, y: 0, h: 0, raddreh: 0, lenkWinkel: 0, ay: 0, ax: 0,
         feder: { z: 0, vz: 0, th: 0, vth: 0, ph: 0, vph: 0 },
@@ -3881,10 +3904,13 @@
     }
     // Start eine halbe Kachel vor Start/Ziel, in Fahrtrichtung.
     const s = Math.max(0, VF.pts.findIndex((p) => p.tile >= 0 && tiles[p.tile] && tiles[p.tile].type === TILE_TYPE.START));
-    const start = ((s - Math.round(TRACK_SAMPLES_PER_TILE / 2)) % VF.pts.length + VF.pts.length) % VF.pts.length;
-    Object.assign(VF, { x: VF.pts[start].x, y: VF.pts[start].y, h: VF.pts[start].heading, idx: start, zaehler: 0, kachel: -2, fort: 0, fortVor: start, startGueltig: false,
+    let start = ((s - Math.round(TRACK_SAMPLES_PER_TILE / 2)) % VF.pts.length + VF.pts.length) % VF.pts.length;
+    // Freie Strecke mit Startaufstellung (Heckenhoim V3): der Spieler steht auf dem ersten Platz (Pole).
+    const pole = vfGitterPlatz(0);
+    if (pole) start = pole.idx;
+    Object.assign(VF, { x: pole ? pole.x : VF.pts[start].x, y: pole ? pole.y : VF.pts[start].y, h: VF.pts[start].heading, idx: start, zaehler: 0, kachel: -2, fort: 0, fortVor: start, startGueltig: false,
                         abseits: false, letzt: 0, kam: null, rundeAb: 0, letzte: null, beste: null, aktiv: true,
-                        startX: VF.pts[start].x, startY: VF.pts[start].y, startH: VF.pts[start].heading });
+                        startX: pole ? pole.x : VF.pts[start].x, startY: pole ? pole.y : VF.pts[start].y, startH: VF.pts[start].heading });
     vfZeitenLaden();
     { const bm = VF.bucht ? Math.max(0, ...VF.bucht.map((x) => x || 0)) : 0;
       VF.boxMax = bm; VF.boxN = bm > 0 ? VF.bucht.filter((x) => (x || 0) > bm * 0.5).length : 0;

@@ -2,7 +2,10 @@
 DXF seit 22.11.2026: Heckenhoim_V2 aus Thorstens Fusion-Projekt, Basis auf 3 x 2 m korrigiert -> Faktor 1.
 Ablauf wie bei der Toernerschleife (ring2_bau / ring2_mitte / ring2_json / bucht_tiefe / boxgasse), hier in einem Skript.
 Fahrtrichtung (22.11., Thorsten/Startaufstellung im Bild): auf der linken Geraden nach oben, wie der Pfeil
-in der DXF (Boxengasse unten rein, oben raus)."""
+in der DXF (Boxengasse unten rein, oben raus).
+25.11.2026 (BESTELLT Gnen54): Heckenhoim_V3 mit Startaufstellung - fuenf Startplatz-Klammern (je drei
+Linien: vorn quer, zwei Seiten nach hinten) auf der linken Geraden, versetzt. Geometrie sonst wie V2, der
+Pfeil ist weg. -> out['gitter']: Linien zum Zeichnen und Startplaetze (Pole zuerst)."""
 import sys, json, numpy as np, cv2, networkx as nx
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -13,7 +16,11 @@ from skimage.morphology import skeletonize
 
 s, _ = lies(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'heckenhoim.dxf')); s = [P * 1.0 for P in s]
 R = 2.0; X0, Y0, W, H = -1500, -1000, 3000, 2000
-RAHMEN = {0, 1, 2, 12, 13}                       # Rahmen, Diagonalen, Fahrtrichtungspfeil
+RAHMEN = {0, 1, 2}                               # Rahmen, Diagonalen
+# Startplatz-Klammern: alle einzelnen Linien (2 Punkte) nach den Bahnlinien - nicht ins Raster, sonst
+# schneiden sie die Bahn beim Fuellen in Stuecke.
+GITTER = {j for j, P in enumerate(s) if j > 11 and len(P) == 2}
+RAHMEN |= GITTER
 MARKEN = {5, 6}                                  # kleine Rechtecke an Ein- und Ausfahrt der Gasse
 START_RECHTECK = {4}
 px = lambda P: np.c_[(P[:, 0] - X0) / R, (Y0 + H - P[:, 1]) / R]
@@ -139,7 +146,7 @@ while i < len(E):
     tiles.append('START' if i == 0 else 'STRAIGHT'); tile_of[i:jj] = len(tiles) - 1; i = jj
 versatz = (E.max(0) + E.min(0)) / 2; E = E - versatz
 edv = lambda Q: ed(Q) - versatz
-out = {'name': 'Heckenhoim', 'quelle': 'Heckenhoim_V2.dxf (Gnen54/Thorsten), 3,00 x 2,00 m',
+out = {'name': 'Heckenhoim', 'quelle': 'Heckenhoim_V3.dxf (Gnen54/Thorsten), 3,00 x 2,00 m',
        'breiteMm': BREITE, 'kacheln': tiles,
        'pts': [[round(float(a), 2), round(float(b_), 2), int(tl)] for (a, b_), tl in zip(E, tile_of)]}
 Sm = edv(S); step = max(1, len(Sm) // 160)
@@ -202,5 +209,35 @@ for (x_, y), w in zip(cc, wand):
 if len(akt) > 5: linien.append(np.array(akt))
 out['boxRand'] = [[[round(float(a), 2), round(float(b_), 2)] for a, b_ in edv(L[::3])] for L in linien if len(L[::3]) >= 3]
 print('Randlinien', [len(l) for l in out['boxRand']], 'Bucht max %.1f' % x.max(), 'Steg b', out['steg']['b'])
+
+# ---- Startaufstellung (V3): Klammern aus der DXF. Vorn = die Querlinie, die Seiten zeigen nach hinten.
+# Startplatz = Mitte der Querlinie, um eine halbe Autolaenge (App: Auto 9,6 Einheiten lang) nach hinten.
+LINIE_MM = 4.0                                     # Strichbreite der Markierung
+AUTO_HALB = 4.8                                    # Karteneinheiten
+if GITTER:
+    L_ = [s[j] for j in sorted(GITTER)]
+    quer = [P for P in L_ if abs(P[0, 1] - P[1, 1]) < 1e-6]
+    seiten = [P for P in L_ if abs(P[0, 1] - P[1, 1]) >= 1e-6]
+    plaetze, linien_g = [], []
+    for Q in quer:
+        mitte = Q.mean(0)
+        # Seiten dieser Klammer: ein Ende liegt auf einem Ende der Querlinie, das andere zeigt nach hinten
+        hinten = [P[1 - k] for P in seiten for k in (0, 1) if min(np.hypot(*(P[k] - Q[0])), np.hypot(*(P[k] - Q[1]))) < 0.5]
+        rueck = (np.mean(hinten, 0) - mitte) if hinten else np.array([0.0, -1.0])
+        rueck = rueck / (np.hypot(*rueck) or 1)
+        platz_mm = mitte + rueck * (AUTO_HALB / K)
+        plaetze.append(platz_mm)
+    # Reihenfolge: Pole = am naechsten hinter der Startlinie (Index 0 der Mittellinie, Fahrt mit steigendem Index)
+    def hinter_start(p):
+        i = int(np.argmin(np.hypot(*(M - p).T))); return (len(M) - i) % len(M)
+    plaetze.sort(key=hinter_start)
+    hb = LINIE_MM / 2
+    for P in L_:
+        d = P[1] - P[0]; d = d / (np.hypot(*d) or 1)
+        a, b_ = P[0] - d * hb, P[1] + d * hb           # Enden um die halbe Strichbreite verlaengert (Ecken zu)
+        linien_g.append([round(float(v), 2) for v in np.r_[edv(a[None])[0], edv(b_[None])[0]]])
+    out['gitter'] = {'b': round(LINIE_MM * K, 3), 'linien': linien_g,
+                     'plaetze': [[round(float(v), 2) for v in edv(p[None])[0]] for p in plaetze]}
+    print('Startaufstellung:', len(plaetze), 'Plaetze, Pole bei', [round(float(v)) for v in plaetze[0]], 'mm')
 json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'img', 'strecken', 'heckenhoim.json'), 'w'), separators=(',', ':'))
 
