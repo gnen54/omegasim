@@ -172,9 +172,17 @@ kand = (alles & ~steg & (dmitte > HALB_MM - 10)).astype(np.uint8)
 n_k, lab_k = cv2.connectedComponents(kand, connectivity=4)
 ids = np.unique(lab_k[gasse & (lab_k > 0)])
 gasse = (np.isin(lab_k, ids) & (lab_k > 0)) | (gasse & ~steg)
+# 25.11. (GEMELDET Gnen54, Tablet: Boxengasse "immer noch zu schmal ... den Gruenstreifen weglassen und als
+# Boxengasse nutzen"): der Steg zwischen Start/Ziel und Gasse (in der DXF 36 mm) gehoert jetzt zur Gasse.
+# Gasse damit 108 statt 72 mm breit (gut 10 Einheiten).
+STEG_ALS_GASSE = True
+if STEG_ALS_GASSE:
+    # um 2 Pixel aufgeweitet: die gezeichnete DXF-Linie zwischen Steg und Gasse liegt in keiner Flaeche
+    steg_g = cv2.dilate(steg.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool) & ~haupt
+    gasse = gasse | steg_g
 print('Gasse mit Muendungen %.0f cm2' % (gasse.sum() * R * R / 100))
 gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)).astype(bool)
-gd = (cv2.dilate(gasse.astype(np.uint8), np.ones((5, 5), np.uint8)) & alles.astype(np.uint8))
+gd = (cv2.dilate(gasse.astype(np.uint8), np.ones((5, 5), np.uint8)) & (alles | (steg_g if STEG_ALS_GASSE else False)).astype(np.uint8))
 n_l, lab = cv2.connectedComponents(gd, connectivity=8)
 gd = (lab == np.bincount(lab.ravel())[1:].argmax() + 1).astype(np.uint8)
 cs, _ = cv2.findContours(gd, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
