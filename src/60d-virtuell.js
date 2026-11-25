@@ -3755,6 +3755,13 @@
   function virtuellStarten(opts) {
     opts = opts || {};
     if (VF.aktiv) return false;
+    // Fork 25.11. (Schnittstelle Luuke 1.6.84): Luukes Rennen/Challenges "mit dem virtuellen Auto" (opts.extern: die
+    // virtuelle Fahrt fuehrt kein eigenes Rennen, 70-race.js wertet) gehoeren zu SEINEM virtuellen Fahren - unser VF
+    // kennt das nicht. Statt zwei Rennen uebereinander: freundlich ablehnen.
+    if (opts.extern) {
+      vfStartHinweis(t('Rennen und Challenges mit dem virtuellen Auto gibt es in dieser Fassung nicht – auf FAHREN „Echt“ wählen oder „Virtuell fahren“ starten.'));
+      return false;
+    }
     vfHandlingCache = null;   // einmal frisch lesen (z. B. in einem anderen Tab geaendert)
     // Rundenuhr der vorigen Fahrt nicht mitnehmen (20.11., GEMELDET Gnen54: "Zeitansage sofort beim Start
     // nach Ueberfahren von Start/Ziel ist wieder da") - die erste Ueberfahrt startet die Uhr, angesagt wird erst

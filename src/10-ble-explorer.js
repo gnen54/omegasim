@@ -4888,6 +4888,7 @@
     "Video speichern braucht die neue APK": "Saving videos needs the new APK",
     "Aufnahme nach 15 min beendet": "Recording stopped after 15 min",
     // ---- Fork gnen54: Texte der Fork-Erweiterungen (virtuelles Fahren, Manta/GT3, Freigaben) ----
+    "Rennen und Challenges mit dem virtuellen Auto gibt es in dieser Fassung nicht – auf FAHREN „Echt“ wählen oder „Virtuell fahren“ starten.": "Races and challenges with the virtual car are not available in this version – choose “Real” on DRIVE or start “Virtual driving”.",
     "Den RC Heli gibt es im virtuellen Fahren dieser Fassung nicht.": "The RC heli is not available in this version's virtual driving.",
     "Die Einstellungen des virtuellen Fahrens stehen in der Garage unter „Virtuell fahren“.": "The virtual driving settings are in the garage under “Virtual driving”.",
     "Porsche 911 GT3 (Gnen54, WIP)": "Porsche 911 GT3 (Gnen54, WIP)",
@@ -7026,6 +7027,7 @@
     "Aufnahme nach 15 min beendet": "Grabación detenida tras 15 min",
     "Zeit": "Tiempo",
     // ---- Fork gnen54: Texte der Fork-Erweiterungen (virtuelles Fahren, Manta/GT3, Freigaben) ----
+    "Rennen und Challenges mit dem virtuellen Auto gibt es in dieser Fassung nicht – auf FAHREN „Echt“ wählen oder „Virtuell fahren“ starten.": "Las carreras y desafíos con el coche virtual no están disponibles en esta versión: elige «Real» en CONDUCIR o inicia «Conducción virtual».",
     "Den RC Heli gibt es im virtuellen Fahren dieser Fassung nicht.": "El helicóptero RC no está disponible en la conducción virtual de esta versión.",
     "Die Einstellungen des virtuellen Fahrens stehen in der Garage unter „Virtuell fahren“.": "Los ajustes de la conducción virtual están en el garaje, en «Conducción virtual».",
     "Porsche 911 GT3 (Gnen54, WIP)": "Porsche 911 GT3 (Gnen54, WIP)",

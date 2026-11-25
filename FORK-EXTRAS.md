@@ -5,7 +5,7 @@ Testfassung (Zweig `testversion`) vorhanden sein. Günter entwickelt das virtuel
 im Fork (keine PRs an Luuke mehr); Ziel ist eine Fassung, die am **PC** gut aussieht und gut fährt.
 Hat Luuke etwas selbst geändert oder weggelassen, gilt in der Testfassung die Fork-Lösung.
 
-Stand: 23.11.2026 (auf Luukes 1.6.22). Garagen-Menü (Garage: links „Virtuell fahren“, rechts die Einstellungen; Kachel „Virtuell fahren“ im FAHREN-Menü) ist Luukes allgemeiner Garagen-Code (90-ghosts.js, 51-konsole.js) und bleibt von ihm. Ältere Fassung: Zweig `sicherung-testversion-1.4.67`.
+Stand: 25.11.2026 (auf Luukes 1.6.84). Garagen-Menü (Garage: links „Virtuell fahren“, rechts die Einstellungen; Kachel „Virtuell fahren“ im FAHREN-Menü) ist Luukes allgemeiner Garagen-Code (90-ghosts.js, 51-konsole.js) und bleibt von ihm. Ältere Fassungen: Zweige `sicherung-testversion-1.6.22`, `sicherung-testversion-1.4.67`.
 
 ## Aufbau: das virtuelle Fahren ist ganz unseres (seit 23.11.2026)
 
@@ -25,16 +25,27 @@ Stand: 23.11.2026 (auf Luukes 1.6.22). Garagen-Menü (Garage: links „Virtuell 
   Funktionen, die unser VF benutzt (Physik, Pad, Rennen, Ton), dann nur die Schnittstelle anpassen, nie Luukes
   VF-Datei übernehmen. Neue Luuke-Selbsttests, die nur sein VF prüfen, entfernen (wie oben).
 - Startampel und Akku kritisch kommen weiter aus den Zweigen `startampel` und `akku-kritisch` (Merge).
+  Seit 1.6.60 hat Luuke Startampel (`src/74c-startampel.js`, Optionen → Zusatz-Hardware → Startampel), Startansage und
+  Akku kritisch selbst übernommen. Der Zweig `startampel` baut seit 25.11. auf seiner Fassung auf und ergänzt nur, was er
+  weggelassen hat: Kennung `AMPEL_STAND`, „Frühstart bricht den Start ab“, „Wartezeit nach dem Start“. `akku-kritisch`
+  ist damit gleich Luukes Stand.
+- **Schnittstellen zu Luukes 1.6.84 (25.11.):** Luukes FAHREN-Seite hat den Umschalter Echt | Virtuell, seine Garage
+  ruft `vfGarageZeigen`, die Optionen-Kacheln „Virtuell“/„RC Heli“ rufen `vfOptionenSeite`. Dafür stehen in unserer
+  60d kleine Hilfsfunktionen (`vfAutoListe`, `vfAutoName`, `vfVorschauUrl`, `vfStreckeName`, `vfGarageZeigen`,
+  `vfOptionenSeite`): Garage öffnet unsere Garage mit „Virtuell fahren“ rechts, die Optionen-Kacheln verweisen dorthin.
+  Luukes AR (`60e-ar.js`, `60f-ar-marker.js`), RC Heli, Neigen-Lenkung, Drift-Physik, Reifenwahl, virtuelle Zeiten
+  in Challenges/online und seine virtuelle Garage gehören zu SEINEM VF und sind bei uns nicht angeschlossen.
+  Luukes Autos haben seit 1.6.84 `vorschau.png` statt `vorschau.jpg`; die Garage nimmt dann das PNG.
 
 ## Liste (jede Zeile wird vor dem Hochladen mit `git grep -F` geprüft)
 
 | Erweiterung | Wo | Prüfung (muss gefunden werden) |
 |---|---|---|
 | Unser virtuelles Fahren (ganze Datei) | `src/60d-virtuell.js`, `hilfe/virtuelles-fahren.html` | `vf-laden-fork`, `const VF_COCKPIT_FOVH` |
-| Startampel am Tisch (AddOn-Menü, BLE) | `src/74-startampel.js`, `src/00-index.head.html` (#tab-addon) | `AMPEL_STAND`, `id="tab-addon"` |
+| Startampel am Tisch (seit 1.6.84 auf Luukes Seite Optionen → Zusatz-Hardware → Startampel, BLE) mit Wartezeit und Frühstart-Abbruch | `src/74c-startampel.js`, `src/70-race.js`, `src/00-index.head.html` (#sub-opt-addon) | `AMPEL_STAND`, `id="race-start-warte"`, `function ampelStartVerzoegert` |
 | Startansage „Gentlemen, start your engines“ | `src/80-sound.js`, Schalter `setting-announce-start` | `setting-announce-start` |
 | Akku kritisch (6 %, „Session abbrechen, Box anfahren!“) | `src/80-sound.js`, Schalter `setting-announce-battery-crit` | `setting-announce-battery-crit`, `AKKU_KRITISCH` |
-| ansageAn mit `start: true, batterycrit: true` | `src/80-sound.js` | `start: true, batterycrit: true` |
+| ansageAn mit `start: true` und `batterycrit: true` (seit 1.6.60 bei Luuke) | `src/80-sound.js` | `start: true,`, `batterycrit: true };` |
 | Opel Manta B400 (nur Fork, KEINE Freigabe, nie in einen PR) | `img/autos/manta/`, Fork-Datei | `manta: 'img/autos/manta/'`, `{ v: 'manta'` |
 | Porsche 911 GT3 (nur Fork, Freigabe nur mündlich) | `img/autos/gt3/`, Fork-Datei | `gt3: 'img/autos/gt3/'`, `{ v: 'gt3'` |
 | Feste Motorklänge Manta/GT3 (+ Menü, Doku, SAMPLE_CARS, Garagen-Name) | `audio/loops.json`, `audio/*.ogg`, `src/80-sound.js`, `src/00-index.head.html`, `tools/engine_synth.py`, `audio/CREDITS.md`, `src/60d-virtuell.js` | `manta400_rec`, `sd_boxer_dunkel`, `const festNamen` |
