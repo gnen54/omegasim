@@ -1,5 +1,5 @@
-{"version":"1.6.84","apk":2,"dateien":[
-{"p":"index.html","h":"7d6b8e4d50eb4ba1410fb5a2c9c2a87fd3fc613229b9a9a47c906a460aca9a34","g":9252515},
+{"version":"1.6.85","apk":2,"dateien":[
+{"p":"index.html","h":"e5d9b4fd4564d844e56bcb5c9ec38f343dd876a30aa62a55b72f808640b13da4","g":9257026},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1221,7 +1221,7 @@
 {"p":"img/strecke-kachel-bg.jpg","h":"1e53777be4c21d705d719ed851d454827ee511070b709f1e2ce3efa79694c43b","g":31342},
 {"p":"img/strecke-kachel.jpg","h":"1e53777be4c21d705d719ed851d454827ee511070b709f1e2ce3efa79694c43b","g":31342},
 {"p":"img/strecken/LIZENZ.txt","h":"1c1ef094875c397ba1ebe36f07e74c89d3f4d171fdab2f6fe920dc02cfb06262","g":455},
-{"p":"img/strecken/indeq-bruecke.json","h":"ef3cd74a0e78f88f3cd464b07cc056695623adb4a7a6b47321feead8ea8534d6","g":23028},
+{"p":"img/strecken/indeq-bruecke.json","h":"79176bda93502ac00949bb1085a1d0f34de3e0fa38629e4626ad388977b54a2b","g":23562},
 {"p":"img/strecken/indeq-ring.json","h":"b08df9d9778fa8659f1775cb55be33b2c31eec627e2745e9404e09fa11561101","g":19581},
 {"p":"img/titel-bg.jpg","h":"c02d07a3d67a58813608b14a32f17da24e026400db9ff966cd66729de63f42f6","g":67544},
 {"p":"img/titel.jpg","h":"d0b0567a6ca37be63fbe2040e34c43d19a6da79fd6dbb8f0404cd46d5fdc7e2b","g":39348},

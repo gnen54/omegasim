@@ -6093,7 +6093,7 @@
         <span class="home-lade-dreh" id="home-lade-dreh"></span><span class="home-lade-text" id="home-lade-text" data-i18n-skip></span>
       </div>
       <div class="k-titel-fuss">
-        <span class="foot-ver">v<span id="app-version">1.6.84</span></span>
+        <span class="foot-ver">v<span id="app-version">1.6.85</span></span>
         <span data-i18n-skip>OmegaSim &middot; AGPL-3.0</span>
         <a class="foot-code" href="https://github.com/Luuke42/omegasim"
            target="_blank" rel="noopener noreferrer">Code auf GitHub</a>
@@ -7419,6 +7419,7 @@
       <h2>Patchnotes</h2>
       <p class="muted"><b><span data-i18n-skip>1.6</span></b></p>
       <ul class="muted" id="patchnotes-16" style="padding-left:20px; line-height:1.7">
+        <li>T&#246;rnerschleife 2.0 mit Br&#252;cke: In der Boxengasse sind jetzt sechs Boxenfelder als gelbe gestrichelte Linien eingezeichnet, an der Einfahrt zur Boxengasse liegt ein wei&#223;er Pfeil auf der Fahrbahn (aus der Zeichnung T&#246;rnerschleife V2c von Gnen54).</li>
         <li>Reifenquietschen in der virtuellen Fahrt: quietscht erst, wenn die Reifen wirklich rutschen (am Scheitel der Reifenkurve und etwas gehalten), nicht mehr bei jedem Lenkeinschlag. &#220;berall halb so laut und ohne mitsteigende Tonh&#246;he; das hohe Bremsenquietschen ist virtuell aus. Neu in Optionen &gt; Virtuell: Totzone f&#252;r die Steuerung &#8222;Neigen&#8220; (0 bis 15 Grad, Vorgabe 2,5).</li>
         <li>Vorschaubilder neu: grauer Hintergrund mit leichtem Verlauf f&#252;r alle Autos und den Hubschrauber (ein Skript f&#252;r alles: tools/vorschau_bilder.py). Bei Boxer 96, FMC GT4 und Lynx 220 sitzen die R&#228;der jetzt in den Radk&#228;sten (die Karosserie steht wie im Spiel um die Bodenfreiheit h&#246;her). Marker-AR: Kamerabild und Strecke geh&#246;ren jetzt immer zum selben Moment (das Bild wird erst mit der erkannten Lage gezeigt), die Lage folgt Bewegungen schneller, ohne im Stand mehr zu zittern. Brems-, R&#252;ck- und Scheinwerferlicht leuchten in AR schw&#228;cher.</li>
         <li>Freie virtuelle Strecken: Zur Auswahl stehen die T&#246;rnerschleife 2.0 mit und ohne Br&#252;cke. Bestenlisten zeigen nur noch Zeiten von Strecken, die es in der App gibt.</li>
@@ -18039,6 +18040,7 @@
     "fein": "subpixel",
     "Marker-AR ruhiger: Die Ecken des Markers werden jetzt auf Bruchteile eines Pixels genau vermessen (Kanten im Graubild, angepasste Geraden) und mit einem One-Euro-Filter geglättet; die Erkennung läuft mit einer festen Breite von 960 Pixeln statt abwechselnd 640/400. Neigung und Abstand werden bei ruhiger Kamera stärker geglättet, bei Bewegung folgt das Bild sofort. Gemessen bei 1,3 m Abstand: Zittern 2- bis 5-mal kleiner, Erkennung in 98 % statt 38 % der Bilder.": "Marker AR calmer: the marker corners are now measured to a fraction of a pixel (edges in the greyscale image, fitted lines) and smoothed with a One Euro filter; detection runs at a fixed width of 960 pixels instead of alternating 640/400. Tilt and distance are smoothed more while the camera is still, and the image follows immediately when you move. Measured at 1.3 m: jitter 2 to 5 times smaller, detection in 98 % instead of 38 % of frames.",
     "Marker-AR: Die Strecke kippt nicht mehr „wie ein Necker-Würfel“ in die andere Neigung. Ein flacher Marker lässt zwei fast gleich gute Neigungen zu; gewählt wird jetzt die, bei der das Papier im Bild nach oben zeigt (der Marker liegt am Boden), die zur bisherigen passt (auch über kurze Aussetzer) und den kleineren Fehler hat, mit Hysterese gegen ständiges Wechseln.": "Marker AR: the track no longer flips “like a Necker cube” to the other tilt. A flat marker allows two almost equally good tilts; the app now picks the one where the paper points upward in the image (the marker lies on the floor), that matches the previous one (also across short dropouts) and has the smaller error, with hysteresis against constant switching.",
+    "Törnerschleife 2.0 mit Brücke: In der Boxengasse sind jetzt sechs Boxenfelder als gelbe gestrichelte Linien eingezeichnet, an der Einfahrt zur Boxengasse liegt ein weißer Pfeil auf der Fahrbahn (aus der Zeichnung Törnerschleife V2c von Gnen54).": "Törnerschleife 2.0 with bridge: the pit lane now shows six pit boxes as yellow dashed lines, and a white arrow on the track marks the pit lane entry (from Gnen54's drawing Törnerschleife V2c).",
     "Freie virtuelle Strecken: Zur Auswahl stehen die Törnerschleife 2.0 mit und ohne Brücke. Bestenlisten zeigen nur noch Zeiten von Strecken, die es in der App gibt.": "Free virtual tracks: you can choose the Törnerschleife 2.0 with and without bridge. Best-time lists now only show times of tracks that exist in the app.",
     "Vorschaubilder neu: grauer Hintergrund mit leichtem Verlauf für alle Autos und den Hubschrauber (ein Skript für alles: tools/vorschau_bilder.py). Bei Boxer 96, FMC GT4 und Lynx 220 sitzen die Räder jetzt in den Radkästen (die Karosserie steht wie im Spiel um die Bodenfreiheit höher). Marker-AR: Kamerabild und Strecke gehören jetzt immer zum selben Moment (das Bild wird erst mit der erkannten Lage gezeigt), die Lage folgt Bewegungen schneller, ohne im Stand mehr zu zittern. Brems-, Rück- und Scheinwerferlicht leuchten in AR schwächer.": "New preview images: gray background with a light gradient for all cars and the helicopter (one script for everything: tools/vorschau_bilder.py). On the Boxer 96, FMC GT4 and Lynx 220 the wheels now sit in the wheel arches (the body is raised by the ground clearance, as in the game). Marker AR: camera image and track now always belong to the same moment (the image is shown together with the detected pose), and the pose follows movements faster without more jitter when still. Brake, tail and head lights are dimmer in AR.",
     "Totzone Neigen": "Tilt dead zone",
@@ -44549,7 +44551,40 @@
     // (aus PR 4 von gnen54, "Unschoener Bogen": lose Rechtecke je Segment liefen an den Knicken zickzack).
     const steg = (tiles.find((x) => x && x.steg) || {}).steg;
     if (steg && steg.pts && steg.pts.length > 1) vfBand(rand, steg.pts, (steg.b || 2) / 2, 0.012, 4 / VF_RAND_B, [0.88, 0.88, 0.89]);
+    // v1.6.85 BESTELLT Gnen54: Boxenfelder aus der DXF als gelbe gestrichelte Linien, Einfahrtspfeil weiss wie die
+    // uebrigen Fahrbahnmarkierungen (freie Strecken, Felder boxFelder / boxPfeil der Strecken-JSON).
+    const mk = (tiles.find((x) => x && x.markierung) || {}).markierung;
+    if (mk) vfMarkierung(rand, mk, kw);
     return { strasse, rand, teile: teile.length };
+  }
+  // Boxenfelder und Pfeil (v1.6.85): Felder = Strecken [x0, y0, x1, y1] in Karteneinheiten, gestrichelt (Strich und
+  // Luecke wie VF_FELD_STRICH / VF_FELD_LUECKE), Pfeil = Dreiecke [x, y, ...]. Knapp ueber dem Asphalt, ohne Textur.
+  const VF_FELD_GELB = [1, 0.82, 0.1], VF_FELD_STRICH = 1.9, VF_FELD_LUECKE = 0.95;
+  function vfStriche(x0, y0, x1, y1) {
+    const l = Math.hypot(x1 - x0, y1 - y0), out = [];
+    if (!(l > 0)) return out;
+    const n = Math.max(1, Math.round((l + VF_FELD_LUECKE) / (VF_FELD_STRICH + VF_FELD_LUECKE)));
+    const s = (l + VF_FELD_LUECKE) / n - VF_FELD_LUECKE;   // Striche gleichmaessig, Anfang und Ende mit Strich
+    for (let k = 0; k < n; k++) {
+      const a = k * (s + VF_FELD_LUECKE) / l, b = Math.min(1, a + s / l);
+      out.push([x0 + (x1 - x0) * a, y0 + (y1 - y0) * a, x0 + (x1 - x0) * b, y0 + (y1 - y0) * b]);
+    }
+    return out;
+  }
+  function vfMarkierung(ziel, mk, kw) {
+    const y = 0.016, lw = kw * 0.1, uk = 4 / VF_RAND_B;
+    for (const f of (mk.felder || [])) {
+      if (!f || f.length < 4) continue;
+      for (const [a0, b0, a1, b1] of vfStriche(f[0], f[1], f[2], f[3])) {
+        const l = Math.hypot(a1 - a0, b1 - b0) || 1, qx = -(b1 - b0) / l * lw, qz = (a1 - a0) / l * lw;
+        vfViereck(ziel, [a0 - qx, y, b0 - qz, uk, -1], [a1 - qx, y, b1 - qz, uk, -1], [a1 + qx, y, b1 + qz, uk, -1],
+          [a0 + qx, y, b0 + qz, uk, -1], VF_FELD_GELB);
+      }
+    }
+    const p = mk.pfeil || [];
+    for (let j = 0; j + 5 < p.length; j += 6) {
+      for (const k of [0, 2, 4]) ziel.push(p[j + k], y, p[j + k + 1], uk, -1, 1, 1, 1);
+    }
   }
   // Liegt ein Kartenpunkt q in der Boxengasse (Dreiecke aus der DXF)? Aus PR 4 von gnen54: fuer Ein- und Ausfahrt,
   // dort bleibt der weisse Randstrich offen ("Boxeneingang und -ausgang frei").
@@ -45360,7 +45395,10 @@
       const tiles = d.kacheln.map((ty) => ({ type: TILE_TYPE[ty] !== undefined ? TILE_TYPE[ty] : TILE_TYPE.STRAIGHT, frei: true,
         bucht: ty === 'PIT' ? d.boxBucht : undefined, seite: ty === 'PIT' ? (d.boxSeite || -1) : undefined,
         steg: ty === 'PIT' && d.steg ? d.steg : undefined,
-        gasse: ty === 'PIT' && Array.isArray(d.boxDreiecke) ? { tri: d.boxDreiecke, rand: d.boxRand || [] } : undefined }));
+        gasse: ty === 'PIT' && Array.isArray(d.boxDreiecke) ? { tri: d.boxDreiecke, rand: d.boxRand || [] } : undefined,
+        // v1.6.85 BESTELLT Gnen54: Boxenfelder (gelb gestrichelt) und Einfahrtspfeil (weiss) aus der DXF V2c.
+        markierung: ty === 'PIT' && (Array.isArray(d.boxFelder) || Array.isArray(d.boxPfeil))
+          ? { felder: d.boxFelder || [], pfeil: d.boxPfeil || [] } : undefined }));
       // buchtPkt: Tiefe der Boxengasse je Punkt (Karteneinheiten jenseits der halben Bahn) - die feste Tiefe
       // mit S-Rampe ueberschlug sich sonst in der Kurve vor der Gasse (GEMELDET Gnen54).
       const bp = Array.isArray(d.buchtPkt) ? d.buchtPkt : null;
@@ -126540,6 +126578,25 @@ const GHOST_GRID_MAX = 0.9;   // maximale Querlage beim Selbst-Einparken (experi
   });
   // ---- v1.5.160: Port von PR 4 (gnen54) und die Wuensche dazu ----
   // Beide Toernerschleifen (mit und ohne Bruecke) in der Garage waehlbar, laden, Randstreifen rein weiss, Bruecke hoch.
+  stAdd('Virtuell v1.6.85: Brueckenstrecke mit gelb gestrichelten Boxenfeldern und weissem Einfahrtspfeil', async () => {
+    const f = [];
+    const d = await vfFreiLaden('indeqBruecke');
+    const mk = (d.tiles.find((x) => x && x.markierung) || {}).markierung;
+    if (!mk) return { ok: false, mass: 'keine Markierung an der PIT-Kachel' };
+    if (mk.felder.length !== 9) f.push('Feldlinien: ' + mk.felder.length + ' statt 9');
+    if (mk.pfeil.length < 18 || mk.pfeil.length % 6) f.push('Pfeil-Dreiecke: ' + mk.pfeil.length / 6);
+    const g = vfBahnGeometrie(d.pts, trackNormals(d.pts), d.tiles, 1), ohne = vfBahnGeometrie(d.pts, trackNormals(d.pts),
+      d.tiles.map((x) => Object.assign({}, x, { markierung: undefined })), 1);
+    let gelb = 0;
+    for (let i = 5; i < g.rand.length; i += 8) if (g.rand[i] === VF_FELD_GELB[0] && g.rand[i + 1] === VF_FELD_GELB[1] && g.rand[i + 2] === VF_FELD_GELB[2]) gelb++;
+    const striche = gelb / 6, neu = (g.rand.length - ohne.rand.length) / 8;
+    if (striche < 9 * 3) f.push('zu wenig Striche: ' + striche);
+    if (neu !== gelb + mk.pfeil.length / 2) f.push('Ecken neu ' + neu + ', erwartet ' + (gelb + mk.pfeil.length / 2));
+    // Gestrichelt: zwei Striche einer Linie beruehren sich nicht.
+    const s = vfStriche(0, 0, 10, 0);
+    if (s.length < 2 || !(s[1][0] - s[0][2] > 0.5) || Math.abs(s[s.length - 1][2] - 10) > 1e-9) f.push('Striche: ' + JSON.stringify(s));
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : striche + ' gelbe Striche, ' + mk.pfeil.length / 6 + ' Pfeil-Dreiecke' };
+  });
   stAdd('Virtuell v1.5.160: beide freien Strecken waehlbar und ladbar, weisse Randstriche, Bruecke mit Hoehe', async () => {
     if (typeof virtuellStarten !== 'function' || typeof VF === 'undefined') return { skip: true, mass: 'kein virtuelles Fahren' };
     if (VF.aktiv) return { skip: true, mass: 'virtuelle Fahrt laeuft gerade' };

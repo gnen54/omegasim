@@ -979,7 +979,40 @@
     // (aus PR 4 von gnen54, "Unschoener Bogen": lose Rechtecke je Segment liefen an den Knicken zickzack).
     const steg = (tiles.find((x) => x && x.steg) || {}).steg;
     if (steg && steg.pts && steg.pts.length > 1) vfBand(rand, steg.pts, (steg.b || 2) / 2, 0.012, 4 / VF_RAND_B, [0.88, 0.88, 0.89]);
+    // v1.6.85 BESTELLT Gnen54: Boxenfelder aus der DXF als gelbe gestrichelte Linien, Einfahrtspfeil weiss wie die
+    // uebrigen Fahrbahnmarkierungen (freie Strecken, Felder boxFelder / boxPfeil der Strecken-JSON).
+    const mk = (tiles.find((x) => x && x.markierung) || {}).markierung;
+    if (mk) vfMarkierung(rand, mk, kw);
     return { strasse, rand, teile: teile.length };
+  }
+  // Boxenfelder und Pfeil (v1.6.85): Felder = Strecken [x0, y0, x1, y1] in Karteneinheiten, gestrichelt (Strich und
+  // Luecke wie VF_FELD_STRICH / VF_FELD_LUECKE), Pfeil = Dreiecke [x, y, ...]. Knapp ueber dem Asphalt, ohne Textur.
+  const VF_FELD_GELB = [1, 0.82, 0.1], VF_FELD_STRICH = 1.9, VF_FELD_LUECKE = 0.95;
+  function vfStriche(x0, y0, x1, y1) {
+    const l = Math.hypot(x1 - x0, y1 - y0), out = [];
+    if (!(l > 0)) return out;
+    const n = Math.max(1, Math.round((l + VF_FELD_LUECKE) / (VF_FELD_STRICH + VF_FELD_LUECKE)));
+    const s = (l + VF_FELD_LUECKE) / n - VF_FELD_LUECKE;   // Striche gleichmaessig, Anfang und Ende mit Strich
+    for (let k = 0; k < n; k++) {
+      const a = k * (s + VF_FELD_LUECKE) / l, b = Math.min(1, a + s / l);
+      out.push([x0 + (x1 - x0) * a, y0 + (y1 - y0) * a, x0 + (x1 - x0) * b, y0 + (y1 - y0) * b]);
+    }
+    return out;
+  }
+  function vfMarkierung(ziel, mk, kw) {
+    const y = 0.016, lw = kw * 0.1, uk = 4 / VF_RAND_B;
+    for (const f of (mk.felder || [])) {
+      if (!f || f.length < 4) continue;
+      for (const [a0, b0, a1, b1] of vfStriche(f[0], f[1], f[2], f[3])) {
+        const l = Math.hypot(a1 - a0, b1 - b0) || 1, qx = -(b1 - b0) / l * lw, qz = (a1 - a0) / l * lw;
+        vfViereck(ziel, [a0 - qx, y, b0 - qz, uk, -1], [a1 - qx, y, b1 - qz, uk, -1], [a1 + qx, y, b1 + qz, uk, -1],
+          [a0 + qx, y, b0 + qz, uk, -1], VF_FELD_GELB);
+      }
+    }
+    const p = mk.pfeil || [];
+    for (let j = 0; j + 5 < p.length; j += 6) {
+      for (const k of [0, 2, 4]) ziel.push(p[j + k], y, p[j + k + 1], uk, -1, 1, 1, 1);
+    }
   }
   // Liegt ein Kartenpunkt q in der Boxengasse (Dreiecke aus der DXF)? Aus PR 4 von gnen54: fuer Ein- und Ausfahrt,
   // dort bleibt der weisse Randstrich offen ("Boxeneingang und -ausgang frei").
@@ -1790,7 +1823,10 @@
       const tiles = d.kacheln.map((ty) => ({ type: TILE_TYPE[ty] !== undefined ? TILE_TYPE[ty] : TILE_TYPE.STRAIGHT, frei: true,
         bucht: ty === 'PIT' ? d.boxBucht : undefined, seite: ty === 'PIT' ? (d.boxSeite || -1) : undefined,
         steg: ty === 'PIT' && d.steg ? d.steg : undefined,
-        gasse: ty === 'PIT' && Array.isArray(d.boxDreiecke) ? { tri: d.boxDreiecke, rand: d.boxRand || [] } : undefined }));
+        gasse: ty === 'PIT' && Array.isArray(d.boxDreiecke) ? { tri: d.boxDreiecke, rand: d.boxRand || [] } : undefined,
+        // v1.6.85 BESTELLT Gnen54: Boxenfelder (gelb gestrichelt) und Einfahrtspfeil (weiss) aus der DXF V2c.
+        markierung: ty === 'PIT' && (Array.isArray(d.boxFelder) || Array.isArray(d.boxPfeil))
+          ? { felder: d.boxFelder || [], pfeil: d.boxPfeil || [] } : undefined }));
       // buchtPkt: Tiefe der Boxengasse je Punkt (Karteneinheiten jenseits der halben Bahn) - die feste Tiefe
       // mit S-Rampe ueberschlug sich sonst in der Kurve vor der Gasse (GEMELDET Gnen54).
       const bp = Array.isArray(d.buchtPkt) ? d.buchtPkt : null;

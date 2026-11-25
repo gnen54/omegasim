@@ -28184,6 +28184,25 @@
   });
   // ---- v1.5.160: Port von PR 4 (gnen54) und die Wuensche dazu ----
   // Beide Toernerschleifen (mit und ohne Bruecke) in der Garage waehlbar, laden, Randstreifen rein weiss, Bruecke hoch.
+  stAdd('Virtuell v1.6.85: Brueckenstrecke mit gelb gestrichelten Boxenfeldern und weissem Einfahrtspfeil', async () => {
+    const f = [];
+    const d = await vfFreiLaden('indeqBruecke');
+    const mk = (d.tiles.find((x) => x && x.markierung) || {}).markierung;
+    if (!mk) return { ok: false, mass: 'keine Markierung an der PIT-Kachel' };
+    if (mk.felder.length !== 9) f.push('Feldlinien: ' + mk.felder.length + ' statt 9');
+    if (mk.pfeil.length < 18 || mk.pfeil.length % 6) f.push('Pfeil-Dreiecke: ' + mk.pfeil.length / 6);
+    const g = vfBahnGeometrie(d.pts, trackNormals(d.pts), d.tiles, 1), ohne = vfBahnGeometrie(d.pts, trackNormals(d.pts),
+      d.tiles.map((x) => Object.assign({}, x, { markierung: undefined })), 1);
+    let gelb = 0;
+    for (let i = 5; i < g.rand.length; i += 8) if (g.rand[i] === VF_FELD_GELB[0] && g.rand[i + 1] === VF_FELD_GELB[1] && g.rand[i + 2] === VF_FELD_GELB[2]) gelb++;
+    const striche = gelb / 6, neu = (g.rand.length - ohne.rand.length) / 8;
+    if (striche < 9 * 3) f.push('zu wenig Striche: ' + striche);
+    if (neu !== gelb + mk.pfeil.length / 2) f.push('Ecken neu ' + neu + ', erwartet ' + (gelb + mk.pfeil.length / 2));
+    // Gestrichelt: zwei Striche einer Linie beruehren sich nicht.
+    const s = vfStriche(0, 0, 10, 0);
+    if (s.length < 2 || !(s[1][0] - s[0][2] > 0.5) || Math.abs(s[s.length - 1][2] - 10) > 1e-9) f.push('Striche: ' + JSON.stringify(s));
+    return { ok: !f.length, mass: f.length ? f.join(' | ') : striche + ' gelbe Striche, ' + mk.pfeil.length / 6 + ' Pfeil-Dreiecke' };
+  });
   stAdd('Virtuell v1.5.160: beide freien Strecken waehlbar und ladbar, weisse Randstriche, Bruecke mit Hoehe', async () => {
     if (typeof virtuellStarten !== 'function' || typeof VF === 'undefined') return { skip: true, mass: 'kein virtuelles Fahren' };
     if (VF.aktiv) return { skip: true, mass: 'virtuelle Fahrt laeuft gerade' };
