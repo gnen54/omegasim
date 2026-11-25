@@ -73,7 +73,7 @@
       const quer = Math.abs((p.x - p0.x) * -dy + (p.y - p0.y) * dx);
       const sl = Math.hypot(p.x - q.x, p.y - q.y) || 1;
       const gleich = ((p.x - q.x) * dx + (p.y - q.y) * dy) / sl > 0.7;
-      if (vor > -0.3 && quer < TRACK_HALF_W && gleich) ende--; else break;
+      if (vor > -0.3 && quer < vfHalbW() && gleich) ende--; else break;
     }
     return ende < n ? pts.slice(0, ende) : pts;
   }
@@ -692,7 +692,7 @@
     if (!tiles.some((x) => x.type === TILE_TYPE.PIT) || typeof boxBucht !== 'function') return { pts, nrm, bucht: null, seite: null, marken: [] };
     // Bucht-Seite: -1 = rechts (Carrera-Boxengasse, rote Seite), +1 = links (freie Strecken, aus der Datei).
     const seiteK = (k) => (tiles[k] && tiles[k].seite) || -1;
-    const half = TRACK_HALF_W, FEIN = 6, n = pts.length;
+    const half = vfHalbW(), FEIN = 6, n = pts.length;
     const tiefeK = (k) => (tiles[k] && tiles[k].bucht ? tiles[k].bucht : BOX_BUCHT) * half;
     const box = {};
     for (let i = 1; i < n; i++) {
@@ -766,7 +766,7 @@
     for (let i = 0; i < n; i++) {
       const k = pts[i].tile, b = box[k];
       if (pts[i].bucht !== undefined) out[i] = pts[i].bucht;
-      else if (b) out[i] = (tiles[k].bucht || BOX_BUCHT) * TRACK_HALF_W * boxBucht((i - b.s) / Math.max(1, b.b - b.s));
+      else if (b) out[i] = (tiles[k].bucht || BOX_BUCHT) * vfHalbW() * boxBucht((i - b.s) / Math.max(1, b.b - b.s));
     }
     return out;
   }
@@ -786,7 +786,7 @@
     }
     const pts = fein.pts, nrm = fein.nrm, bucht = fein.bucht;
     const bu = (i) => (bucht ? bucht[i] : 0), bse = (i) => (fein.seite ? fein.seite[i] : -1);
-    const half = TRACK_HALF_W, kw = TRACK_KERB_W, ky = 0.09, n = pts.length;
+    const half = vfHalbW(), kw = TRACK_KERB_W, ky = 0.09, n = pts.length;
     const rnd = vfZufall(4242 + tiles.length * 31 + Math.round(Math.abs(pts[n - 1].x) * 7));
     const off = (i, d) => [pts[i].x + nrm[i].x * d, pts[i].y + nrm[i].y * d];
     const zz = (i) => pts[i].z || 0;   // Hoehe (Bruecke), sonst 0
@@ -1233,7 +1233,7 @@
   function vfHz(x, y, h) {
     if (!VF.hoehe) return VF_HZ_NULL;
     const r = h * Math.PI / 180, fx = Math.sin(r), fy = -Math.cos(r);
-    let best = null, bq = TRACK_HALF_W + TRACK_KERB_W + VF_AUTO.B;
+    let best = null, bq = vfHalbW() + TRACK_KERB_W + VF_AUTO.B;
     for (const sg of VF.hoehe) {
       const t = ((x - sg.ax) * sg.ex + (y - sg.ay) * sg.ey) / sg.l;
       if (t < -0.3 || t > 1.3) continue;
@@ -1410,7 +1410,7 @@
       // gitter (25.11., Heckenhoim V3): Startplatz-Klammern aus der DXF - Linien zum Zeichnen, Startplaetze
       // (Pole zuerst) fuer Spieler und NPCs.
       const gitter = d.gitter && Array.isArray(d.gitter.plaetze) && d.gitter.plaetze.length ? d.gitter : null;
-      vfFreiCache[k] = { name: d.name, tiles, pts, gitter };
+      vfFreiCache[k] = { name: d.name, tiles, pts, gitter, halb: d.halb > 0 ? d.halb : 0 };
       return vfFreiCache[k];
     });
   }
@@ -1457,7 +1457,7 @@
   function vfPflichtGilt() { return !!(VF.boxN && (VF.modus === 'laps' || VF.modus === 'endurance') && vfPflichtBox() > 0); }
   function vfBoxDurchfahrt(o, zus) {
     if (!VF.boxN) return;
-    const drin = zus > VF.boxMax * 0.3 && Math.abs(o.quer) > TRACK_HALF_W + zus * 0.5;
+    const drin = zus > VF.boxMax * 0.3 && Math.abs(o.quer) > vfHalbW() + zus * 0.5;
     VF.inBox = drin;
     // Von-bis statt Einzelpunkte: bei hohem Tempo springt der Index mehrere Punkte je Bild.
     if (drin) { if (!VF.boxBesucht) VF.boxBesucht = { von: o.idx, bis: o.idx }; else VF.boxBesucht.bis = o.idx; return; }
@@ -1513,6 +1513,9 @@
   const VF_GRID_REIHE = Math.max(2, Math.round((typeof TRACK_SAMPLES_PER_TILE !== 'undefined' ? TRACK_SAMPLES_PER_TILE : 8) * 1.5));
   // Startplatz i der freien Strecke (Pole = 0): naechster Mittellinienpunkt und seitlicher Versatz dazu
   // (wie npc.offset: Lauf = Punkt + Normale * Versatz). null ohne Startaufstellung oder Platz.
+  // Halbe Fahrbahnbreite: Carrera-Kacheln TRACK_HALF_W (25 cm), freie Strecke aus ihrer JSON ("halb",
+  // 25.11.: Heckenhoim in echten Massen, 33,6 cm Bahn = 31,3 Einheiten). Ohne Angabe wie bisher.
+  function vfHalbW() { return (VF.frei && VF.frei.halb > 0) ? VF.frei.halb : TRACK_HALF_W; }
   function vfGitterPlatz(i) {
     const g = VF.frei && VF.frei.gitter, p = g && g.plaetze[i];
     if (!p || !VF.pts || !VF.nrm) return null;
@@ -2569,7 +2572,7 @@
     // Bruecke und Rampen: seitlich begrenzt (Bordwand), herunterfallen gibt es nicht.
     const Hb = vfHzSpieler();
     if (Hb.z > 0.3) {
-      const grenze = TRACK_HALF_W + TRACK_KERB_W - VF_AUTO.B * 0.5;
+      const grenze = vfHalbW() + TRACK_KERB_W - VF_AUTO.B * 0.5;
       if (Math.abs(o.quer) > grenze) {
         const zu = (Math.abs(o.quer) - grenze) * Math.sign(o.quer);
         VF.x -= VF.nrm[o.idx].x * zu; VF.y -= VF.nrm[o.idx].y * zu; o.quer -= zu;
@@ -2582,14 +2585,14 @@
     // Steigung bremst bergauf, beschleunigt bergab (Hangabtrieb, g * sin).
     // physEngine rechnet ein grosses Auto, verkleinert um REAL_SCALE - die Schwerkraft ebenso.
     if (Hb.p) st.speedKmh -= 9.81 * Math.sin(Hb.p) * 3.6 * dt / REAL_SCALE;
-    const ab = Math.abs(o.quer) - zus > TRACK_HALF_W * 1.19 + VF_AUTO.B * 0.3;
+    const ab = Math.abs(o.quer) - zus > vfHalbW() * 1.19 + VF_AUTO.B * 0.3;
     if (ab && !VF.abseits) VF.abseitsSeit = rennZeitJetzt();
     VF.abseits = ab;
     // Randstein (v1.2.62): der erhabene Stein links/rechts der Fahrbahn. Faehrt das Auto mit dem
     // Rand ueber ihn, rattert es und der Controller brummt.
     const q = Math.abs(o.quer) - zus;
-    const kerbRand = TRACK_HALF_W * 2 * 0.095;
-    const kerb = !ab && q > TRACK_HALF_W - VF_AUTO.B * 0.5 && q < TRACK_HALF_W + kerbRand;
+    const kerbRand = vfHalbW() * 2 * 0.095;
+    const kerb = !ab && q > vfHalbW() - VF_AUTO.B * 0.5 && q < vfHalbW() + kerbRand;
     if (kerb && Math.abs(kmh) > 0.05) {
       if (VF.kerbSeit === undefined || rennZeitJetzt() - VF.kerbSeit > 70) {
         VF.kerbSeit = rennZeitJetzt();
@@ -3231,7 +3234,7 @@
   const VF_FAHRER_AUGE_CM = 100, VF_FAHRER_ABSTAND_CM = 75, VF_FAHRER_TAU = 0.25, VF_FAHRER_ZOOM_TAU = 0.8;
   const VF_FAHRER_FOV = 34, VF_FAHRER_FOV_FERN = 21;
   function vfFahrerOrt(pts, nrm, tiles) {
-    const n = pts.length, rand = TRACK_HALF_W + TRACK_KERB_W, abst = VF_FAHRER_ABSTAND_CM * TRACK_UNITS_PER_CM;
+    const n = pts.length, rand = vfHalbW() + TRACK_KERB_W, abst = VF_FAHRER_ABSTAND_CM * TRACK_UNITS_PER_CM;
     const s = Math.max(0, pts.findIndex((p) => p.tile >= 0 && tiles[p.tile] && tiles[p.tile].type === TILE_TYPE.START));
     const innen = (x, y) => {
       let c = false;
@@ -4407,7 +4410,7 @@
   }
   function vfRandsteinMenge(kerb, q, kmh) {
     if (!kerb || randsteinKlangAlt || !(Math.abs(kmh) > 0.05)) return 0;
-    const tiefe = Math.max(0, Math.min(1, (q - (TRACK_HALF_W - VF_AUTO.B * 0.5)) / (VF_AUTO.B * 0.5)));
+    const tiefe = Math.max(0, Math.min(1, (q - (vfHalbW() - VF_AUTO.B * 0.5)) / (VF_AUTO.B * 0.5)));
     return (0.45 + 0.55 * tiefe) * Math.min(1, 0.35 + Math.abs(kmh) * TACHO_SCALE / 160);
   }
   function vfRandsteinTon(kerb, q, kmh) {

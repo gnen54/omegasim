@@ -67,7 +67,8 @@ start_mm = np.array([(-1447 + -1111.5) / 2, (126 + 150) / 2.0])
 print('Laenge %.2f m, Breite (Skelett) %.0f mm' % (np.hypot(*np.diff(np.vstack([M, M[:1]]), axis=0).T).sum() / 1000, breite))
 
 BREITE = 336.0                                     # Startlinie quer ueber die Bahn = Bahnbreite
-K = 25.0 / BREITE * 0.997                          # Karteneinheiten je mm (Bahn = 25 Einheiten wie die Toernerschleife)
+K = 0.093023                                       # Karteneinheiten je mm = TRACK_UNITS_PER_CM/10 der App (echte Masse wie die
+                                                   # Toernerschleife; 25.11., Gnen54: Autos im Vergleich zu Fusion 1,47x zu gross)
 P_ = np.vstack([M, M[:1]]); sl = np.r_[0, np.cumsum(np.hypot(*np.diff(P_, axis=0).T))]
 u = np.arange(0, sl[-1], 2.857 / K); M = np.c_[np.interp(u, sl, P_[:, 0]), np.interp(u, sl, P_[:, 1])]
 r0 = int(np.argmin(np.hypot(*(M - start_mm).T))); M = np.roll(M, -r0, axis=0)
@@ -106,7 +107,7 @@ breit = cv2.morphologyEx(cv2.morphologyEx(breit.astype(np.uint8), cv2.MORPH_OPEN
 breit &= ~alles & ~steg & (hd0 > 25)
 alles = alles | breit
 gasse = gasse | breit
-HALF = 12.5
+HALF = BREITE * K / 2                              # halbe Bahn in Einheiten (geht als 'halb' in die JSON)
 def strahl(i, sg):
     letzte, leer, gesehen = 0, 0, False
     for dmm in np.arange(0, 800, 2.0):
@@ -147,14 +148,14 @@ while i < len(E):
 versatz = (E.max(0) + E.min(0)) / 2; E = E - versatz
 edv = lambda Q: ed(Q) - versatz
 out = {'name': 'Heckenhoim', 'quelle': 'Heckenhoim_V3.dxf (Gnen54/Thorsten), 3,00 x 2,00 m',
-       'breiteMm': BREITE, 'kacheln': tiles,
+       'breiteMm': BREITE, 'halb': round(float(HALF), 3), 'kacheln': tiles,
        'pts': [[round(float(a), 2), round(float(b_), 2), int(tl)] for (a, b_), tl in zip(E, tile_of)]}
 Sm = edv(S); step = max(1, len(Sm) // 160)
 out['steg'] = {'b': round(float(steg.sum() * R * R / (np.hypot(*np.diff(S, axis=0).T).sum() + 1) * K), 2),
                'pts': [[round(float(a), 2), round(float(b_), 2)] for a, b_ in Sm[::step]],
                # 25.11. (Gnen54): auf dem Heckenhoim kein Curb zwischen Start/Ziel und Boxengasse zeichnen
                'zeichnen': False}
-out['boxBucht'] = round(float(np.median(x[x > 0]) / 11.63), 2) if (x > 0).any() else 1.0
+out['boxBucht'] = round(float(np.median(x[x > 0]) / HALF), 2) if (x > 0).any() else 1.0
 out['boxSeite'] = int(SEITE)
 gz = np.argwhere(gasse); gm = mm(gz[len(gz) // 2])
 out['boxPunkt'] = [round(float(v), 2) for v in edv(gm[None])[0]]

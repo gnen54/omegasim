@@ -62,6 +62,7 @@ Stand: 25.11.2026 (auf Luukes 1.6.84). Garagen-Menü (Garage: links „Virtuell 
 | Lebenszeichen der virtuellen Fahrt: erkennt Neuladen der Seite mitten in der Fahrt, meldet „Letzte Fahrt unerwartet abgebrochen“ (23.11.) | `src/60d-virtuell.js` | `const VF_LAEUFT_STORE`, `function vfAbbruchPruefen` |
 | Rennende: Ergebnistafel bleibt stehen („Zurück zur Garage“, A/Enter); Garage zeigt Rennmodus und Länge (23.11.) | `src/60d-virtuell.js` | `function vfErgebnisTafel`, `function vfModusText` |
 | Startaufstellung freier Strecken (`gitter` in der Strecken-JSON, Heckenhoim V3): Klammern gezeichnet, Spieler auf der Pole, NPCs auf den Plätzen dahinter (25.11.) | `src/60d-virtuell.js`, `tools/strecken/heckenhoim_bau.py`, `img/strecken/heckenhoim.json` | `function vfGitterPlatz`, `"gitter"` |
+| Bahnbreite je freier Strecke (`halb` in der Strecken-JSON, `vfHalbW()` statt TRACK_HALF_W im VF); Heckenhoim in echten Maßen (0,093 Einheiten/mm wie die Törnerschleife), ohne hellen Streifen an der Boxengasse (25.11.) | `src/60d-virtuell.js`, `tools/strecken/heckenhoim_bau.py`, `img/strecken/heckenhoim.json` | `function vfHalbW`, `steg.zeichnen` |
 | Bulli: Scheiben von innen fast klar (Onboard-Kamera) | `src/60d-virtuell.js` | `innen ? 0.12 : 0.86` |
 | Innenspiegel, Außenspiegel (Spider), Armaturenbrett-Cockpit wie im Fork | `src/60d-virtuell.js` | `function vfInnenspiegelMalen`, `function vfCockpit(` |
 | Umgebungston (Ambience) ab Werk aus | `src/80-sound.js`, `id="amb-enable"` ohne checked | `let ambienceEnabled = false` |
