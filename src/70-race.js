@@ -5236,7 +5236,10 @@
     // Virtuelle Fahrt (aus PR 4 von gnen54): hat die Strecke eine Boxengasse, gibt es Service nur dort
     // (vfBoxOrtOk, 60d-virtuell.js), nicht mitten auf der Strecke.
     const vfOrtOk = typeof vfBoxOrtOk !== 'function' || vfBoxOrtOk();
-    const amOrt = (pitTrigger !== 'offtrack' || istAbseits()) && vfOrtOk;
+    // 25.11. (GEMELDET Gnen54, Tablet mit Gamepad: "er tankt nicht, er repariert nicht"): in der virtuellen
+    // Fahrt gibt es keinen echten Bahnsensor - istAbseits() wird dort nie wahr. Dort zaehlt nur die Boxengasse.
+    const vfFahrt = typeof vfAktiv === 'function' && vfAktiv();
+    const amOrt = (vfFahrt || pitTrigger !== 'offtrack' || istAbseits()) && vfOrtOk;
     if (pitState === 'limited' && stopped && amOrt) { setPitState('servicing'); return; }
     if (pitState === 'limited' && stopped && !amOrt && !pitOrtGemeldet) {
       pitOrtGemeldet = true;
@@ -8346,7 +8349,8 @@
     pitLastPress = now;
 
     if (pitState === 'off') {
-      if (pitTrigger === 'double') {
+      // Virtuelle Fahrt (25.11., Fork): kein Start-Ausdruck zum Ueberfahren - der Knopf gilt immer.
+      if (pitTrigger === 'double' && !(typeof vfAktiv === 'function' && vfAktiv())) {
         showHudToast('NUR ÜBER DEN DOPPELTEN AUSDRUCK');
         log('Boxenstopp per Knopf abgelehnt: die Ausloesung steht auf "doppelter '
             + 'Ausdruck". Zweimal ueber den Start-Ausdruck fahren, innerhalb von '

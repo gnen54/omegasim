@@ -1457,7 +1457,9 @@
   function vfPflichtGilt() { return !!(VF.boxN && (VF.modus === 'laps' || VF.modus === 'endurance') && vfPflichtBox() > 0); }
   function vfBoxDurchfahrt(o, zus) {
     if (!VF.boxN) return;
-    const drin = zus > VF.boxMax * 0.3 && Math.abs(o.quer) > vfHalbW() + zus * 0.5;
+    // 25.11.: drin, sobald das Auto ganz neben der Fahrbahn steht (halbe Autobreite), hoechstens aber eine halbe
+    // Buchttiefe - Heckenhoim hat die Gasse jetzt direkt an der Bahn, wer dort am Rand hielt, galt nicht als "in der Box".
+    const drin = zus > VF.boxMax * 0.3 && Math.abs(o.quer) > vfHalbW() + Math.min(zus * 0.5, VF_AUTO.B * 0.5);
     VF.inBox = drin;
     // Von-bis statt Einzelpunkte: bei hohem Tempo springt der Index mehrere Punkte je Bild.
     if (drin) { if (!VF.boxBesucht) VF.boxBesucht = { von: o.idx, bis: o.idx }; else VF.boxBesucht.bis = o.idx; return; }
