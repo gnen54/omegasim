@@ -54,7 +54,3 @@ sketchfab/
 # Entwuerfe ohne Bezug zur App (lokal behalten, nicht verteilen).
 mockup/manylaps_opus.html
 mockup/omegalab-studien.html
-
-# Python-Cache
-__pycache__/
-*.pyc

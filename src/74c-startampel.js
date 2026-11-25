@@ -27,6 +27,12 @@
   let ampelSchlange = Promise.resolve();
   let ampelVorstart = false;     // steht die Ampel gerade auf Gelb (START gesendet)?
   let ampelLetzter = '', ampelFehler = '';
+  // Fork gnen54: Kennung des Fork-Stands, steht unter Optionen -> Startampel (AddOn) hinter dem Status.
+  const AMPEL_STAND = '25.11.-a';
+  // Fork gnen54: Countdown mit fester Gruenzeit (WLAN-Mehrspieler, Challenge-Fenster) - dort laeuft die Ampel auf allen
+  // Geraeten gleichzeitig, ein Abbruch durch Fruehstart wuerde nur dieses Geraet anhalten.
+  let ampelZeitgesteuert = false;
+  function ampelNeustartAn() { const el = $('race-ampel-neustart'); return el ? !!el.checked : true; }
 
   function ampelVerbunden() {
     return !!(ampelKanal && ampelGeraet && ampelGeraet.gatt && ampelGeraet.gatt.connected);
@@ -75,6 +81,7 @@
       : t('Nicht verbunden.'));
     if (!text && ampelLetzter) zeile += ' · ' + t('zuletzt') + ': ' + ampelLetzter;
     if (!text && ampelFehler) zeile += ' · ⚠ ' + ampelFehler;
+    if (!text) zeile += ' · (' + AMPEL_STAND + ')';
     if (s) s.textContent = zeile;
     const b = $('ampel-verbinden');
     if (b) b.textContent = ampelVerbunden() ? t('Trennen') : t('Verbinden');
@@ -135,11 +142,104 @@
   // ---- Aufrufe aus dem Rennablauf (70-race.js, 90-ghosts.js) ----
   function ampelStartKnopf() { if (raceState === 'idle' || raceState === 'finished') ampelSenden('START'); }   // Start im Fenster "Autos in Position"
   function ampelStartAbgebrochen() { ampelSenden('ROT'); }
-  function ampelCountdown() { if (!ampelVorstart) ampelSenden('START'); }        // Countdown ohne Startfenster (Mehrspieler, Challenge)
+  function ampelCountdown(zeitgesteuert) {        // Countdown ohne Startfenster (Mehrspieler, Challenge)
+    ampelZeitgesteuert = !!zeitgesteuert;
+    if (!ampelVorstart) ampelSenden('START');
+  }
   function startampelLicht(licht) { ampelSenden('GRUEN ' + Math.max(1, Math.min(5, licht))); }
   function ampelLos() { ampelSenden('LOS'); }
   function ampelRennende() { ampelSenden('ROT'); }
   function ampelGelb(an) { ampelSenden(an ? 'GELB' : 'GELB_AUS'); }
-  function ampelFruehstartMelden() { if (raceState === 'countdown') ampelSenden('FRUEHSTART'); }
+  // Fork gnen54: FRUEHSTART BRICHT DEN START AB (Schalter unter Optionen -> Startampel, ab Werk an). Nur mit verbundener
+  // Ampel, nicht im Mehrspieler und nicht in einer Challenge (dort haengt Gruen an einer vorgegebenen Zeit). Sonst wie
+  // bei Luuke: Gelb blinkt, Strafe nach den Renneinstellungen. Rueckgabe true: der Start ist abgebrochen.
+  function ampelFruehstartMelden() {
+    if (raceState !== 'countdown') return false;
+    if (!ampelVerbunden() || !ampelNeustartAn() || ampelZeitgesteuert
+        || (typeof challengeLaeuft === 'function' && challengeLaeuft())) { ampelSenden('FRUEHSTART'); return false; }
+    ampelSenden('FRUEHSTART');
+    if (raceCountdownTimer) { rennZeitTimeoutStop(raceCountdownTimer); raceCountdownTimer = null; }
+    ampelPlan = null; ampelSchritt = null;
+    setRaceLights(0);
+    fruehstartReset();
+    raceState = 'idle';
+    $('race-start-btn').disabled = false;
+    $('race-stop-btn').disabled = true;
+    $('race-status').textContent = t('Frühstart – bitte neu starten');
+    showHudToast(t('Frühstart – Start abgebrochen'));
+    log('Fruehstart: Start abgebrochen, die Startampel blinkt gelb. Rennen neu starten.', 'err');
+    updateRaceActButtons();
+    return true;
+  }
+
+  // ---- Fork gnen54: WARTEZEIT zwischen Start und erstem gruenen Licht ----
+  // BESTELLT: "Wir brauchen ein Delay (3-5 Sekunden) nach Betaetigen des Start-Buttons bis zum Beginn der Sequenz der
+  // gruenen LEDs." Nach dem Start im Fenster steht die Ampel auf Gelb, die Ansage laeuft, und erst nach dieser Zeit
+  // beginnt der Countdown. Einstellbar unter Optionen -> Startampel, ab Werk 4 s, 0 = sofort (dann wie bei Luuke:
+  // Countdown nach der Ansage). Die Uhr laeuft ab dem ersten gesprochenen Wort, spaetestens nach ANSAGE_MAX_MS.
+  // Waehrend des Wartens laeuft noch nichts (raceState bleibt idle): kein zweites Startfenster, der Start-Knopf im
+  // Cockpit bricht das Warten ab (Ampel Rot).
+  const START_WARTE_STORE = 'omegasim-start-warte-s', START_WARTE_VORGABE = 4;
+  const ANSAGE_MAX_MS = 4000;
+  let startWarteTimer = null, startWarteNr = 0;
+  function startWarteMs() {
+    const el = $('race-start-warte');
+    const v = el ? parseFloat(el.value) : START_WARTE_VORGABE;
+    return (Number.isFinite(v) ? Math.max(0, Math.min(10, v)) : START_WARTE_VORGABE) * 1000;
+  }
+  function ampelStartWartet() { return !!startWarteTimer; }
+  // Aus raceGridStart() (70-race.js). Rueckgabe false: keine Wartezeit eingestellt, Luukes Ablauf gilt.
+  function ampelStartVerzoegert(weiter) {
+    if (startWarteTimer) return true;
+    const ms = startWarteMs();
+    if (ms <= 0) return false;
+    const nr = ++startWarteNr;
+    let laeuft = false;
+    const uhrStarten = () => {
+      if (laeuft || nr !== startWarteNr || !startWarteTimer) return;
+      laeuft = true;
+      clearTimeout(startWarteTimer);
+      startWarteTimer = setTimeout(() => {
+        startWarteTimer = null;
+        weiter();
+        // Lief der Start nicht an (z. B. Time Attack ohne eingescannte Strecke), darf die Ampel nicht auf Gelb bleiben.
+        if (raceState === 'idle' || raceState === 'finished') {
+          ampelSenden('ROT');
+          if ($('race-status').textContent.indexOf('…') >= 0) $('race-status').textContent = t('Start abgebrochen');
+          if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+          if ($('race-start-btn')) $('race-start-btn').disabled = false;
+        }
+        updateRaceActButtons();
+      }, ms);
+    };
+    startWarteTimer = setTimeout(uhrStarten, ANSAGE_MAX_MS);
+    $('race-status').textContent = t('Start in {n} s …').replace('{n}', String(Math.round(ms / 1000)));
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = false;
+    updateRaceActButtons();
+    if (!(typeof startAnsageSprechen === 'function' && startAnsageSprechen(uhrStarten))) uhrStarten();
+    return true;
+  }
+  function ampelStartWarteAbbrechen() {
+    if (!startWarteTimer) return;
+    clearTimeout(startWarteTimer);
+    startWarteTimer = null;
+    startWarteNr++;
+    ampelSenden('ROT');
+    if ($('race-stop-btn')) $('race-stop-btn').disabled = true;
+    if ($('race-start-btn')) $('race-start-btn').disabled = false;
+    $('race-status').textContent = t('Start abgebrochen');
+    showHudToast(t('Start abgebrochen'));
+    updateRaceActButtons();
+  }
+  if ($('race-start-warte')) {
+    const el = $('race-start-warte');
+    const zeigen = () => { if ($('race-start-warte-val')) $('race-start-warte-val').textContent = Math.round(startWarteMs() / 1000) + ' s'; };
+    try { const w = localStorage.getItem(START_WARTE_STORE); if (w !== null && w !== '') el.value = w; } catch (e) { /* privat */ }
+    el.addEventListener('input', () => {
+      zeigen();
+      try { localStorage.setItem(START_WARTE_STORE, el.value); } catch (e) { /* privat */ }
+    });
+    zeigen();
+  }
 
   ampelStatusZeigen();
