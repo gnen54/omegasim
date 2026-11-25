@@ -781,6 +781,41 @@
     }
     return out;
   }
+  // Striche der Buchstaben P, I, T in einem Feld 0..1 (u quer nach rechts, v in Fahrtrichtung, v = 0 zum Fahrer).
+  const VF_PIT_GLYPHEN = {
+    P: [[0, 0, 0, 1], [0, 1, 1, 1], [1, 1, 1, 0.5], [1, 0.5, 0, 0.5]],
+    I: [[0.5, 0, 0.5, 1]],
+    T: [[0, 1, 1, 1], [0.5, 1, 0.5, 0]],
+  };
+  function vfPitSchrift(rand, pts, nrm, bucht, bse, half, um) {
+    const n = pts.length; if (n < 10) return;
+    // Einfahrt: erster Punkt mit Bucht nach einem ohne
+    let e = -1;
+    for (let i = 0; i < n; i++) { const a = bucht[(i - 1 + n) % n] || 0, b = bucht[i] || 0; if (b > 0.5 && a <= 0.5) { e = i; break; } }
+    if (e < 0) return;
+    // 18 Einheiten davor
+    let j = e, weg = 0;
+    while (weg < 18 && j > e - n) { const p = pts[((j % n) + n) % n], q = pts[(((j - 1) % n) + n) % n]; weg += Math.hypot(p.x - q.x, p.y - q.y); j--; }
+    j = ((j % n) + n) % n;
+    const p = pts[j], q = pts[(j + 1) % n];
+    let tx = q.x - p.x, ty = q.y - p.y; const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+    const nm = nrm[j], seite = bse(e);
+    // Mitte der Schrift: auf der Haelfte zur Gasse
+    const cx = p.x + nm.x * seite * half * 0.5, cy = p.y + nm.y * seite * half * 0.5;
+    const rx = -ty, ry = tx;                            // quer zur Fahrt (Richtung fuer "links nach rechts")
+    const W = 2.6, H = 6.5, LUECKE = 1.2, STRICH = 0.55, text = 'PIT';
+    const breit = text.length * W + (text.length - 1) * LUECKE;
+    for (let k = 0; k < text.length; k++) {
+      const u0 = -breit / 2 + k * (W + LUECKE);
+      for (const s of VF_PIT_GLYPHEN[text[k]]) {
+        const pt = (u, v) => [cx + rx * (u0 + u * W) + tx * (v - 0.5) * H, cy + ry * (u0 + u * W) + ty * (v - 0.5) * H];
+        // Enden um den halben Strich verlaengert, damit die Ecken geschlossen sind
+        const a = pt(s[0], s[1]), b = pt(s[2], s[3]); let dx = b[0] - a[0], dy = b[1] - a[1]; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+        const h = STRICH / 2;
+        vfBand(rand, [[a[0] - dx * h, a[1] - dy * h], [b[0] + dx * h, b[1] + dy * h]], h, 0.013, um, [1, 1, 1]);
+      }
+    }
+  }
   function vfBahnGeometrie(pts0, nrm0, tiles, ao) {
     const strasse = [], rand = [];
     const fein = vfBoxVerfeinern(pts0, nrm0, tiles);
@@ -975,6 +1010,10 @@
     if (VF.frei && VF.frei.gitter && Array.isArray(VF.frei.gitter.linien)) {
       for (const l of VF.frei.gitter.linien) vfBand(rand, [[l[0], l[1]], [l[2], l[3]]], (VF.frei.gitter.b || 0.3) / 2, 0.013, um, [1, 1, 1]);
     }
+    // 25.11.2026 (BESTELLT Gnen54): "PIT" als Schrift auf der Fahrbahn vor der Boxeneinfahrt freier Strecken -
+    // auf Heckenhoim und der Toernerschleife verpasst man sonst die Einfahrt ("nach der Kurve so eng").
+    // Wie auf der Original-Rennrollstrecke: weiss, auf der Haelfte zur Gasse, quer zur Fahrt lesbar.
+    if (tiles[0] && tiles[0].frei && bucht) vfPitSchrift(rand, pts, nrm, bucht, bse, half, um);
     for (const mk of fein.marken) {
       if (mk.band) { vfBand(rand, mk.band, mk.b / 2, 0.012, um, mk.c); continue; }
       const ex = mk.e[0] * mk.l / 2, ey = mk.e[1] * mk.l / 2, qx = mk.q[0] * mk.b / 2, qy = mk.q[1] * mk.b / 2, y = 0.012;
