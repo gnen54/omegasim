@@ -15,6 +15,10 @@ Diese Skripte stammen aus Gnen54s Fork (Commits bfa36b6 und 7a284ac vom 22.11.20
 
 Python 3 mit numpy, opencv-python, scipy und scikit-image. `ring2_mitte.py` braucht zusätzlich matplotlib.
 
+## Zeichnungen
+
+- `Toernerschleife-V2c.dxf`: Törnerschleife (3,60 x 1,80 m) ohne Brücke, mit 6 Boxenfeldern als gelbe gestrichelte Linien unter der Boxengasse und Pfeil an der Boxeneinfahrt. Enthält keine POINT-Marken für Start und Box; `ring2_json.py` erwartet diese.
+
 ## Lücken
 
 - Für die Törnerschleife fehlen im Fork:
