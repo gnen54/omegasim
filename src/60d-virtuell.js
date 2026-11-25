@@ -727,7 +727,9 @@
       if (tiles[k].steg) {
         // 21.11. (GEMELDET Gnen54 "Unschoener Bogen"): als ein durchgehendes, geglaettetes Band (vfBand)
         // statt loser Rechtecke je Segment - die liefen an den Knicken zickzack.
-        marken.push({ band: tiles[k].steg.pts, b: tiles[k].steg.b, c: [0.88, 0.88, 0.89] });
+        // 25.11. (GEMELDET Gnen54): auf dem Heckenhoim kein heller Streifen zwischen Start/Ziel und Boxengasse
+        // ("Das war bei der Toernerschleife ein Curb") - dort steht in der JSON steg.zeichnen = false.
+        if (tiles[k].steg.zeichnen !== false) marken.push({ band: tiles[k].steg.pts, b: tiles[k].steg.b, c: [0.88, 0.88, 0.89] });
         continue;
       }
       const A = pts[i0], Z = pts[i1], nn = nrm[Math.min(i1, i0 + 1)];

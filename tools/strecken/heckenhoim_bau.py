@@ -151,7 +151,9 @@ out = {'name': 'Heckenhoim', 'quelle': 'Heckenhoim_V3.dxf (Gnen54/Thorsten), 3,0
        'pts': [[round(float(a), 2), round(float(b_), 2), int(tl)] for (a, b_), tl in zip(E, tile_of)]}
 Sm = edv(S); step = max(1, len(Sm) // 160)
 out['steg'] = {'b': round(float(steg.sum() * R * R / (np.hypot(*np.diff(S, axis=0).T).sum() + 1) * K), 2),
-               'pts': [[round(float(a), 2), round(float(b_), 2)] for a, b_ in Sm[::step]]}
+               'pts': [[round(float(a), 2), round(float(b_), 2)] for a, b_ in Sm[::step]],
+               # 25.11. (Gnen54): auf dem Heckenhoim kein Curb zwischen Start/Ziel und Boxengasse zeichnen
+               'zeichnen': False}
 out['boxBucht'] = round(float(np.median(x[x > 0]) / 11.63), 2) if (x > 0).any() else 1.0
 out['boxSeite'] = int(SEITE)
 gz = np.argwhere(gasse); gm = mm(gz[len(gz) // 2])
