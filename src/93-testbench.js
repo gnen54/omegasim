@@ -1821,8 +1821,7 @@
       const merk = {};
       const kaesten = { lap: 'setting-announce', damage: 'setting-announce-damage',
                         fuel: 'setting-announce-fuel', tyre: 'setting-announce-tyre',
-                        rain: 'setting-announce-rain', battery: 'setting-announce-battery',
-                        batterycrit: 'setting-announce-battery-crit' };
+                        rain: 'setting-announce-rain', battery: 'setting-announce-battery' };
       // Die Kaestchen setzen und hinterher zuruecklegen: der Test darf die Einstellung
       // des Nutzers nicht behalten.
       try {
@@ -1848,10 +1847,8 @@
         // Das Akku-Latch ist JE AUTO (batteryLatchSet in 80-sound.js) und genauso geteilt -
         // dieselbe Vorsicht wie oben: eine vorangegangene Probe darf kein Auto-Latch
         // hinterlassen.
-        const merkBatt = new Set(batteryLatchSet);
-        batteryLatchSet.clear();
-        const merkKrit = new Set(batteryKritLatchSet);
-        batteryKritLatchSet.clear();
+        const merkBatt = new Set(batteryLatchSet), merkKrit = new Set(batteryKritLatchSet);
+        batteryLatchSet.clear(); batteryKritLatchSet.clear();
         // BESTELLT: die Aufnahme hat jetzt IMMER Vorrang vor der Live-Stimme (ansage()),
         // nicht nur ohne speechSynthesis. Diese Probe will aber ausdruecklich den
         // Live-Pfad beobachten (ueber die Attrappe unten) - ist der Browser, in dem der
@@ -1875,10 +1872,8 @@
             delete window.speechSynthesis;
           }
           Object.assign(ansageLatch, merkLatch);
-          batteryLatchSet.clear();
-          merkBatt.forEach((c) => batteryLatchSet.add(c));
-          batteryKritLatchSet.clear();
-          merkKrit.forEach((c) => batteryKritLatchSet.add(c));
+          batteryLatchSet.clear(); batteryKritLatchSet.clear();
+          merkBatt.forEach((c) => batteryLatchSet.add(c)); merkKrit.forEach((c) => batteryKritLatchSet.add(c));
           Object.keys(voiceBuffers).forEach((k) => delete voiceBuffers[k]);
           Object.assign(voiceBuffers, echtBuffers);
         }
@@ -1916,8 +1911,7 @@
 
       const kaesten = { lap: 'setting-announce', damage: 'setting-announce-damage',
                         fuel: 'setting-announce-fuel', tyre: 'setting-announce-tyre',
-                        rain: 'setting-announce-rain', battery: 'setting-announce-battery',
-                        batterycrit: 'setting-announce-battery-crit' };
+                        rain: 'setting-announce-rain', battery: 'setting-announce-battery' };
       const merk = {};
       try {
         Object.keys(kaesten).forEach((art) => {
@@ -1942,10 +1936,8 @@
         // zu DIESER Zustandsfolge nicht gehoert.
         const merkLatch = Object.assign({}, ansageLatch);
         Object.assign(ansageLatch, { damage: false, fuel: false, tyre: false, rain: null, battery: false, batterycrit: false });
-        const merkBatt = new Set(batteryLatchSet);
-        batteryLatchSet.clear();
-        const merkKrit = new Set(batteryKritLatchSet);
-        batteryKritLatchSet.clear();
+        const merkBatt = new Set(batteryLatchSet), merkKrit = new Set(batteryKritLatchSet);
+        batteryLatchSet.clear(); batteryKritLatchSet.clear();
         try {
           delete window.speechSynthesis;
           const folge = schritte.map((w) => ({ w, fiel: ansagenPruefen(w) }));
@@ -1959,10 +1951,8 @@
                                   { configurable: true, value: echtSpeech });
           }
           Object.assign(ansageLatch, merkLatch);
-          batteryLatchSet.clear();
-          merkBatt.forEach((c) => batteryLatchSet.add(c));
-          batteryKritLatchSet.clear();
-          merkKrit.forEach((c) => batteryKritLatchSet.add(c));
+          batteryLatchSet.clear(); batteryKritLatchSet.clear();
+          merkBatt.forEach((c) => batteryLatchSet.add(c)); merkKrit.forEach((c) => batteryKritLatchSet.add(c));
         }
       } finally {
         Object.keys(merk).forEach((art) => {

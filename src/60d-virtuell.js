@@ -4049,6 +4049,58 @@
     if (sampleEngine.loading) return t('Aufnahmen werden geladen …');
     return t('Keine Aufnahmen gefunden – es spielt der Ersatzton.');
   }
+  // Fork 25.11. (Schnittstelle Luuke 1.6.84): die Autoliste der Garage als eigene Funktion - Luukes FAHREN-Seite
+  // (51-konsole.js, Umschalter Echt | Virtuell) fragt Name und Vorschaubild des virtuellen Autos ab.
+  function vfAutoListe() {
+    return [{ v: 'v5r', name: 'Vulture V5.R (Speed Dreams)' }, { v: 'lynx220', name: 'Lynx 220 (Jaguar XJ220, Speed Dreams)' },
+                   { v: 'fmcgt4', name: 'FMC GT4 (Ford GT40 Mk1, Speed Dreams)' }, { v: 'boxer96', name: 'Boxer 96 (Porsche 911 GT3, Speed Dreams)' },
+                   // Eigenbau von Gnen54 (CC BY 4.0), WIP: Fahrdaten geschaetzt, siehe img/autos/kaefer/LIZENZ.txt
+                   { v: 'kaefer', name: 'VW Käfer 1303 RS mit Boxster-Motor (Gnen54, WIP)' },
+                   // Spider NG1 (Gnen54) auf Modiplay-MP1-Karosserie, Freigabe von Sturmkind, siehe img/autos/spider/LIZENZ.txt
+                   { v: 'spider', name: 'Spider NG1 (Gnen54, WIP)' },
+                   // Porsche 911 GT3 (Gnen54) auf Vehicle-World-Karosserie (Freigabe nur muendlich) – nur Testversion
+                   { v: 'gt3', name: 'Porsche 911 GT3 (Gnen54, WIP)' },
+                   // VW Caravelle (Gnen54) auf Vehicle-World-Karosserie (Freigabe erteilt), Oettinger-Boxer-6 (Werte geschaetzt),
+                   // Motorhauben-Kamera = Kamera im echten Modell (Lage, Neigung, Bildwinkel aus auto.json "haube")
+                   { v: 'caravelle', name: 'VW Caravelle Oettinger (Gnen54, WIP)' },
+                   // Opel Manta B400 (Gnen54, fuer einen Freund) - KEINE Freigabe: nur im Fork, nie in einen PR
+                   { v: 'manta', name: 'Opel Manta B400 (Gnen54, WIP)' },
+                   { v: 'kasten', name: t('Einfaches Modell') }];
+  }
+  function vfAutoName(id) { const a = vfAutoListe().find((x) => x.v === id); return a ? a.name : String(id || ''); }
+  // Vorschaubild fuer Luukes Autos-Kachel: unsere Autos haben vorschau.jpg (tools/vorschau_webgl), Luukes seit 1.6.84 PNG.
+  const VF_VORSCHAU_JPG = ['kaefer', 'spider', 'gt3', 'caravelle', 'manta'];
+  function vfVorschauUrl(id) {
+    if (!VF_MODELL_PFADE[id]) return 'img/garage-virtuell.jpg';
+    return VF_MODELL_PFADE[id] + (VF_VORSCHAU_JPG.indexOf(id) >= 0 ? 'vorschau.jpg' : 'vorschau.png');
+  }
+  function vfStreckeName() { const k = vfFreiWahl(); return k ? VF_FREIE[k].name : t('Gebaute Bahn'); }
+  // Luukes "Garage" im Modus Virtuell und sein Knopf "Virtuell fahren" in der Garage rufen vfGarageZeigen (bei ihm eine
+  // eigene Seite). Bei uns: die Garage mit den Einstellungen der virtuellen Fahrt rechts (vfGarageOptionen) wie bisher.
+  function vfGarageZeigen() {
+    try { garVirtuellAuf = true; garKameraAuf = false; } catch (e) { /* egal */ }
+    if (typeof konsoleZeige === 'function') konsoleZeige('garage'); else showTab('garage');
+    if (typeof renderGarage === 'function') renderGarage();
+  }
+  // Luukes Optionen haben seit 1.6.41 die Kacheln "Virtuell" und "RC Heli" (10-ble-explorer.js ruft vfOptionenSeite).
+  // Unsere Einstellungen stehen in der Garage; den RC Heli gibt es im Fork-Fahren nicht.
+  function vfOptionenSeite(key) {
+    const el = $(key === 'opt-heli' ? 'opt-heli-inhalt' : 'opt-virtuell-inhalt');
+    if (!el) return;
+    el.innerHTML = '';
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = key === 'opt-heli' ? t('Den RC Heli gibt es im virtuellen Fahren dieser Fassung nicht.')
+      : t('Die Einstellungen des virtuellen Fahrens stehen in der Garage unter „Virtuell fahren“.');
+    el.appendChild(p);
+    if (key !== 'opt-heli') {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = t('Zur Garage');
+      b.onclick = () => vfGarageZeigen();
+      el.appendChild(b);
+    }
+  }
   function vfGarageOptionen(rechts) {
     vfTonVorbereiten();
     vfTexturenVorbereiten();   // v1.3.39: Bahn- und Bodentexturen im Leerlauf rechnen
@@ -4078,20 +4130,7 @@
       rechts.appendChild(fest);
     } else rechts.appendChild(garWertZeile(t('Motorsound'), werte[j].name, () => wahl(-1), () => wahl(1)));
     // v1.1.9: welches Auto, und wie deutlich die Federung sichtbar neigt.
-    const autos = [{ v: 'v5r', name: 'Vulture V5.R (Speed Dreams)' }, { v: 'lynx220', name: 'Lynx 220 (Jaguar XJ220, Speed Dreams)' },
-                   { v: 'fmcgt4', name: 'FMC GT4 (Ford GT40 Mk1, Speed Dreams)' }, { v: 'boxer96', name: 'Boxer 96 (Porsche 911 GT3, Speed Dreams)' },
-                   // Eigenbau von Gnen54 (CC BY 4.0), WIP: Fahrdaten geschaetzt, siehe img/autos/kaefer/LIZENZ.txt
-                   { v: 'kaefer', name: 'VW Käfer 1303 RS mit Boxster-Motor (Gnen54, WIP)' },
-                   // Spider NG1 (Gnen54) auf Modiplay-MP1-Karosserie, Freigabe von Sturmkind, siehe img/autos/spider/LIZENZ.txt
-                   { v: 'spider', name: 'Spider NG1 (Gnen54, WIP)' },
-                   // Porsche 911 GT3 (Gnen54) auf Vehicle-World-Karosserie (Freigabe nur muendlich) – nur Testversion
-                   { v: 'gt3', name: 'Porsche 911 GT3 (Gnen54, WIP)' },
-                   // VW Caravelle (Gnen54) auf Vehicle-World-Karosserie (Freigabe erteilt), Oettinger-Boxer-6 (Werte geschaetzt),
-                   // Motorhauben-Kamera = Kamera im echten Modell (Lage, Neigung, Bildwinkel aus auto.json "haube")
-                   { v: 'caravelle', name: 'VW Caravelle Oettinger (Gnen54, WIP)' },
-                   // Opel Manta B400 (Gnen54, fuer einen Freund) - KEINE Freigabe: nur im Fork, nie in einen PR
-                   { v: 'manta', name: 'Opel Manta B400 (Gnen54, WIP)' },
-                   { v: 'kasten', name: t('Einfaches Modell') }];
+    const autos = vfAutoListe();
     const ja = Math.max(0, autos.findIndex((a) => a.v === vfAutoWahl()));
     const autoWahl = (dd) => {
       try { localStorage.setItem(VF_AUTO_STORE, autos[(ja + dd + autos.length) % autos.length].v); } catch (e) { /* egal */ }
@@ -4124,7 +4163,9 @@
       img.className = 'vf-vorschau-bild';
       img.alt = autos[ja].name;
       img.src = VF_MODELL_PFADE[autos[ja].v] + 'vorschau.jpg';
-      img.onerror = () => { vor.remove(); };
+      // Fork 25.11. (Schnittstelle Luuke 1.6.84): Luuke hat die vorschau.jpg seiner Autos durch vorschau.png ersetzt -
+      // fehlt das JPG, einmal das PNG versuchen, erst dann verschwindet die Zeile.
+      img.onerror = () => { if (!img.dataset.png) { img.dataset.png = '1'; img.src = VF_MODELL_PFADE[autos[ja].v] + 'vorschau.png'; } else vor.remove(); };
       vor.appendChild(img);
       rechts.appendChild(vor);
       rechts.appendChild(zeile);
