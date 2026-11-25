@@ -46,15 +46,13 @@ SR = 22050
 # Wortlaut aus ansagenPruefen()/lapSpeechText() in src/80-sound.js, Zeilen 509/519/529/545 -
 # fuenf Meldungen, aber 'rain' hat zwei Texte (an/aus), macht zehn Aufnahmen.
 PHRASES = {
+    'batterycrit': {'de': 'Session abbrechen, Box anfahren!', 'en': 'Abort session, box now!'},
     'damage': {'de': 'Achtung, Schaden kritisch', 'en': 'Warning, damage critical'},
     'fuel': {'de': 'Tank fast leer', 'en': 'Fuel almost empty'},
     'tyre': {'de': 'Reifen abgefahren', 'en': 'Tyres worn out'},
     'rainstart': {'de': 'Es regnet', 'en': 'Rain has started'},
     'rainstop': {'de': 'Der Regen hört auf', 'en': 'The rain is stopping'},
     'battery': {'de': 'Akku fast leer', 'en': 'Battery low'},
-    # Startansage, startAnsageSprechen() in src/80-sound.js - in beiden Sprachen englisch
-    # (feststehender Ruf). Fuer 'de' am besten auch mit der englischen Stimme rendern.
-    'start': {'de': 'Gentlemen, start your engines', 'en': 'Gentlemen, start your engines'},
 }
 
 # Dieselben zwei Stimmen, die GetInstalledVoices() auf diesem Rechner meldet. Ein anderer
