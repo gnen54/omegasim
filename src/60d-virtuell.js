@@ -923,7 +923,9 @@
             // v = -1: reines Weiss im Shader (21.11., GEMELDET Gnen54: in der Ferne hellblau/rosa statt weiss)
             // 21.11. (Gnen54: "hinter Start/Ziel ... fehlt ein Stueck gerades"): ueber Ein- und Ausfahrt laeuft
             // die Kante gestrichelt weiter - die Gerade bleibt als Gerade zu sehen, die Einfahrt bleibt offen.
-            if (!offen || i % 2 === 0) vfViereck(rand, [iA[0], zA + 0.012, iA[1], um, -1], [iB[0], zB + 0.012, iB[1], um, -1], [lB[0], zB + 0.012, lB[1], um, -1], [lA[0], zA + 0.012, lA[1], um, -1], [1, 1, 1]);
+            // 28.11. (GEMELDET Gnen54, Toernerschleife V3): Strecken mit eigenen Markierungen (gestrichelte Ein-/
+            // Ausfahrt aus der DXF) lassen die Kante an der Muendung offen - die lange Strichelung stoerte dort.
+            if (!offen || (i % 2 === 0 && !(VF.frei && VF.frei.markierungen))) vfViereck(rand, [iA[0], zA + 0.012, iA[1], um, -1], [iB[0], zB + 0.012, iB[1], um, -1], [lB[0], zB + 0.012, lB[1], um, -1], [lA[0], zA + 0.012, lA[1], um, -1], [1, 1, 1]);
             if (zA > 0 || zB > 0) {
               // Bruecke (19.11.): Bordwand aussen (gedruckt, grau) bis 1,3 ueber die Fahrbahn, unten so
               // tief wie die Platte (11 mm, wie im STL) - darunter bleibt die Durchfahrt offen; an den
@@ -991,7 +993,9 @@
       let bMax = 0;
       for (let i = 0; i < n; i++) bMax = Math.max(bMax, bu(i) || 0);
       const drin = (i) => (bu((i + n) % n) || 0) > bMax * 0.3;
-      if (bMax > 0) for (let i = 0; i < n; i++) {
+      // 28.11. (GEMELDET Gnen54): nicht auf Strecken mit eigenen Markierungen (Toernerschleife V3) - dort stand die
+      // Querlinie mitten in der Boxeneinfahrt.
+      if (bMax > 0 && !(VF.frei && VF.frei.markierungen)) for (let i = 0; i < n; i++) {
         if (!drin(i) || (drin(i - 1) && drin(i + 1))) continue;
         const sg = bse(i), tief = half + bMax * 1.3, sl = kw * 0.5, lw = kw * 0.12;
         const zi = zz(i), e = [nrm[i].x * sg, nrm[i].y * sg], q = [-e[1] * lw, e[0] * lw];
