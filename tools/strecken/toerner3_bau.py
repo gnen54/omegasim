@@ -23,7 +23,7 @@ START_RECHTECK = set()
 def _naechst(p, js):
     Q = np.vstack([s[j][:, :2] for j in js]); return Q[np.argmin(np.hypot(*(Q - p).T))]
 # Die gestrichelten Linien enden mitten auf der Bahn - fuer die Trennung Bahn/Gasse bis zur Wand weiter
-ZU = [np.vstack([s[77][-1, :2], _naechst(s[77][-1, :2], [86, 12])]), np.vstack([s[79][-1, :2], _naechst(s[79][-1, :2], [1, 24])])]
+ZU = [np.vstack([s[77][-1, :2], _naechst(s[77][-1, :2], [86, 12])]), np.vstack([s[79][-1, :2], s[24][0, :2]])]  # Ausfahrt bis zum Ende der Einmuendung (-750|585), Gnen54 28.11.
 px = lambda P: np.c_[(P[:, 0] - X0) / R, (Y0 + H - P[:, 1]) / R]
 rc = lambda p: (int(round((Y0 + H - p[1]) / R)), int(round((p[0] - X0) / R)))
 mm = lambda r: np.array([r[1] * R + X0, Y0 + H - r[0] * R])
@@ -99,7 +99,7 @@ gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3),
 # sonst kam ein schmaler Streifen entlang der linken und unteren Bahn dazu und die Kante blieb dort offen.
 _yy, _xx = np.mgrid[0:gasse.shape[0], 0:gasse.shape[1]]
 _xm, _ym = X0 + _xx * R, Y0 + H - _yy * R
-gasse &= (_xm > -760) & (_xm < 1560) & (_ym > -330) & (_ym < 640)
+gasse &= (_xm > -760) & (_xm < 1560) & (_ym > -330) & (_ym < 900)
 # 21.11. (GEMELDET Gnen54: "Boxengasse viel zu schmal, da passt kein Fahrzeug drauf"): in der DXF 73 mm
 # = gut 5 Karteneinheiten, ein Auto ist ~4 breit. Die Gasse waechst um BREIT_MM nach aussen in die Insel,
 # mit mindestens 25 mm Abstand zur Bahn dahinter.
@@ -138,7 +138,7 @@ x = np.where(tief > 0, np.maximum(0, tief * K - HALF), 0.0); x[x < 1.5] = 0
 # (Ende der gestrichelten Linien an Ein- und Ausfahrt) darf die Gasse liegen.
 def _idx(p): return int(np.argmin(np.hypot(*(M - p).T)))
 _ds = float(np.median(np.hypot(*np.diff(M, axis=0).T)))
-_ein = (_idx(s[77][-1, :2]) - int(60 / _ds)) % len(M); _aus = (_idx(s[79][-1, :2]) + int(60 / _ds)) % len(M)
+_ein = (_idx(s[77][-1, :2]) - int(60 / _ds)) % len(M); _aus = (_idx(s[24][0, :2]) + int(30 / _ds)) % len(M)
 _drin = np.zeros(len(M), bool); _k = _ein
 while True:
     _drin[_k] = True
@@ -154,6 +154,9 @@ if len(ii) and ii[0] == 0 and ii[-1] == len(x) - 1:
 for k_, f in enumerate([1 / 4, 2 / 4, 3 / 4]):
     if len(ii) > 6: x[ii[k_]] *= f; x[ii[-1 - k_]] *= f
 
+# flaches Ende an der Ausfahrt abschneiden (sonst zweite "Einfahrt" und PIT-Schrift hinter Start/Ziel)
+_k = (_aus + 15) % len(M)
+while _k != _ein and (x[_k] < 2.0): x[_k] = 0; _k = (_k - 1) % len(M)
 on = x > 0
 n_ = len(x); b1 = int(np.where(on)[0][on[np.where(on)[0]].argmax()]) if on.any() else 0
 # Lauf durch Index 0: Anfang = erster Punkt einer zusammenhaengenden Folge, die ueber das Ende laeuft
@@ -205,7 +208,7 @@ gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3),
 # sonst kam ein schmaler Streifen entlang der linken und unteren Bahn dazu und die Kante blieb dort offen.
 _yy, _xx = np.mgrid[0:gasse.shape[0], 0:gasse.shape[1]]
 _xm, _ym = X0 + _xx * R, Y0 + H - _yy * R
-gasse &= (_xm > -760) & (_xm < 1560) & (_ym > -330) & (_ym < 640)
+gasse &= (_xm > -760) & (_xm < 1560) & (_ym > -330) & (_ym < 900)
 gd = (cv2.dilate(gasse.astype(np.uint8), np.ones((5, 5), np.uint8)) & (alles | (steg_g if STEG_ALS_GASSE else False)).astype(np.uint8))
 n_l, lab = cv2.connectedComponents(gd, connectivity=8)
 gd = (lab == np.bincount(lab.ravel())[1:].argmax() + 1).astype(np.uint8)
@@ -236,6 +239,11 @@ out['boxDreiecke'] = [round(float(v), 2) for t_ in tri for j in t_ for v in EQ[j
 sd = distance_transform_edt(~steg) * R; hd = distance_transform_edt(~haupt) * R
 cc = max(cv2.findContours(gd, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0], key=cv2.contourArea)[:, 0, :]
 wand = np.array([dmitte[y, x_] > HALB_MM + 14 and sd[y, x_] > 8 for x_, y in cc])
+# Nicht an den gestrichelten Muendungslinien und ihren Verlaengerungen (Gnen54 28.11.: durchgezogener Strich mitten in der Ausfahrt)
+_mund = np.vstack([np.linspace(P[k], P[k + 1], 40) for P in ZU + [s[j][:, :2] for j in (74, 75, 76, 77, 79)] for k in range(len(P) - 1)])
+from scipy.spatial import cKDTree as _KD
+_dm, _ = _KD(_mund).query(np.c_[cc[:, 0] * R + X0, Y0 + H - cc[:, 1] * R])
+wand &= _dm > 12
 linien, akt = [], []
 for (x_, y), w in zip(cc, wand):
     if w: akt.append((x_ * R + X0, Y0 + H - y * R))

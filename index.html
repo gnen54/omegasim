@@ -44613,7 +44613,9 @@
             // 21.11. (GEMELDET Gnen54 "Fehlender Randstreifen"): nur wo die Gassen-Flaeche den Streifen selbst
             // beruehrt (Ein-/Ausfahrt). Vorher fehlte er entlang der ganzen Gasse und an Stellen, an denen ein
             // anderer Streckenteil nahe an der Gasse vorbeifuehrt.
-            const offen = !!gasse && [0.5, 1.0].some((f) => vfInGasse(gasse, off(i, (half + kw * f) * sg)) || vfInGasse(gasse, off(i + 1, (half + kw * f) * sg)));
+            // 28.11. (GEMELDET Gnen54, V3 Boxenausfahrt): mit eigenen Markierungen auch knapp innerhalb der Kante pruefen -
+            // dort, wo die Gasse spitz einmuendet, lagen die Pruefpunkte sonst schon ausserhalb der Gassenflaeche.
+            const offen = !!gasse && (VF.frei && VF.frei.markierungen ? [-0.5, 0, 0.5, 1.0] : [0.5, 1.0]).some((f) => vfInGasse(gasse, off(i, (half + kw * f) * sg)) || vfInGasse(gasse, off(i + 1, (half + kw * f) * sg)));
             const bsZ = (j) => (gasse ? 0 : bs(j));
             // Randkanten aus entknoteten Ringen (siehe kante): in engen Kurven innen keine Schlaufe mehr.
             const iA = kante(sg, 0, bsZ)[i], iB = kante(sg, 0, bsZ)[i + 1];
