@@ -95,6 +95,11 @@ def trifft(i, sg, bis=300):
     return None
 gasse = alles & ~haupt
 gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)).astype(bool)
+# 28.11. (GEMELDET Gnen54: Kanten innen unterbrochen): nur der Bereich der Boxengasse zaehlt als Gasse -
+# sonst kam ein schmaler Streifen entlang der linken und unteren Bahn dazu und die Kante blieb dort offen.
+_yy, _xx = np.mgrid[0:gasse.shape[0], 0:gasse.shape[1]]
+_xm, _ym = X0 + _xx * R, Y0 + H - _yy * R
+gasse &= (_xm > -760) & (_xm < 1560) & (_ym > -330) & (_ym < 640)
 # 21.11. (GEMELDET Gnen54: "Boxengasse viel zu schmal, da passt kein Fahrzeug drauf"): in der DXF 73 mm
 # = gut 5 Karteneinheiten, ein Auto ist ~4 breit. Die Gasse waechst um BREIT_MM nach aussen in die Insel,
 # mit mindestens 25 mm Abstand zur Bahn dahinter.
@@ -128,6 +133,19 @@ for sg in (1, -1):
     if best is None or (tt > 0).sum() > (best[1] > 0).sum(): best = (sg, tt)
 SEITE, tief = best
 x = np.where(tief > 0, np.maximum(0, tief * K - HALF), 0.0); x[x < 1.5] = 0
+# 28.11. (GEMELDET Gnen54): Die Strahlen fanden die Gasse auch quer ueber Insel und Kurven - die Bahnkante war
+# dann schon ab der Haarnadel unten rechts und bis in die Kurve oben links offen. Nur zwischen den Muendungen
+# (Ende der gestrichelten Linien an Ein- und Ausfahrt) darf die Gasse liegen.
+def _idx(p): return int(np.argmin(np.hypot(*(M - p).T)))
+_ds = float(np.median(np.hypot(*np.diff(M, axis=0).T)))
+_ein = (_idx(s[77][-1, :2]) - int(60 / _ds)) % len(M); _aus = (_idx(s[79][-1, :2]) + int(60 / _ds)) % len(M)
+_drin = np.zeros(len(M), bool); _k = _ein
+while True:
+    _drin[_k] = True
+    if _k == _aus: break
+    _k = (_k + 1) % len(M)
+x[~_drin] = 0
+print('Gasse nur von', _ein, 'bis', _aus)
 x = uniform_filter1d(uniform_filter1d(x, 9, mode='wrap'), 9, mode='wrap')
 x[x < 0.05] = 0
 ii = np.where(x > 0)[0]
@@ -183,6 +201,11 @@ if STEG_ALS_GASSE:
     gasse = gasse | steg_g
 print('Gasse mit Muendungen %.0f cm2' % (gasse.sum() * R * R / 100))
 gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)).astype(bool)
+# (zweimal) (GEMELDET Gnen54: Kanten innen unterbrochen): nur der Bereich der Boxengasse zaehlt als Gasse -
+# sonst kam ein schmaler Streifen entlang der linken und unteren Bahn dazu und die Kante blieb dort offen.
+_yy, _xx = np.mgrid[0:gasse.shape[0], 0:gasse.shape[1]]
+_xm, _ym = X0 + _xx * R, Y0 + H - _yy * R
+gasse &= (_xm > -760) & (_xm < 1560) & (_ym > -330) & (_ym < 640)
 gd = (cv2.dilate(gasse.astype(np.uint8), np.ones((5, 5), np.uint8)) & (alles | (steg_g if STEG_ALS_GASSE else False)).astype(np.uint8))
 n_l, lab = cv2.connectedComponents(gd, connectivity=8)
 gd = (lab == np.bincount(lab.ravel())[1:].argmax() + 1).astype(np.uint8)
@@ -254,10 +277,29 @@ if GITTER:
 # Markierungen: Boxen gelb, Ein-/Ausfahrt gestrichelt weiss (Gnen54 28.11.)
 def zug(Ps):
     return [[round(float(v), 2) for v in q] for q in edv(np.asarray(Ps, float)[:, :2])]
-mk = [{'b': round(4.0 * K, 3), 'farbe': [0.92, 0.78, 0.15], 'pts': zug(s[j])} for j in range(60, 69)]
+# Boxen gelb gestrichelt (Gnen54 28.11.: "die gelben Boxenbereiche sollten gestrichelt sein")
+mk = [{'b': round(4.0 * K, 3), 'farbe': [0.92, 0.78, 0.15], 'strich': [round(12 * K, 2), round(8 * K, 2)], 'pts': zug(s[j])} for j in range(60, 69)]
+# Pfeil an der Boxeneinfahrt (DXF 59) als weisse Flaeche, in Dreiecke zerlegt (Ohrenschneiden)
+def ohren(P):
+    P = [tuple(q) for q in P]; idx = list(range(len(P))); D = []
+    fl = sum(P[i][0] * P[(i + 1) % len(P)][1] - P[(i + 1) % len(P)][0] * P[i][1] for i in range(len(P)))
+    kreuz = lambda a, b, c: (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+    while len(idx) > 3:
+        for k in range(len(idx)):
+            i0, i1, i2 = idx[k - 1], idx[k], idx[(k + 1) % len(idx)]
+            a, b, c = P[i0], P[i1], P[i2]
+            if kreuz(a, b, c) * fl <= 0: continue
+            if any(j not in (i0, i1, i2) and kreuz(a, b, P[j]) * fl > 0 and kreuz(b, c, P[j]) * fl > 0 and kreuz(c, a, P[j]) * fl > 0 for j in idx): continue
+            D.append((i0, i1, i2)); idx.pop(k); break
+        else: break
+    if len(idx) == 3: D.append(tuple(idx))
+    return D
+_pf = edv(np.asarray(s[59], float)[:, :2])
+pfeil = [[round(float(v), 2) for i in tr for v in _pf[i]] for tr in ohren(_pf)]
 ein = np.vstack([s[74][:, :2], s[75][1:, :2], s[76][1:, :2], s[77][1:, :2]])
 mk.append({'b': round(4.0 * K, 3), 'farbe': [1, 1, 1], 'strich': [round(25 * K, 2), round(25 * K, 2)], 'pts': zug(ein)})
 mk.append({'b': round(4.0 * K, 3), 'farbe': [1, 1, 1], 'strich': [round(25 * K, 2), round(25 * K, 2)], 'pts': zug(s[79][::6])})
 out['markierungen'] = mk
+out['flaechen'] = [{'farbe': [1, 1, 1], 'dreiecke': pfeil}]
 json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'img', 'strecken', 'toerner3.json'), 'w'), separators=(',', ':'))
 

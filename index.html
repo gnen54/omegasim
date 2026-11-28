@@ -44736,6 +44736,14 @@
         if (zeichnen && zug.length > 1) vfBand(rand, zug, hb, 0.013, um, fb);
       }
     }
+    // 28.11. (BESTELLT Gnen54): gefuellte Flaechen aus der DXF, z. B. der Pfeil an der Boxeneinfahrt (V3)
+    if (VF.frei && VF.frei.flaechen) for (const fl of VF.frei.flaechen) {
+      const fb = fl.farbe || [1, 1, 1];
+      for (const d of fl.dreiecke || []) {
+        const e = (k) => [d[2 * k], 0.013, d[2 * k + 1], um, -1];
+        vfViereck(rand, e(0), e(1), e(2), e(2), fb);
+      }
+    }
     // 25.11.2026 (BESTELLT Gnen54): "PIT" als Schrift auf der Fahrbahn vor der Boxeneinfahrt freier Strecken -
     // auf Heckenhoim und der Toernerschleife verpasst man sonst die Einfahrt ("nach der Kurve so eng").
     // Wie auf der Original-Rennrollstrecke: weiss, auf der Haelfte zur Gasse, quer zur Fahrt lesbar.
@@ -45189,7 +45197,7 @@
       // (Pole zuerst) fuer Spieler und NPCs.
       const gitter = d.gitter && Array.isArray(d.gitter.plaetze) && d.gitter.plaetze.length ? d.gitter : null;
       vfFreiCache[k] = { name: d.name, tiles, pts, gitter, halb: d.halb > 0 ? d.halb : 0,
-        markierungen: Array.isArray(d.markierungen) ? d.markierungen : null };
+        markierungen: Array.isArray(d.markierungen) ? d.markierungen : null, flaechen: Array.isArray(d.flaechen) ? d.flaechen : null };
       return vfFreiCache[k];
     });
   }
