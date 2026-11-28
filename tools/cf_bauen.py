@@ -27,3 +27,8 @@ for f in sorted(glob.glob('img/autos/*/*.bin')):
     print('zerlegt', f, n, '->', k, 'Teile')
 for f in glob.glob('apk/*.apk'):
     os.remove(f); print('entfernt', f)
+# Ohne 404.html liefert Cloudflare Pages fuer jede fehlende Datei die Startseite (200) - dann haelt die App
+# HTML fuer ein Modell. Eine kleine 404-Seite sorgt fuer echte 404-Antworten.
+if not os.path.exists('404.html'):
+    open('404.html', 'w').write('<!DOCTYPE html><meta charset="utf-8"><title>404</title><p>Nicht gefunden.</p>')
+    print('404.html angelegt')

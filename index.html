@@ -45982,7 +45982,7 @@
   function vfBinTeile(pfad, datei, meta) {
     const v = '?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb;
     return fetch(pfad + datei + '.teile.json' + v, { cache: 'no-cache' })
-      .then((r) => { if (!r.ok) throw new Error(datei + '.bin 404'); return r.json(); })
+      .then((r) => { if (!r.ok || /text\/html/.test(r.headers.get('content-type') || '')) throw new Error(datei + '.bin 404'); return r.json(); })
       .then((t) => Promise.all(Array.from({ length: t.teile }, (_, k) => fetch(pfad + datei + '.teil' + k + '.bin' + v, { cache: 'no-cache' })
         .then((r) => { if (!r.ok) throw new Error(datei + '.teil' + k + ' ' + r.status); return r.arrayBuffer(); })))
         .then((teile) => {
@@ -46014,7 +46014,8 @@
             .catch(() => [meta, 'auto']);
         })
         .then(([meta, datei]) => fetch(pfad + datei + '.bin?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb, { cache: 'no-cache' })
-          .then((r) => { if (r.ok) return r.arrayBuffer(); if (r.status === 404) return vfBinTeile(pfad, datei, meta); throw new Error(datei + '.bin ' + r.status); })
+          // Cloudflare Pages liefert fuer fehlende Dateien ohne 404.html die Startseite mit 200 aus - HTML heisst hier "fehlt".
+          .then((r) => { const html = /text\/html/.test(r.headers.get('content-type') || ''); if (r.ok && !html) return r.arrayBuffer(); if (r.status === 404 || html) return vfBinTeile(pfad, datei, meta); throw new Error(datei + '.bin ' + r.status); })
           .then((bin) => [meta, bin]))
       .then(([meta, bin]) => {
         if (bin.byteLength < meta.indexAb + meta.indizes * 2) throw new Error('auto.bin zu kurz');
