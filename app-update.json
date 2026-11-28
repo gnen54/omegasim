@@ -1,5 +1,5 @@
 {"version":"1.6.84","apk":2,"dateien":[
-{"p":"index.html","h":"232a1e0da3aa56a79164c0b7382163b2420b2cd7a8882591cab5ea67c6d51806","g":9016846},
+{"p":"index.html","h":"32606bf7b8748b1b32153626fe780c3f704da18a963396774329ee4de7625948","g":9018371},
 {"p":"mp-overview.html","h":"61388dad99cb805de167fe9a10b9ffdb1d4655c450f175f4eeb9ede3a24d04aa","g":9956},
 {"p":"manifest.webmanifest","h":"868416fe2c9d41ebed0b5d479f07bbd16679dd4835e9c526da9eae8046e1e36a","g":639},
 {"p":"favicon.svg","h":"bc804f771d409b0efff2f2a78238a91d843d8d02efc2c614c6bdc544763de931","g":5456},
@@ -1277,6 +1277,7 @@
 {"p":"img/strecken/heckenhoim.json","h":"60571a84433a989634988e441c1b49419af9ee6ae2338c0050ab7c47ac520495","g":16812},
 {"p":"img/strecken/indeq-bruecke.json","h":"5d9eebcc1993587d218a1116aa44b454a0f1fe92c703d2a50030f57537ee1bed","g":22290},
 {"p":"img/strecken/indeq-ring.json","h":"4b9af3b216b18f40e8bf8a1684b627631f82b8c2ab4e75e8a08a0f9780aecd8b","g":18885},
+{"p":"img/strecken/toerner3.json","h":"3455bd12fb797bade4291b441b35a48545a662bc84c792f1728a1af695e62ad0","g":27775},
 {"p":"img/titel-bg.jpg","h":"c02d07a3d67a58813608b14a32f17da24e026400db9ff966cd66729de63f42f6","g":67544},
 {"p":"img/titel.jpg","h":"d0b0567a6ca37be63fbe2040e34c43d19a6da79fd6dbb8f0404cd46d5fdc7e2b","g":39348},
 {"p":"img/vf/LIZENZ.txt","h":"1dd29e4f7735d198f631365b997e800be65abbab591510ce83d417aeb99947cc","g":519},

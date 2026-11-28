@@ -1010,6 +1010,27 @@
     if (VF.frei && VF.frei.gitter && Array.isArray(VF.frei.gitter.linien)) {
       for (const l of VF.frei.gitter.linien) vfBand(rand, [[l[0], l[1]], [l[2], l[3]]], (VF.frei.gitter.b || 0.3) / 2, 0.013, um, [1, 1, 1]);
     }
+    // 28.11. (BESTELLT Gnen54, Toernerschleife V3): weitere Markierungen aus der DXF - Linienzuege mit Farbe,
+    // wahlweise gestrichelt ("strich": [an, aus] in Einheiten), z. B. Boxen und Ein-/Ausfahrt der Gasse.
+    if (VF.frei && VF.frei.markierungen) {
+      for (const mk of VF.frei.markierungen) {
+        const P = mk.pts || [], hb = (mk.b || 0.37) / 2, fb = mk.farbe || [1, 1, 1];
+        if (P.length < 2) continue;
+        if (!mk.strich) { vfBand(rand, P, hb, 0.013, um, fb); continue; }
+        const an = mk.strich[0] || 2, aus = mk.strich[1] || 2;
+        let zug = [P[0].slice(0, 2)], rest = an, zeichnen = true;
+        for (let i = 1; i < P.length; i++) {
+          let a = P[i - 1], b = P[i], l = Math.hypot(b[0] - a[0], b[1] - a[1]), pos = 0;
+          while (l - pos > rest) {
+            pos += rest; const q = [a[0] + (b[0] - a[0]) * pos / l, a[1] + (b[1] - a[1]) * pos / l];
+            if (zeichnen) { zug.push(q); if (zug.length > 1) vfBand(rand, zug, hb, 0.013, um, fb); }
+            zeichnen = !zeichnen; rest = zeichnen ? an : aus; zug = [q];
+          }
+          rest -= l - pos; if (zeichnen) zug.push([b[0], b[1]]);
+        }
+        if (zeichnen && zug.length > 1) vfBand(rand, zug, hb, 0.013, um, fb);
+      }
+    }
     // 25.11.2026 (BESTELLT Gnen54): "PIT" als Schrift auf der Fahrbahn vor der Boxeneinfahrt freier Strecken -
     // auf Heckenhoim und der Toernerschleife verpasst man sonst die Einfahrt ("nach der Kurve so eng").
     // Wie auf der Original-Rennrollstrecke: weiss, auf der Haelfte zur Gasse, quer zur Fahrt lesbar.
@@ -1431,7 +1452,9 @@
   const VF_FREIE = { indeq: { name: 'Törnerschleife 2.0', pfad: 'img/strecken/indeq-ring.json' },
     indeqBruecke: { name: 'Törnerschleife 2.0 mit Brücke', pfad: 'img/strecken/indeq-bruecke.json' },
     // 21.11. (BESTELLT Gnen54): Renn-Rollstrecke Heckenhoim, 3 x 2 m, nur im Fork
-    heckenhoim: { name: 'Heckenhoim', pfad: 'img/strecken/heckenhoim.json' } };
+    heckenhoim: { name: 'Heckenhoim', pfad: 'img/strecken/heckenhoim.json' },
+    // 28.11. (BESTELLT Gnen54): dritte Variante der Toernerschleife (Toernerschleife_V3.dxf), erst nur im Fork
+    toerner3: { name: 'Törnerschleife V3', pfad: 'img/strecken/toerner3.json' } };
   function vfFreiWahl() { try { const v = localStorage.getItem(VF_STRECKE_STORE) || ''; return VF_FREIE[v] ? v : ''; } catch (e) { return ''; } }
   const vfFreiCache = {};
   function vfFreiLaden(k) {
@@ -1460,7 +1483,8 @@
       // gitter (25.11., Heckenhoim V3): Startplatz-Klammern aus der DXF - Linien zum Zeichnen, Startplaetze
       // (Pole zuerst) fuer Spieler und NPCs.
       const gitter = d.gitter && Array.isArray(d.gitter.plaetze) && d.gitter.plaetze.length ? d.gitter : null;
-      vfFreiCache[k] = { name: d.name, tiles, pts, gitter, halb: d.halb > 0 ? d.halb : 0 };
+      vfFreiCache[k] = { name: d.name, tiles, pts, gitter, halb: d.halb > 0 ? d.halb : 0,
+        markierungen: Array.isArray(d.markierungen) ? d.markierungen : null };
       return vfFreiCache[k];
     });
   }

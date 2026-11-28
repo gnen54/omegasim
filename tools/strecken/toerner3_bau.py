@@ -1,0 +1,263 @@
+"""Toernerschleife V3 (Gnen54, 28.11.2026, 3,60 x 1,80 m) -> img/strecken/toerner3.json.
+Ablauf wie heckenhoim_bau.py. Fahrtrichtung: Start/Ziel-Gerade oben nach links (Startplatz-Klammern oeffnen nach
+rechts). Boxengasse unter der Geraden, Einfahrt rechts unten am Pfeil, Ausfahrt links oben.
+Gestrichelte Linien an Ein- und Ausfahrt (DXF 74-77, 79) trennen Bahn und Gasse; die Boxen (60-68) und die
+Klammern (35-58) sind nur Markierungen. Der weisse Steg zwischen Gerade und Gasse wird gezeichnet."""
+import sys, json, numpy as np, cv2, networkx as nx
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from dxfread import lies
+from scipy.ndimage import distance_transform_edt, uniform_filter1d
+from scipy.spatial import cKDTree
+from skimage.morphology import skeletonize
+
+s, _ = lies(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'toerner3.dxf')); s = [P * 1.0 for P in s]
+R = 2.0; X0, Y0, W, H = -1800, -900, 3600, 1800
+RAHMEN = {0, 29, 30, 31, 32, 33, 59} | set(range(60, 69))   # Rahmen, Pfeil, Boxen
+# Startplatz-Klammern: alle einzelnen Linien (2 Punkte) nach den Bahnlinien - nicht ins Raster, sonst
+# schneiden sie die Bahn beim Fuellen in Stuecke.
+GITTER = set(range(35, 59))
+RAHMEN |= GITTER
+MARKEN = {74, 75, 76, 77, 79}                    # gestrichelte Linien an Ein- und Ausfahrt der Gasse
+START_RECHTECK = set()
+def _naechst(p, js):
+    Q = np.vstack([s[j][:, :2] for j in js]); return Q[np.argmin(np.hypot(*(Q - p).T))]
+# Die gestrichelten Linien enden mitten auf der Bahn - fuer die Trennung Bahn/Gasse bis zur Wand weiter
+ZU = [np.vstack([s[77][-1, :2], _naechst(s[77][-1, :2], [86, 12])]), np.vstack([s[79][-1, :2], _naechst(s[79][-1, :2], [1, 24])])]
+px = lambda P: np.c_[(P[:, 0] - X0) / R, (Y0 + H - P[:, 1]) / R]
+rc = lambda p: (int(round((Y0 + H - p[1]) / R)), int(round((p[0] - X0) / R)))
+mm = lambda r: np.array([r[1] * R + X0, Y0 + H - r[0] * R])
+
+def raster(ohne):
+    img = np.zeros((int(H / R), int(W / R)), np.uint8)
+    if not (MARKEN & ohne):                      # Hauptbahn: gestrichelte Linien bis zur Wand verlaengert
+        for Q in ZU: cv2.polylines(img, [np.round(px(Q)).astype(np.int32)], False, 255, 2)
+    for j, P in enumerate(s):
+        if j in RAHMEN or j in ohne: continue
+        cv2.polylines(img, [np.round(px(P)).astype(np.int32)], False, 255, 2)
+    return img
+def fuellen(img, p):
+    f = img.copy(); m = np.zeros((f.shape[0] + 2, f.shape[1] + 2), np.uint8)
+    r, c = rc(p); cv2.floodFill(f, m, (c, r), 128); return f == 128
+
+haupt = fuellen(raster(START_RECHTECK), (0, 727))                 # Hauptbahn (Gasse durch die Marken zu)
+alles = fuellen(raster(START_RECHTECK | MARKEN), (0, 727))        # mit Boxengasse
+haupt = cv2.morphologyEx(haupt.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)).astype(bool)
+alles = cv2.morphologyEx(alles.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8)).astype(bool)
+steg = fuellen(raster(set()), (500, 573))
+print('Hauptbahn %.2f m2, mit Gasse %.2f m2, Steg %.0f cm2' % (haupt.sum() * R * R / 1e6, alles.sum() * R * R / 1e6, steg.sum() * R * R / 100))
+
+# ---- Mittellinie: Skelett der Hauptbahn, groesster Kreis
+dt = distance_transform_edt(haupt)
+sk = skeletonize(haupt)
+pts = np.argwhere(sk); idx = {tuple(p): i for i, p in enumerate(pts)}
+G = nx.Graph()
+for i, (r, c) in enumerate(pts):
+    for dr in (-1, 0, 1):
+        for dc in (-1, 0, 1):
+            j = idx.get((r + dr, c + dc))
+            if j is not None and j > i: G.add_edge(i, j, weight=np.hypot(dr, dc))
+zyk = max(nx.cycle_basis(G), key=len)
+M = np.array([mm(pts[i]) for i in zyk])
+# Ordnung entlang des Kreises (cycle_basis liefert die Knoten in Kreisreihenfolge)
+for _ in range(4): M = np.c_[uniform_filter1d(M[:, 0], 21, mode='wrap'), uniform_filter1d(M[:, 1], 21, mode='wrap')]
+# Fahrtrichtung: auf der linken Geraden (x < -1100) nach oben (Pfeil in der DXF)
+oben = np.where((M[:, 1] > 650) & (np.abs(M[:, 0]) < 1000))[0]
+dx_ = np.mean(np.diff(M[oben, 0])) if len(oben) > 2 else 0
+if dx_ > 0: M = M[::-1]
+breite = 2 * np.median(dt[sk]) * R
+start_mm = np.array([-170.0, 727.0])           # Start/Ziel am linken Ende des Stegs (Bild Gnen54)
+print('Laenge %.2f m, Breite (Skelett) %.0f mm' % (np.hypot(*np.diff(np.vstack([M, M[:1]]), axis=0).T).sum() / 1000, breite))
+
+BREITE = float(round(breite))                    # Bahnbreite aus dem Skelett
+K = 0.093023                                       # Karteneinheiten je mm = TRACK_UNITS_PER_CM/10 der App (echte Masse wie die
+                                                   # Toernerschleife; 25.11., Gnen54: Autos im Vergleich zu Fusion 1,47x zu gross)
+P_ = np.vstack([M, M[:1]]); sl = np.r_[0, np.cumsum(np.hypot(*np.diff(P_, axis=0).T))]
+u = np.arange(0, sl[-1], 2.857 / K); M = np.c_[np.interp(u, sl, P_[:, 0]), np.interp(u, sl, P_[:, 1])]
+r0 = int(np.argmin(np.hypot(*(M - start_mm).T))); M = np.roll(M, -r0, axis=0)
+ed = lambda Q: np.c_[Q[:, 0] * K, -Q[:, 1] * K]
+E = ed(M)
+t = np.roll(E, -1, axis=0) - np.roll(E, 1, axis=0); t /= np.linalg.norm(t, axis=1)[:, None]
+nrm = np.c_[t[:, 1], -t[:, 0]]                     # Editor: quer > 0 = links
+nmm = np.c_[nrm[:, 0], -nrm[:, 1]]
+# Seite der Gasse und Boxenabschnitt: Punkte, deren Normale (eine Seite) innerhalb 260 mm auf den Steg trifft
+sk_steg = np.argwhere(skeletonize(steg)); S = np.array([mm(p) for p in sk_steg])
+o = [int(np.argmax(S[:, 1]))]; rest = set(range(len(S))) - {o[0]}; T = cKDTree(S)
+while rest:
+    d_, j_ = T.query(S[o[-1]], k=12); nxt = [jj for jj in j_ if jj in rest]
+    if not nxt: break
+    o.append(nxt[0]); rest.discard(nxt[0])
+S = S[o]
+def trifft(i, sg, bis=300):
+    for dmm in np.arange(0, bis, 2.0):
+        q = M[i] + nmm[i] * dmm * sg; r, c = rc(q)
+        if 0 <= r < steg.shape[0] and 0 <= c < steg.shape[1] and steg[r, c]: return dmm
+    return None
+gasse = alles & ~haupt
+gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)).astype(bool)
+# 21.11. (GEMELDET Gnen54: "Boxengasse viel zu schmal, da passt kein Fahrzeug drauf"): in der DXF 73 mm
+# = gut 5 Karteneinheiten, ein Auto ist ~4 breit. Die Gasse waechst um BREIT_MM nach aussen in die Insel,
+# mit mindestens 25 mm Abstand zur Bahn dahinter.
+BREIT_MM = 0    # 75 = verbreiterte Gasse (Test 21.11., nicht gepusht); 0 = wie in der DXF
+hd0 = distance_transform_edt(~haupt) * R
+ker = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * int(BREIT_MM / R) + 1,) * 2)
+# Aussenkante im festen Abstand zum Steg (nicht zur alten Wand), sonst wellt sie sich und schlaegt an den
+# Enden Haken; danach rund glaetten.
+sdst = distance_transform_edt(~steg) * R
+breit = cv2.dilate(gasse.astype(np.uint8), ker).astype(bool) & ~steg & (hd0 > 25) & (sdst <= 73 + BREIT_MM)
+rund = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31))
+breit = cv2.morphologyEx(cv2.morphologyEx(breit.astype(np.uint8), cv2.MORPH_OPEN, rund), cv2.MORPH_CLOSE, rund).astype(bool)
+breit &= ~alles & ~steg & (hd0 > 25)
+alles = alles | breit
+gasse = gasse | breit
+HALF = BREITE * K / 2                              # halbe Bahn in Einheiten (geht als 'halb' in die JSON)
+def strahl(i, sg):
+    letzte, leer, gesehen = 0, 0, False
+    for dmm in np.arange(0, 800, 2.0):
+        q = M[i] + nmm[i] * dmm * sg; r, c = rc(q)
+        if not (0 <= r < gasse.shape[0] and 0 <= c < gasse.shape[1]): break
+        if gasse[r, c]: letzte, gesehen, leer = dmm, True, 0
+        elif steg[r, c] or haupt[r, c]: leer = 0
+        else:
+            leer += 2
+            if leer > 10: break
+    return letzte if gesehen else 0
+best = None
+for sg in (1, -1):
+    tt = np.array([strahl(i, sg) for i in range(len(M))])
+    if best is None or (tt > 0).sum() > (best[1] > 0).sum(): best = (sg, tt)
+SEITE, tief = best
+x = np.where(tief > 0, np.maximum(0, tief * K - HALF), 0.0); x[x < 1.5] = 0
+x = uniform_filter1d(uniform_filter1d(x, 9, mode='wrap'), 9, mode='wrap')
+x[x < 0.05] = 0
+ii = np.where(x > 0)[0]
+if len(ii) and ii[0] == 0 and ii[-1] == len(x) - 1:
+    k0 = int(np.where(np.diff(ii) > 1)[0][0]) + 1; ii = np.r_[ii[k0:], ii[:k0]]
+for k_, f in enumerate([1 / 4, 2 / 4, 3 / 4]):
+    if len(ii) > 6: x[ii[k_]] *= f; x[ii[-1 - k_]] *= f
+
+on = x > 0
+n_ = len(x); b1 = int(np.where(on)[0][on[np.where(on)[0]].argmax()]) if on.any() else 0
+# Lauf durch Index 0: Anfang = erster Punkt einer zusammenhaengenden Folge, die ueber das Ende laeuft
+b0 = n_ - 1
+while on[b0 - 1]: b0 -= 1
+print('Gasse vor dem Start ab', b0, 'von', n_, ', nach dem Start bis', int(np.argmin(on)) - 1)
+tiles, tile_of = [], np.zeros(len(E), int); i = 0
+while i < len(E):
+    if i == b0:
+        tiles.append('PIT'); tile_of[b0:] = len(tiles) - 1; break
+    jj = min(len(E), i + 14, b0 if i < b0 else len(E))
+    tiles.append('START' if i == 0 else 'STRAIGHT'); tile_of[i:jj] = len(tiles) - 1; i = jj
+versatz = (E.max(0) + E.min(0)) / 2; E = E - versatz
+edv = lambda Q: ed(Q) - versatz
+out = {'name': 'Törnerschleife V3', 'quelle': 'Toernerschleife_V3.dxf (Gnen54), 3,60 x 1,80 m, Layout Driftstrecken.de',
+       'breiteMm': BREITE, 'halb': round(float(HALF), 3), 'kacheln': tiles,
+       'pts': [[round(float(a), 2), round(float(b_), 2), int(tl)] for (a, b_), tl in zip(E, tile_of)]}
+Sm = edv(S); step = max(1, len(Sm) // 160)
+out['steg'] = {'b': round(float(steg.sum() * R * R / (np.hypot(*np.diff(S, axis=0).T).sum() + 1) * K), 2),
+               'pts': [[round(float(a), 2), round(float(b_), 2)] for a, b_ in Sm[::step]]}
+out['boxBucht'] = round(float(np.median(x[x > 0]) / HALF), 2) if (x > 0).any() else 1.0
+out['boxSeite'] = int(SEITE)
+gz = np.argwhere(gasse); gm = mm(gz[len(gz) // 2])
+out['boxPunkt'] = [round(float(v), 2) for v in edv(gm[None])[0]]
+out['buchtPkt'] = [round(float(v), 2) for v in x]
+out['_versatz'] = [round(float(versatz[0]), 3), round(float(versatz[1]), 3)]
+# Gasse als Dreiecke (Ear clipping) + Wandlinien (Kontur an Gras, nicht an Hauptbahn oder Steg)
+# Muendungen: die Gasse reicht bis an das gefahrene Band (halbe Bahn um die Mittellinie), sonst bleibt
+# zwischen Gasse und Bahn ein Streifen Gras (die DXF-Bahn ist dort breiter als das Band).
+mimg = np.full(haupt.shape, 255, np.uint8)
+cv2.polylines(mimg, [np.round(px(np.vstack([M, M[:1]]))).astype(np.int32)], False, 0, 1)
+dmitte = distance_transform_edt(mimg) * R
+HALB_MM = HALF / K
+kand = (alles & ~steg & (dmitte > HALB_MM - 10)).astype(np.uint8)
+n_k, lab_k = cv2.connectedComponents(kand, connectivity=4)
+ids = np.unique(lab_k[gasse & (lab_k > 0)])
+gasse = (np.isin(lab_k, ids) & (lab_k > 0)) | (gasse & ~steg)
+# 25.11. (GEMELDET Gnen54, Tablet: Boxengasse "immer noch zu schmal ... den Gruenstreifen weglassen und als
+# Boxengasse nutzen"): der Steg zwischen Start/Ziel und Gasse (in der DXF 36 mm) gehoert jetzt zur Gasse.
+# Gasse damit 108 statt 72 mm breit (gut 10 Einheiten).
+STEG_ALS_GASSE = False
+if STEG_ALS_GASSE:
+    # um 2 Pixel aufgeweitet: die gezeichnete DXF-Linie zwischen Steg und Gasse liegt in keiner Flaeche
+    steg_g = cv2.dilate(steg.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool) & ~haupt
+    gasse = gasse | steg_g
+print('Gasse mit Muendungen %.0f cm2' % (gasse.sum() * R * R / 100))
+gasse = cv2.morphologyEx(gasse.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)).astype(bool)
+gd = (cv2.dilate(gasse.astype(np.uint8), np.ones((5, 5), np.uint8)) & (alles | (steg_g if STEG_ALS_GASSE else False)).astype(np.uint8))
+n_l, lab = cv2.connectedComponents(gd, connectivity=8)
+gd = (lab == np.bincount(lab.ravel())[1:].argmax() + 1).astype(np.uint8)
+cs, _ = cv2.findContours(gd, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+c = max(cs, key=cv2.contourArea); c = cv2.approxPolyDP(c, 1.2, True)[:, 0, :].astype(float)
+poly = np.c_[c[:, 0] * R + X0, Y0 + H - c[:, 1] * R]
+def flaeche(Q): return 0.5 * np.sum(Q[:, 0] * np.roll(Q[:, 1], -1) - np.roll(Q[:, 0], -1) * Q[:, 1])
+Q = poly if flaeche(poly) > 0 else poly[::-1]
+idx2 = list(range(len(Q))); tri = []
+def innen(p, a, b_, c_):
+    def s_(p1, p2, p3): return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+    d1, d2, d3 = s_(p, a, b_), s_(p, b_, c_), s_(p, c_, a)
+    return not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0))
+guard = 0
+while len(idx2) > 3 and guard < 200000:
+    guard += 1; ok = False
+    for k_ in range(len(idx2)):
+        i0, i1, i2 = idx2[k_ - 1], idx2[k_], idx2[(k_ + 1) % len(idx2)]
+        a, b_, c_ = Q[i0], Q[i1], Q[i2]
+        if (b_[0] - a[0]) * (c_[1] - a[1]) - (b_[1] - a[1]) * (c_[0] - a[0]) <= 0: continue
+        if any(innen(Q[j], a, b_, c_) for j in idx2 if j not in (i0, i1, i2)): continue
+        tri.append((i0, i1, i2)); idx2.pop(k_); ok = True; break
+    if not ok: break
+if len(idx2) == 3: tri.append(tuple(idx2))
+print('Gasse: %d Ecken, %d Dreiecke, Rest %d' % (len(Q), len(tri), len(idx2)))
+EQ = edv(Q)
+out['boxDreiecke'] = [round(float(v), 2) for t_ in tri for j in t_ for v in EQ[j]]
+sd = distance_transform_edt(~steg) * R; hd = distance_transform_edt(~haupt) * R
+cc = max(cv2.findContours(gd, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0], key=cv2.contourArea)[:, 0, :]
+wand = np.array([dmitte[y, x_] > HALB_MM + 14 and sd[y, x_] > 8 for x_, y in cc])
+linien, akt = [], []
+for (x_, y), w in zip(cc, wand):
+    if w: akt.append((x_ * R + X0, Y0 + H - y * R))
+    elif len(akt) > 5: linien.append(np.array(akt)); akt = []
+    else: akt = []
+if len(akt) > 5: linien.append(np.array(akt))
+out['boxRand'] = [[[round(float(a), 2), round(float(b_), 2)] for a, b_ in edv(L[::3])] for L in linien if len(L[::3]) >= 3]
+print('Randlinien', [len(l) for l in out['boxRand']], 'Bucht max %.1f' % x.max(), 'Steg b', out['steg']['b'])
+
+# ---- Startaufstellung (V3): Klammern aus der DXF. Vorn = die Querlinie, die Seiten zeigen nach hinten.
+# Startplatz = Mitte der Querlinie, um eine halbe Autolaenge (App: Auto 9,6 Einheiten lang) nach hinten.
+LINIE_MM = 4.0                                     # Strichbreite der Markierung
+AUTO_HALB = 4.1                                    # Karteneinheiten (Auto in 1:50, ~4,4 m)
+if GITTER:
+    L_ = [s[j] for j in sorted(GITTER)]
+    quer = [P for P in L_ if abs(P[0, 0] - P[1, 0]) < 1e-3]
+    seiten = [P for P in L_ if abs(P[0, 0] - P[1, 0]) >= 1e-3]
+    plaetze, linien_g = [], []
+    for Q in quer:
+        mitte = Q.mean(0)
+        # Seiten dieser Klammer: ein Ende liegt auf einem Ende der Querlinie, das andere zeigt nach hinten
+        hinten = [P[1 - k] for P in seiten for k in (0, 1) if min(np.hypot(*(P[k] - Q[0])), np.hypot(*(P[k] - Q[1]))) < 0.5]
+        rueck = (np.mean(hinten, 0) - mitte) if hinten else np.array([0.0, -1.0])
+        rueck = rueck / (np.hypot(*rueck) or 1)
+        platz_mm = mitte + rueck * (AUTO_HALB / K)
+        plaetze.append(platz_mm)
+    # Reihenfolge: Pole = am naechsten hinter der Startlinie (Index 0 der Mittellinie, Fahrt mit steigendem Index)
+    def hinter_start(p):
+        i = int(np.argmin(np.hypot(*(M - p).T))); return (len(M) - i) % len(M)
+    plaetze.sort(key=hinter_start)
+    hb = LINIE_MM / 2
+    for P in L_:
+        d = P[1] - P[0]; d = d / (np.hypot(*d) or 1)
+        a, b_ = P[0] - d * hb, P[1] + d * hb           # Enden um die halbe Strichbreite verlaengert (Ecken zu)
+        linien_g.append([round(float(v), 2) for v in np.r_[edv(a[None])[0], edv(b_[None])[0]]])
+    out['gitter'] = {'b': round(LINIE_MM * K, 3), 'linien': linien_g,
+                     'plaetze': [[round(float(v), 2) for v in edv(p[None])[0]] for p in plaetze]}
+    print('Startaufstellung:', len(plaetze), 'Plaetze, Pole bei', [round(float(v)) for v in plaetze[0]], 'mm')
+# Markierungen: Boxen gelb, Ein-/Ausfahrt gestrichelt weiss (Gnen54 28.11.)
+def zug(Ps):
+    return [[round(float(v), 2) for v in q] for q in edv(np.asarray(Ps, float)[:, :2])]
+mk = [{'b': round(4.0 * K, 3), 'farbe': [0.92, 0.78, 0.15], 'pts': zug(s[j])} for j in range(60, 69)]
+ein = np.vstack([s[74][:, :2], s[75][1:, :2], s[76][1:, :2], s[77][1:, :2]])
+mk.append({'b': round(4.0 * K, 3), 'farbe': [1, 1, 1], 'strich': [round(25 * K, 2), round(25 * K, 2)], 'pts': zug(ein)})
+mk.append({'b': round(4.0 * K, 3), 'farbe': [1, 1, 1], 'strich': [round(25 * K, 2), round(25 * K, 2)], 'pts': zug(s[79][::6])})
+out['markierungen'] = mk
+json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'img', 'strecken', 'toerner3.json'), 'w'), separators=(',', ':'))
+
