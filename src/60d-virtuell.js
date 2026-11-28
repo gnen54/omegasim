@@ -2275,6 +2275,21 @@
   }
   // Daten einmal je Sitzung und Auto holen (fetch: ueber file:// nicht ladbar, dann bleibt der Kasten).
   let vfModellLaden = {};
+  // 28.11. (Gnen54, privater Zugang ueber Cloudflare Pages): dort darf keine Datei groesser als 25 MiB sein -
+  // tools/cf_bauen.py zerlegt grosse Modelle in auto.teil0.bin, auto.teil1.bin ... und auto.teile.json.
+  // Fehlt auto.bin, werden die Teile geholt und wieder zusammengesetzt.
+  function vfBinTeile(pfad, datei, meta) {
+    const v = '?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb;
+    return fetch(pfad + datei + '.teile.json' + v, { cache: 'no-cache' })
+      .then((r) => { if (!r.ok) throw new Error(datei + '.bin 404'); return r.json(); })
+      .then((t) => Promise.all(Array.from({ length: t.teile }, (_, k) => fetch(pfad + datei + '.teil' + k + '.bin' + v, { cache: 'no-cache' })
+        .then((r) => { if (!r.ok) throw new Error(datei + '.teil' + k + ' ' + r.status); return r.arrayBuffer(); })))
+        .then((teile) => {
+          const ganz = new Uint8Array(teile.reduce((s, b) => s + b.byteLength, 0)); let o = 0;
+          for (const b of teile) { ganz.set(new Uint8Array(b), o); o += b.byteLength; }
+          return ganz.buffer;
+        }));
+  }
   function vfModellDaten(pfad) {
     pfad = pfad || vfModellPfad();
     // 22.11. (GEMELDET Gnen54, Android-Tablet: "furchtbar zu fahren" mit Spider, GT3, Bulli, Manta - ruckelig,
@@ -2298,7 +2313,7 @@
             .catch(() => [meta, 'auto']);
         })
         .then(([meta, datei]) => fetch(pfad + datei + '.bin?v=' + meta.ecken + '-' + meta.indizes + '-' + meta.indexAb, { cache: 'no-cache' })
-          .then((r) => { if (!r.ok) throw new Error(datei + '.bin ' + r.status); return r.arrayBuffer(); })
+          .then((r) => { if (r.ok) return r.arrayBuffer(); if (r.status === 404) return vfBinTeile(pfad, datei, meta); throw new Error(datei + '.bin ' + r.status); })
           .then((bin) => [meta, bin]))
       .then(([meta, bin]) => {
         if (bin.byteLength < meta.indexAb + meta.indizes * 2) throw new Error('auto.bin zu kurz');
